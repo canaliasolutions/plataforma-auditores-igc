@@ -1,6 +1,6 @@
 "use client";
 
-import { useMsal, useAccount } from "@azure/msal-react";
+import { useMsal } from "@azure/msal-react";
 import { AccountInfo } from "@azure/msal-browser";
 
 interface UserProfileProps {
