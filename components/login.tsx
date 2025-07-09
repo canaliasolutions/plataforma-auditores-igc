@@ -9,7 +9,7 @@ interface LoginProps {
 }
 
 export function Login({ onLoginSuccess }: LoginProps) {
-  const { instance, accounts } = useMsal();
+  const { instance } = useMsal();
 
   const handleLogin = async () => {
     try {
