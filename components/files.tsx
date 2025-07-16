@@ -60,15 +60,15 @@ export function Files({ auditId }: FilesProps) {
   const getFileIcon = (type: string) => {
     switch (type) {
       case "document":
-        return "📄";
+        return DescriptionIcon;
       case "image":
-        return "🖼️";
+        return ImageIcon;
       case "evidence":
-        return "📋";
+        return AssignmentIcon;
       case "report":
-        return "📊";
+        return BarChartIcon;
       default:
-        return "📁";
+        return FolderIcon;
     }
   };
 
