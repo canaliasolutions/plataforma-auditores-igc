@@ -1,5 +1,6 @@
 "use client";
 
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import { AuditCard } from "./audit-card";
 import styles from "./Dashboard.module.css";
 
@@ -60,7 +61,10 @@ export function Dashboard({}: DashboardProps) {
       <div className={styles["dashboard-content"]}>
         {filteredAudits.length === 0 ? (
           <div className={styles["empty-state"]}>
-            <div className={styles["empty-icon"]}>📋</div>
+            <AssignmentIcon
+              className={styles["empty-icon"]}
+              sx={{ fontSize: 64 }}
+            />
             <h3 className={styles["empty-title"]}>
               No se encontraron auditorías
             </h3>
