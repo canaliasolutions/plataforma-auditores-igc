@@ -130,7 +130,7 @@
 }
 
 .empty-icon {
-  font-size: 64px;
+  font-size: 64px !important;
   margin-bottom: 24px;
   opacity: 0.5;
 }
