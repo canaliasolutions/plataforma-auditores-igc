@@ -182,7 +182,7 @@ export function Files({ auditId }: FilesProps) {
                       className={styles["download-button"]}
                       title="Descargar archivo"
                     >
-                      ⬇️
+                      <DownloadIcon sx={{ fontSize: 16 }} />
                     </button>
                   </div>
                 </div>
