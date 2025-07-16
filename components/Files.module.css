@@ -167,7 +167,7 @@
 }
 
 .file-icon {
-  font-size: 32px;
+  font-size: 32px !important;
   flex-shrink: 0;
 }
 
