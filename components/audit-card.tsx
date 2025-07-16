@@ -17,6 +17,7 @@ interface AuditCardProps {
 export function AuditCard({
   client,
   standard,
+  stage,
   dateRange,
   status = "scheduled",
   onClick,
@@ -31,32 +32,6 @@ export function AuditCard({
         return "#f39c12"; // Orange
       default:
         return "#00609d"; // Primary
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "#2ecc71"; // Green
-      case "in-progress":
-        return "#f39c12"; // Orange
-      case "pending":
-        return "#e74c3c"; // Red
-      default:
-        return "#00609d"; // Blue
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Completada";
-      case "in-progress":
-        return "En Proceso";
-      case "pending":
-        return "Pendiente";
-      default:
-        return "Programada";
     }
   };
 
@@ -87,21 +62,20 @@ export function AuditCard({
           </div>
           <h3 className="client-name">{client.name}</h3>
         </div>
-        <div
-          className="status-badge"
-          style={{ backgroundColor: getStatusColor(status) }}
-        >
-          {getStatusText(status)}
-        </div>
+
       </div>
 
       <div className="audit-card-body">
         <div className="standard-info">
           <span
-            className="standard-badge"
-            style={{ backgroundColor: getStandardColor(standard) }}
+              className="standard-badge"
           >
             {standard}
+          </span>
+          <span
+              className="standard-badge"
+          >
+            {stage}
           </span>
         </div>
 

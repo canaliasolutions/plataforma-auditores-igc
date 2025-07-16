@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Microsoft Login App",
-  description: "Login with your Microsoft account",
+  title: "Portal de auditores - IGC",
+  description: "Portal de auditores",
 };
 
 export default function RootLayout({

@@ -18,15 +18,6 @@ export function MainApp({ account }: MainAppProps) {
       case "auditorias":
         router.push("/dashboard");
         break;
-      case "clients":
-        router.push("/clients");
-        break;
-      case "reports":
-        router.push("/reports");
-        break;
-      case "settings":
-        router.push("/settings");
-        break;
       default:
         router.push("/dashboard");
     }

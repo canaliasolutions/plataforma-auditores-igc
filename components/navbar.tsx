@@ -24,16 +24,13 @@ export function Navbar({
 
   const tabs = [
     { id: "auditorias", label: "Auditorías" },
-    { id: "clients", label: "Clientes" },
-    { id: "reports", label: "Reportes" },
-    { id: "settings", label: "Configuración" },
   ];
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-brand">
-          <h1 className="brand-title">Sistema de Auditorías</h1>
+          <h1 className="brand-title">Portal de auditores</h1>
         </div>
 
         <div className="navbar-menu">
