@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import styles from "./NonConformities.module.css";
 
 interface NonConformity {
@@ -118,7 +121,8 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           onClick={() => setShowAddForm(true)}
           className={styles["add-button"]}
         >
-          + Agregar No Conformidad
+          <AddIcon sx={{ fontSize: 16, marginRight: 1 }} />
+          Agregar No Conformidad
         </button>
       </div>
 
@@ -131,7 +135,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 onClick={() => setShowAddForm(false)}
                 className={styles["close-button"]}
               >
-                ×
+                <CloseIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
 
