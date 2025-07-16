@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "./AuditCard.module.css";
+
 interface AuditCardProps {
   client: {
     name: string;
@@ -44,55 +46,50 @@ export function AuditCard({
   };
 
   return (
-    <div className="audit-card" onClick={onClick}>
-      <div className="audit-card-header">
-        <div className="client-info">
-          <div className="client-logo">
+    <div className={styles["audit-card"]} onClick={onClick}>
+      <div className={styles["audit-card-header"]}>
+        <div className={styles["client-info"]}>
+          <div className={styles["client-logo"]}>
             {client.logo ? (
               <img
                 src={client.logo}
                 alt={`${client.name} logo`}
-                className="logo-image"
+                className={styles["logo-image"]}
               />
             ) : (
-              <div className="logo-placeholder">
+              <div className={styles["logo-placeholder"]}>
                 {client.name.charAt(0).toUpperCase()}
               </div>
             )}
           </div>
-          <h3 className="client-name">{client.name}</h3>
+          <h3 className={styles["client-name"]}>{client.name}</h3>
         </div>
-
       </div>
 
-      <div className="audit-card-body">
-        <div className="standard-info">
-          <span
-              className="standard-badge"
-          >
-            {standard}
-          </span>
-          <span
-              className="standard-badge"
-          >
-            {stage}
-          </span>
+      <div className={styles["audit-card-body"]}>
+        <div className={styles["standard-info"]}>
+          <span className={styles["standard-badge"]}>{standard}</span>
+          <span className={styles["standard-badge"]}>{stage}</span>
         </div>
 
-        <div className="date-info">
-          <div className="date-item">
-            <span className="date-label">Inicio:</span>
-            <span className="date-value">{formatDate(dateRange.start)}</span>
+        <div className={styles["date-info"]}>
+          <div className={styles["date-item"]}>
+            <span className={styles["date-label"]}>Inicio:</span>
+            <span className={styles["date-value"]}>
+              {formatDate(dateRange.start)}
+            </span>
           </div>
-          <div className="date-item">
-            <span className="date-label">Fin:</span>
-            <span className="date-value">{formatDate(dateRange.end)}</span>
+          <div className={styles["date-item"]}>
+            <span className={styles["date-label"]}>Fin:</span>
+            <span className={styles["date-value"]}>
+              {formatDate(dateRange.end)}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="audit-card-footer">
-        <span className="duration-info">
+      <div className={styles["audit-card-footer"]}>
+        <span className={styles["duration-info"]}>
           Duración:{" "}
           {Math.ceil(
             (new Date(dateRange.end).getTime() -

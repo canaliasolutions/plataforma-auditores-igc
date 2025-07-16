@@ -2,6 +2,7 @@
 
 import { useMsal } from "@azure/msal-react";
 import { AccountInfo } from "@azure/msal-browser";
+import styles from "./Navbar.module.css";
 
 interface NavbarProps {
   account: AccountInfo;
@@ -22,22 +23,20 @@ export function Navbar({
     });
   };
 
-  const tabs = [
-    { id: "auditorias", label: "Auditorías" },
-  ];
+  const tabs = [{ id: "auditorias", label: "Auditorías" }];
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="navbar-brand">
-          <h1 className="brand-title">Portal de auditores</h1>
+    <nav className={styles.navbar}>
+      <div className={styles["navbar-container"]}>
+        <div className={styles["navbar-brand"]}>
+          <h1 className={styles["brand-title"]}>Portal de auditores</h1>
         </div>
 
-        <div className="navbar-menu">
+        <div className={styles["navbar-menu"]}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`nav-tab ${activeTab === tab.id ? "nav-tab-active" : ""}`}
+              className={`${styles["nav-tab"]} ${activeTab === tab.id ? styles["nav-tab-active"] : ""}`}
               onClick={() => onTabChange?.(tab.id)}
             >
               {tab.label}
@@ -45,17 +44,19 @@ export function Navbar({
           ))}
         </div>
 
-        <div className="navbar-user">
-          <div className="user-info">
-            <div className="user-avatar">
+        <div className={styles["navbar-user"]}>
+          <div className={styles["user-info"]}>
+            <div className={styles["user-avatar"]}>
               {account.name ? account.name.charAt(0).toUpperCase() : "U"}
             </div>
-            <div className="user-details">
-              <span className="user-name">{account.name || "Usuario"}</span>
-              <span className="user-email">{account.username}</span>
+            <div className={styles["user-details"]}>
+              <span className={styles["user-name"]}>
+                {account.name || "Usuario"}
+              </span>
+              <span className={styles["user-email"]}>{account.username}</span>
             </div>
           </div>
-          <button onClick={handleLogout} className="logout-btn">
+          <button onClick={handleLogout} className={styles["logout-btn"]}>
             Cerrar Sesión
           </button>
         </div>
