@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AccountInfo } from "@azure/msal-browser";
 import { Navbar } from "./navbar";
 import { Dashboard } from "./dashboard";
@@ -10,35 +10,25 @@ interface MainAppProps {
 }
 
 export function MainApp({ account }: MainAppProps) {
-  const [activeTab, setActiveTab] = useState("auditorias");
+  const router = useRouter();
 
-  const renderContent = () => {
-    switch (activeTab) {
+  const handleTabChange = (tab: string) => {
+    // Navigate to different pages based on tab selection
+    switch (tab) {
       case "auditorias":
-        return <Dashboard />;
+        router.push("/dashboard");
+        break;
       case "clients":
-        return (
-          <div className="page-placeholder">
-            <h2>Gestión de Clientes</h2>
-            <p>Módulo en desarrollo...</p>
-          </div>
-        );
+        router.push("/clients");
+        break;
       case "reports":
-        return (
-          <div className="page-placeholder">
-            <h2>Reportes y Estadísticas</h2>
-            <p>Módulo en desarrollo...</p>
-          </div>
-        );
+        router.push("/reports");
+        break;
       case "settings":
-        return (
-          <div className="page-placeholder">
-            <h2>Configuración del Sistema</h2>
-            <p>Módulo en desarrollo...</p>
-          </div>
-        );
+        router.push("/settings");
+        break;
       default:
-        return <Dashboard />;
+        router.push("/dashboard");
     }
   };
 
@@ -46,10 +36,12 @@ export function MainApp({ account }: MainAppProps) {
     <div className="main-app">
       <Navbar
         account={account}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        activeTab="auditorias"
+        onTabChange={handleTabChange}
       />
-      <main className="main-content">{renderContent()}</main>
+      <main className="main-content">
+        <Dashboard />
+      </main>
     </div>
   );
 }
