@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { AccountInfo } from "@azure/msal-browser";
 import { Navbar } from "./navbar";
 import { Dashboard } from "./dashboard";
+import styles from "./MainApp.module.css";
 
 interface MainAppProps {
   account: AccountInfo;
@@ -24,13 +25,13 @@ export function MainApp({ account }: MainAppProps) {
   };
 
   return (
-    <div className="main-app">
+    <div className={styles["main-app"]}>
       <Navbar
         account={account}
         activeTab="auditorias"
         onTabChange={handleTabChange}
       />
-      <main className="main-content">
+      <main className={styles["main-content"]}>
         <Dashboard />
       </main>
     </div>
