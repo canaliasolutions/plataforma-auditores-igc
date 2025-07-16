@@ -1,5 +1,7 @@
 "use client";
 
+import WarningIcon from "@mui/icons-material/Warning";
+import CloseIcon from "@mui/icons-material/Close";
 import styles from "./ReportGenerationModal.module.css";
 
 interface ReportGenerationModalProps {
@@ -23,12 +25,15 @@ export function ReportGenerationModal({
         <div className={styles["modal-header"]}>
           <h3 className={styles["modal-title"]}>Generar Informe Final</h3>
           <button onClick={onClose} className={styles["close-button"]}>
-            ×
+            <CloseIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
 
         <div className={styles["modal-body"]}>
-          <div className={styles["warning-icon"]}>⚠️</div>
+          <WarningIcon
+            className={styles["warning-icon"]}
+            sx={{ fontSize: 48 }}
+          />
           <div className={styles["warning-content"]}>
             <h4 className={styles["warning-title"]}>Confirmación Requerida</h4>
             <p className={styles["warning-message"]}>
