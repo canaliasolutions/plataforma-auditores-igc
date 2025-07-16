@@ -171,7 +171,10 @@ export function Files({ auditId }: FilesProps) {
               <div key={file.id} className={styles["file-card"]}>
                 <div className={styles["file-header"]}>
                   <div className={styles["file-icon"]}>
-                    {getFileIcon(file.type)}
+                    {(() => {
+                      const IconComponent = getFileIcon(file.type);
+                      return <IconComponent sx={{ fontSize: 32 }} />;
+                    })()}
                   </div>
                   <div className={styles["file-actions"]}>
                     <button
