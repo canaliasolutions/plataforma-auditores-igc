@@ -111,7 +111,10 @@ export function Files({ auditId }: FilesProps) {
     <div className={styles["files-section"]}>
       <div className={styles["section-header"]}>
         <h2 className={styles["section-title"]}>Archivos de la Auditoría</h2>
-        <button className={styles["upload-button"]}>📤 Subir Archivo</button>
+        <button className={styles["upload-button"]}>
+          <UploadIcon sx={{ fontSize: 16, marginRight: 1 }} />
+          Subir Archivo
+        </button>
       </div>
 
       <div className={styles["filters"]}>
