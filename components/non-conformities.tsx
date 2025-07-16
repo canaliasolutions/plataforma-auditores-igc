@@ -232,7 +232,10 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
       <div className={styles["conformities-list"]}>
         {nonConformities.length === 0 ? (
           <div className={styles["empty-state"]}>
-            <div className={styles["empty-icon"]}>✅</div>
+            <CheckCircleIcon
+              className={styles["empty-icon"]}
+              sx={{ fontSize: 64 }}
+            />
             <h3 className={styles["empty-title"]}>No hay no conformidades</h3>
             <p className={styles["empty-description"]}>
               No se han registrado no conformidades para esta auditoría.
