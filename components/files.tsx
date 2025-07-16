@@ -154,7 +154,10 @@ export function Files({ auditId }: FilesProps) {
       <div className={styles["files-list"]}>
         {filteredFiles.length === 0 ? (
           <div className={styles["empty-state"]}>
-            <div className={styles["empty-icon"]}>📁</div>
+            <FolderIcon
+              className={styles["empty-icon"]}
+              sx={{ fontSize: 64 }}
+            />
             <h3 className={styles["empty-title"]}>No hay archivos</h3>
             <p className={styles["empty-description"]}>
               {selectedCategory === "all"
