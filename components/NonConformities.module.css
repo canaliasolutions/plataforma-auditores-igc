@@ -296,6 +296,103 @@
   color: var(--text-secondary);
 }
 
+.date-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-button {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.edit-button:hover {
+  background: #bbdefb;
+  color: #0d47a1;
+}
+
+.delete-button {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.delete-button:hover {
+  background: #ffcdd2;
+  color: #b71c1c;
+}
+
+/* Delete Dialog */
+.delete-dialog {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.delete-header {
+  padding: 24px 24px 0 24px;
+}
+
+.delete-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.delete-content {
+  padding: 16px 24px;
+}
+
+.delete-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 0 24px 24px 24px;
+}
+
+.confirm-delete-button {
+  padding: 12px 20px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirm-delete-button:hover {
+  background: #b71c1c;
+}
+
 .date-info {
   font-style: italic;
 }
@@ -331,7 +428,15 @@
   .card-footer {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
+  }
+
+  .date-section {
+    align-self: stretch;
+  }
+
+  .action-buttons {
+    align-self: flex-end;
   }
 }
 
