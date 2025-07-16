@@ -1,5 +1,8 @@
 "use client";
 
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import WarningIcon from "@mui/icons-material/Warning";
+import FolderIcon from "@mui/icons-material/Folder";
 import styles from "./AuditSubNavigation.module.css";
 
 interface AuditSubNavigationProps {
@@ -12,9 +15,9 @@ export function AuditSubNavigation({
   onTabChange,
 }: AuditSubNavigationProps) {
   const tabs = [
-    { id: "overview", label: "Resumen", icon: "📋" },
-    { id: "non-conformities", label: "No Conformidades", icon: "⚠️" },
-    { id: "files", label: "Archivos", icon: "📁" },
+    { id: "overview", label: "Resumen", icon: AssignmentIcon },
+    { id: "non-conformities", label: "No Conformidades", icon: WarningIcon },
+    { id: "files", label: "Archivos", icon: FolderIcon },
   ];
 
   return (
@@ -26,7 +29,7 @@ export function AuditSubNavigation({
             className={`${styles["nav-tab"]} ${activeTab === tab.id ? styles["nav-tab-active"] : ""}`}
             onClick={() => onTabChange(tab.id)}
           >
-            <span className={styles["tab-icon"]}>{tab.icon}</span>
+            <tab.icon className={styles["tab-icon"]} />
             <span className={styles["tab-label"]}>{tab.label}</span>
           </button>
         ))}
