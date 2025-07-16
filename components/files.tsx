@@ -100,11 +100,11 @@ export function Files({ auditId }: FilesProps) {
   };
 
   const categories = [
-    { id: "all", label: "Todos los archivos", icon: "📁" },
-    { id: "document", label: "Documentos", icon: "📄" },
-    { id: "evidence", label: "Evidencias", icon: "📋" },
-    { id: "image", label: "Imágenes", icon: "🖼️" },
-    { id: "report", label: "Reportes", icon: "📊" },
+    { id: "all", label: "Todos los archivos", icon: FolderIcon },
+    { id: "document", label: "Documentos", icon: DescriptionIcon },
+    { id: "evidence", label: "Evidencias", icon: AssignmentIcon },
+    { id: "image", label: "Imágenes", icon: ImageIcon },
+    { id: "report", label: "Reportes", icon: BarChartIcon },
   ];
 
   return (
