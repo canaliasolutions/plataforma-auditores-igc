@@ -125,7 +125,10 @@ export function Files({ auditId }: FilesProps) {
               className={`${styles["filter-button"]} ${selectedCategory === category.id ? styles["filter-active"] : ""}`}
               onClick={() => setSelectedCategory(category.id)}
             >
-              <span className={styles["filter-icon"]}>{category.icon}</span>
+              <category.icon
+                className={styles["filter-icon"]}
+                sx={{ fontSize: 16 }}
+              />
               <span className={styles["filter-label"]}>{category.label}</span>
             </button>
           ))}
