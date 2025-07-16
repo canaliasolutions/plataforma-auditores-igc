@@ -45,8 +45,7 @@ export function Dashboard({}: DashboardProps) {
   const filteredAudits = mockAudits;
 
   const handleAuditClick = (auditId: number) => {
-    console.log(`Clicked audit ${auditId}`);
-    // TODO: Navigate to audit details page
+    window.location.href = `/dashboard/${auditId}`;
   };
 
   return (
