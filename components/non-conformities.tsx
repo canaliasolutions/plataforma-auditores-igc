@@ -4,8 +4,6 @@ import { useState } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import styles from "./NonConformities.module.css";
 
 interface NonConformity {
@@ -178,13 +176,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
   return (
     <div className={styles["non-conformities"]}>
       <div className={styles["section-header"]}>
-        <h2 className={styles["section-title"]}>No Conformidades</h2>
+        <h2 className={styles["section-title"]}>Hallazgos</h2>
         <button
           onClick={() => setShowAddForm(true)}
           className={styles["add-button"]}
         >
           <AddIcon sx={{ fontSize: 16, marginRight: 1 }} />
-          Agregar No Conformidad
+          Agregar hallazgo
         </button>
       </div>
 
@@ -192,7 +190,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
         <div className={styles["modal-overlay"]}>
           <div className={styles["modal-content"]}>
             <div className={styles["modal-header"]}>
-              <h3 className={styles["modal-title"]}>Nueva No Conformidad</h3>
+              <h3 className={styles["modal-title"]}>Nuevo hallazgo</h3>
               <button
                 onClick={() => setShowAddForm(false)}
                 className={styles["close-button"]}
@@ -283,7 +281,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   Cancelar
                 </button>
                 <button type="submit" className={styles["submit-button"]}>
-                  Agregar No Conformidad
+                  Agregar hallazgo
                 </button>
               </div>
             </form>
@@ -295,7 +293,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
         <div className={styles["modal-overlay"]}>
           <div className={styles["modal-content"]}>
             <div className={styles["modal-header"]}>
-              <h3 className={styles["modal-title"]}>Editar No Conformidad</h3>
+              <h3 className={styles["modal-title"]}>Editar hallazgo</h3>
               <button
                 onClick={() => {
                   setShowEditForm(false);
@@ -404,7 +402,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   Cancelar
                 </button>
                 <button type="submit" className={styles["submit-button"]}>
-                  Actualizar No Conformidad
+                  Actualizar hallazgo
                 </button>
               </div>
             </form>
@@ -421,7 +419,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
 
             <div className={styles["delete-content"]}>
               <p className={styles["delete-message"]}>
-                ¿Estás seguro de que deseas eliminar esta no conformidad? Esta
+                ¿Estás seguro de que deseas eliminar este hallazgo? Esta
                 acción no se puede deshacer.
               </p>
             </div>
@@ -451,9 +449,9 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
               className={styles["empty-icon"]}
               sx={{ fontSize: 64 }}
             />
-            <h3 className={styles["empty-title"]}>No hay no conformidades</h3>
+            <h3 className={styles["empty-title"]}>No hay hallazgos</h3>
             <p className={styles["empty-description"]}>
-              No se han registrado no conformidades para esta auditoría.
+              No se han registrado hallazgos para esta auditoría.
             </p>
           </div>
         ) : (
@@ -500,16 +498,16 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   <button
                     onClick={() => handleEditNonConformity(item)}
                     className={styles["edit-button"]}
-                    title="Editar no conformidad"
+                    title="Editar hallazgo"
                   >
-                    <EditIcon sx={{ fontSize: 16 }} />
+                    Editar
                   </button>
                   <button
                     onClick={() => handleDeleteNonConformity(item.id)}
                     className={styles["delete-button"]}
-                    title="Eliminar no conformidad"
+                    title="Eliminar hallazgo"
                   >
-                    <DeleteIcon sx={{ fontSize: 16 }} />
+                    Eliminar
                   </button>
                 </div>
               </div>

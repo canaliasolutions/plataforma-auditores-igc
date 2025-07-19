@@ -25,7 +25,7 @@ This application provides authentication using Microsoft accounts only. Follow t
 2. Copy the **Application (client) ID**
 3. Update your `.env.local` file:
    ```
-   NEXT_PUBLIC_AZURE_CLIENT_ID=your-copied-client-id-here
+   AZURE_CLIENT_ID=your-copied-client-id-here
    ```
 
 ### 3. Configure Authentication Settings (Optional)
@@ -52,7 +52,7 @@ The app is configured with basic `User.Read` permission by default, which allows
 Make sure to set up your environment variables in `.env.local`:
 
 ```env
-NEXT_PUBLIC_AZURE_CLIENT_ID=your-azure-client-id-here
+AZURE_CLIENT_ID=your-azure-client-id-here
 ```
 
 ## Running the Application

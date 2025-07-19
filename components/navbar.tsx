@@ -3,6 +3,7 @@
 import { useMsal } from "@azure/msal-react";
 import { AccountInfo } from "@azure/msal-browser";
 import styles from "./Navbar.module.css";
+import {useRouter} from "next/navigation";
 
 interface NavbarProps {
   account: AccountInfo;
@@ -13,14 +14,25 @@ interface NavbarProps {
 export function Navbar({
   account,
   activeTab = "auditorias",
-  onTabChange,
 }: NavbarProps) {
-  const { instance } = useMsal();
 
+  const { instance } = useMsal();
+  const router = useRouter();
   const handleLogout = () => {
     instance.logoutPopup({
       postLogoutRedirectUri: window.location.origin,
     });
+  };
+
+  const onTabChange = (tab: string) => {
+    // Navigate to different pages based on tab selection
+    switch (tab) {
+      case "auditorias":
+        router.push("/dashboard");
+        break;
+      default:
+        router.push("/dashboard");
+    }
   };
 
   const tabs = [{ id: "auditorias", label: "Auditorías" }];
@@ -37,7 +49,7 @@ export function Navbar({
             <button
               key={tab.id}
               className={`${styles["nav-tab"]} ${activeTab === tab.id ? styles["nav-tab-active"] : ""}`}
-              onClick={() => onTabChange?.(tab.id)}
+              onClick={() => onTabChange(tab.id)}
             >
               {tab.label}
             </button>

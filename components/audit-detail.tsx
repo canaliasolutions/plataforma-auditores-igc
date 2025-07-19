@@ -7,63 +7,17 @@ import { NonConformities } from "./non-conformities";
 import { Files } from "./files";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
-
-// Mock data for the audit
-const getAuditData = (auditId: string) => {
-  const audits = {
-    "1": {
-      id: 1,
-      client: {
-        name: "Banco Nacional de México",
-        logo: null,
-      },
-      stage: "1er Seguimiento",
-      standard: "ISO 27001" as const,
-      dateRange: {
-        start: "2024-12-15",
-        end: "2024-12-20",
-      },
-      status: "scheduled" as const,
-      description:
-        "Auditoría de seguimiento para verificar la implementación de controles de seguridad de la información según ISO 27001.",
-      auditor: "María González",
-      location: "Ciudad de México, México",
-      scope: "Sistema de gestión de seguridad de la información corporativo",
-    },
-    "2": {
-      id: 2,
-      client: {
-        name: "Grupo Industrial Saltillo",
-        logo: null,
-      },
-      stage: "Renovación",
-      standard: "ISO 9001" as const,
-      dateRange: {
-        start: "2024-12-10",
-        end: "2024-12-18",
-      },
-      status: "in-progress" as const,
-      description:
-        "Auditoría de renovación del certificado ISO 9001 para el sistema de gestión de calidad.",
-      auditor: "Carlos Rodríguez",
-      location: "Saltillo, Coahuila",
-      scope: "Procesos de manufactura y control de calidad",
-    },
-  };
-
-  return audits[auditId as keyof typeof audits] || audits["1"];
-};
+import {Audit} from "@/types/audit";
 
 interface AuditDetailProps {
-  auditId: string;
+  audit: Audit | null;
 }
 
-export function AuditDetail({ auditId }: AuditDetailProps) {
+export function AuditDetail({ audit }: AuditDetailProps) {
+
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const [showReportModal, setShowReportModal] = useState(false);
-
-  const audit = getAuditData(auditId);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("es-ES", {
@@ -74,35 +28,9 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
   };
 
   const getDuration = () => {
-    const start = new Date(audit.dateRange.start);
-    const end = new Date(audit.dateRange.end);
+    const start = new Date(audit.startDate);
+    const end = new Date(audit.endDate);
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return "#f39c12";
-      case "in-progress":
-        return "#3498db";
-      case "completed":
-        return "#2ecc71";
-      default:
-        return "#95a5a6";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return "Programada";
-      case "in-progress":
-        return "En Progreso";
-      case "completed":
-        return "Completada";
-      default:
-        return "Pendiente";
-    }
   };
 
   const renderContent = () => {
@@ -122,8 +50,8 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
                   <span className={styles["info-value"]}>{audit.location}</span>
                 </div>
                 <div className={styles["info-item"]}>
-                  <span className={styles["info-label"]}>Alcance:</span>
-                  <span className={styles["info-value"]}>{audit.scope}</span>
+                  <span className={styles["info-label"]}>Tipo:</span>
+                  <span className={styles["info-value"]}>{audit.type}</span>
                 </div>
                 <div className={styles["info-item"]}>
                   <span className={styles["info-label"]}>Duración:</span>
@@ -134,16 +62,16 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
               </div>
 
               <div className={styles["info-card"]}>
-                <h3 className={styles["info-title"]}>Descripción</h3>
-                <p className={styles["description"]}>{audit.description}</p>
+                <h3 className={styles["info-title"]}>Alcance</h3>
+                <p className={styles["description"]}>{audit.scope}</p>
               </div>
             </div>
           </div>
         );
       case "non-conformities":
-        return <NonConformities auditId={auditId} />;
+        return <NonConformities auditId={audit.id} />;
       case "files":
-        return <Files auditId={auditId} />;
+        return <Files auditId={audit.id} />;
       default:
         return null;
     }
@@ -155,7 +83,6 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
         <button onClick={() => router.back()} className={styles["back-button"]}>
           ← Volver
         </button>
-
         <div className={styles["header-content"]}>
           <div className={styles["header-main"]}>
             <div className={styles["client-section"]}>
@@ -179,12 +106,6 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
                     {audit.standard}
                   </span>
                   <span className={styles["stage-badge"]}>{audit.stage}</span>
-                  <span
-                    className={styles["status-badge"]}
-                    style={{ backgroundColor: getStatusColor(audit.status) }}
-                  >
-                    {getStatusText(audit.status)}
-                  </span>
                 </div>
               </div>
             </div>
@@ -193,13 +114,13 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
               <div className={styles["date-item"]}>
                 <span className={styles["date-label"]}>Fecha de inicio:</span>
                 <span className={styles["date-value"]}>
-                  {formatDate(audit.dateRange.start)}
+                  {formatDate(audit.startDate)}
                 </span>
               </div>
               <div className={styles["date-item"]}>
                 <span className={styles["date-label"]}>Fecha de fin:</span>
                 <span className={styles["date-value"]}>
-                  {formatDate(audit.dateRange.end)}
+                  {formatDate(audit.endDate)}
                 </span>
               </div>
             </div>
@@ -225,7 +146,7 @@ export function AuditDetail({ auditId }: AuditDetailProps) {
           onClose={() => setShowReportModal(false)}
           onConfirm={() => {
             // TODO: Implement report generation
-            console.log("Generating report for audit:", auditId);
+            console.log("Generating report for audit:", audit.id);
             setShowReportModal(false);
           }}
           auditName={audit.client.name}

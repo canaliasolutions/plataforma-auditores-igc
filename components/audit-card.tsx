@@ -1,104 +1,82 @@
 "use client";
 
 import styles from "./AuditCard.module.css";
+import {AuditCard} from "@/types/audit";
 
 interface AuditCardProps {
-  client: {
-    name: string;
-    logo?: string;
-  };
-  standard: "ISO 27001" | "ISO 9001" | "ISO 14001";
-  dateRange: {
-    start: string;
-    end: string;
-  };
-  status?: "scheduled" | "in-progress" | "completed" | "pending";
-  onClick?: () => void;
+    audit: AuditCard,
+    onClick?: () => void,
+    href?: string
 }
 
 export function AuditCard({
-  client,
-  standard,
-  stage,
-  dateRange,
-  status = "scheduled",
-  onClick,
-}: AuditCardProps) {
-  const getStandardColor = (std: string) => {
-    switch (std) {
-      case "ISO 27001":
-        return "#e74c3c"; // Red
-      case "ISO 9001":
-        return "#2ecc71"; // Green
-      case "ISO 14001":
-        return "#f39c12"; // Orange
-      default:
-        return "#00609d"; // Primary
-    }
-  };
+                              audit
+                          }: AuditCardProps) {
+    const getStandardColor = (std: string) => {
+        if (std.includes("27001")) {
+            return "#9bddb6"; // Green
+        }
+        if (std.includes("9001")) {
+            return "#a9cee7"; // Blue
+        }
+        if (std.includes("14001")) {
+            return "#efca8b"; // Orange
+        }
+        return "#7f8c8d"; // Gray
+    };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+    return (
+        <a className={styles["audit-card"]} href={`/auditorias/${audit.id}`}>
+            <div className={styles["audit-card-header"]}>
+                <div className={styles["client-info"]}>
+                    <div className={styles["client-logo"]}>
+                        {audit.client.logo ? (
+                            <img
+                                src={audit.client.logo}
+                                alt={`${audit.client.name} logo`}
+                                className={styles["logo-image"]}
+                            />
+                        ) : (
+                            <div className={styles["logo-placeholder"]}>
+                                {audit.client.name?.charAt(0).toUpperCase()}
+                            </div>
+                        )}
+                    </div>
+                    <h3 className={styles["client-name"]}>{audit.client.name}</h3>
+                </div>
+            </div>
 
-  return (
-    <div className={styles["audit-card"]} onClick={onClick}>
-      <div className={styles["audit-card-header"]}>
-        <div className={styles["client-info"]}>
-          <div className={styles["client-logo"]}>
-            {client.logo ? (
-              <img
-                src={client.logo}
-                alt={`${client.name} logo`}
-                className={styles["logo-image"]}
-              />
-            ) : (
-              <div className={styles["logo-placeholder"]}>
-                {client.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-          <h3 className={styles["client-name"]}>{client.name}</h3>
-        </div>
-      </div>
+            <div className={styles["audit-card-body"]}>
+                <div className={styles["standard-info"]}>
+                    <span className={styles["standard-badge"]}
+                          style={{"backgroundColor": getStandardColor(audit.standard)}}>{audit.standard}</span>
+                    <span className={styles["standard-badge"]}>{audit.stage}</span>
+                </div>
 
-      <div className={styles["audit-card-body"]}>
-        <div className={styles["standard-info"]}>
-          <span className={styles["standard-badge"]}>{standard}</span>
-          <span className={styles["standard-badge"]}>{stage}</span>
-        </div>
-
-        <div className={styles["date-info"]}>
-          <div className={styles["date-item"]}>
-            <span className={styles["date-label"]}>Inicio:</span>
-            <span className={styles["date-value"]}>
-              {formatDate(dateRange.start)}
+                <div className={styles["date-info"]}>
+                    <div className={styles["date-item"]}>
+                        <span className={styles["date-label"]}>Inicio:</span>
+                        <span className={styles["date-value"]}>
+              {new Intl.DateTimeFormat('es-ES', {
+                  dateStyle: 'long',
+                  timeZone: 'America/Panama',
+              }).format(new Date(audit.startDate))}
             </span>
-          </div>
-          <div className={styles["date-item"]}>
-            <span className={styles["date-label"]}>Fin:</span>
-            <span className={styles["date-value"]}>
-              {formatDate(dateRange.end)}
-            </span>
-          </div>
-        </div>
-      </div>
+                    </div>
+                </div>
+            </div>
 
-      <div className={styles["audit-card-footer"]}>
+            <div className={styles["audit-card-footer"]}>
         <span className={styles["duration-info"]}>
           Duración:{" "}
-          {Math.ceil(
-            (new Date(dateRange.end).getTime() -
-              new Date(dateRange.start).getTime()) /
-              (1000 * 60 * 60 * 24),
-          )}{" "}
-          días
+            {Math.ceil(
+                (new Date(audit.endDate).getTime() -
+                    new Date(audit.startDate).getTime()) /
+                (1000 * 60 * 60 * 24),
+            ) + 1}{" "}
+            días
         </span>
-      </div>
-    </div>
-  );
+            </div>
+        </a>
+    );
 }

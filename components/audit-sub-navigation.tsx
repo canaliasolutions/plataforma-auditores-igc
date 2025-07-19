@@ -16,7 +16,7 @@ export function AuditSubNavigation({
 }: AuditSubNavigationProps) {
   const tabs = [
     { id: "overview", label: "Resumen", icon: AssignmentIcon },
-    { id: "non-conformities", label: "No Conformidades", icon: WarningIcon },
+    { id: "non-conformities", label: "Hallazgos", icon: WarningIcon },
     { id: "files", label: "Archivos", icon: FolderIcon },
   ];
 

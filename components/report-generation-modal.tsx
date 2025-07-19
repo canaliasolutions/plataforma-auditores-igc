@@ -44,12 +44,12 @@ export function ReportGenerationModal({
             </div>
             <div className={styles["important-notice"]}>
               <p className={styles["notice-text"]}>
-                <strong>Importante:</strong> Esta acción es{" "}
+                <strong>Importante:</strong> Esta acción es
                 <strong>definitiva</strong> y no se puede deshacer. Una vez
                 generado el informe final:
               </p>
               <ul className={styles["notice-list"]}>
-                <li>No se podrán agregar más no conformidades</li>
+                <li>No se podrán agregar más hallazgos</li>
                 <li>No se podrán modificar los hallazgos existentes</li>
                 <li>El estado de la auditoría cambiará a "Completada"</li>
                 <li>Se enviará automáticamente al cliente</li>

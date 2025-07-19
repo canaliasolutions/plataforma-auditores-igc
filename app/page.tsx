@@ -11,7 +11,7 @@ export default function Home() {
   useEffect(() => {
     // Redirect based on authentication state
     if (accounts.length > 0) {
-      router.push("/dashboard");
+      router.push("/auditorias");
     } else {
       router.push("/login");
     }
