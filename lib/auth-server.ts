@@ -1,137 +1,176 @@
-import jwt from "jsonwebtoken";
-import jwksClient from 'jwks-rsa';
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
-export interface UserInfo {
-    email: string;
-    name?: string;
-    oid: string; // Object ID from Azure AD
+export interface MsalIdTokenClaims {
+    iss: string; // Issuer
+    aud: string; // Audience (your client ID)
+    exp: number; // Expiration time (Unix timestamp)
+    nbf: number; // Not Before time (Unix timestamp)
+    iat: number; // Issued At time (Unix timestamp)
+    oid?: string; // Object ID (unique identifier for the user in Azure AD)
+    sub: string; // Subject (unique identifier for the user)
+    preferred_username?: string; // User's preferred username (often email)
+    name?: string; // User's full name
+    tid?: string;
+    ver?: string; // Version of the token
 }
 
-export interface AuthValidationResult {
+export interface MsalValidationResult {
     isValid: boolean;
-    user?: UserInfo;
     error?: string;
+    claims?: MsalIdTokenClaims; // The verified claims
 }
 
-export const placeholderAccount = {
-    homeAccountId: "a1b2c3d4-e5f6-7890-1234-567890abcdef-tenantId",
-    environment: "login.microsoftonline.com",
-    tenantId: "your-tenant-id-12345",
-    username: "john.doe@example.com",
-    localAccountId: "f1e2d3c4-b5a6-9876-5432-10fedcba9876",
-    name: "John Doe", // Optional property included
-    idToken: "eyJraWQiOiJ...", // A shortened example of a JWT (JSON Web Token)
-    idTokenClaims: {
-        // Optional property included, showing some common claims
-        aud: "your-client-id",
-        iss: "https://login.microsoftonline.com/your-tenant-id-12345/v2.0",
-        iat: 1678886400, // Unix timestamp for 'issued at'
-        exp: 1678890000, // Unix timestamp for 'expiration'
-        name: "John Doe",
-        preferred_username: "john.doe@example.com",
-        oid: "f1e2d3c4-b5a6-9876-5432-10fedcba9876", // Object ID
-        tid: "your-tenant-id-12345", // Tenant ID
-        // Example of a custom claim or other common claims
-        roles: ["user", "admin"],
-        custom_data: { setting: "value" },
-    },
-    nativeAccountId: "some-native-account-identifier", // Optional property
-    authorityType: "MSSTS", // Optional property
-    tenantProfiles: new Map([
-        // Optional property: Example of a Map with tenant profiles
-        [
-            "tenant-id-1",
-            {
-                tenantId: "tenant-id-1",
-                // ... other TenantProfile properties if available
-                isMfaEnabled: true,
-                localAccountId: "123",
-            },
-        ],
-        [
-            "tenant-id-2",
-            {
-                tenantId: "tenant-id-2",
-                // ...
-                isMfaEnabled: false,
-                localAccountId: "123",
-            },
-        ],
-    ]),
-};
+interface OidcMetadata {
+    issuer: string;
+    jwks_uri: string;
+    // You might include other fields if needed, e.g., authorization_endpoint, token_endpoint
+}
 
+const AZURE_AD_CLIENT_ID = process.env.NEXT_PUBLIC_AZURE_CLIENT_ID;
+const AZURE_AD_TENANT_ID = process.env.NEXT_PUBLIC_AZURE_TENANT_ID;
 
-const jwksUri = `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/discovery/v2.0/keys`;
+if (!AZURE_AD_CLIENT_ID || !AZURE_AD_TENANT_ID) {
+    throw new Error("Missing Azure AD environment variables. Please set NEXT_PUBLIC_AZURE_CLIENT_ID and AZURE_TENANT_ID.");
+}
 
-const client = jwksClient({
-    jwksUri: jwksUri,
-    cache: true,             // Cache the signing keys to prevent too many requests to Azure AD
-    rateLimit: true,         // Prevent abuse
-    jwksRequestsPerMinute: 5, // Allow 5 JWKS requests per minute
-});
+let cachedOidcMetadata: OidcMetadata | undefined;
+let lastMetadataFetchTime: number = 0;
+const METADATA_CACHE_DURATION = 60 * 60 * 1000; // Cache for 1 hour
 
-function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
-    if (!header.kid) {
-        return callback(new Error('JWT header missing "kid" (Key ID)'));
+// The JWKSet from jose's createRemoteJWKSet is a function, not a simple object.
+// We cache the function directly.
+let cachedJWKSetFn: ReturnType<typeof createRemoteJWKSet> | undefined;
+let lastJwksFetchTime: number = 0;
+const JWKS_CACHE_DURATION = 60 * 60 * 1000; // Cache for 1 hour
+
+/**
+ * Fetches and caches the OpenID Connect metadata from Azure AD.
+ */
+async function getAzureADOidcMetadata(): Promise<OidcMetadata> {
+    const now = Date.now();
+    if (cachedOidcMetadata && (now - lastMetadataFetchTime < METADATA_CACHE_DURATION)) {
+        return cachedOidcMetadata;
     }
-    client.getSigningKey(header.kid, (err, key) => {
-        if (err) {
-            return callback(err);
+
+    const tenantForMetadataUrl = AZURE_AD_TENANT_ID === 'common' ? 'common' : AZURE_AD_TENANT_ID;
+    const AAD_OIDC_METADATA_URL = `https://login.microsoftonline.com/${tenantForMetadataUrl}/v2.0/.well-known/openid-configuration`;
+
+    try {
+        const oidcResponse = await fetch(AAD_OIDC_METADATA_URL);
+        if (!oidcResponse.ok) {
+            throw new Error(`Failed to fetch OIDC metadata from ${AAD_OIDC_METADATA_URL}: ${oidcResponse.statusText}`);
         }
-        const signingKey = key.getPublicKey();
-        callback(null, signingKey);
-    });
+        const oidcConfig: OidcMetadata = await oidcResponse.json();
+
+        if (!oidcConfig.jwks_uri || !oidcConfig.issuer) {
+            throw new Error('Missing jwks_uri or issuer in OpenID Connect metadata.');
+        }
+
+        cachedOidcMetadata = oidcConfig;
+        lastMetadataFetchTime = now;
+        return oidcConfig;
+
+    } catch (error) {
+        console.error("Error fetching Azure AD OIDC metadata:", error);
+        throw new Error(`Could not retrieve Azure AD OpenID Connect metadata from ${AAD_OIDC_METADATA_URL}: ${error}`);
+    }
+}
+
+/**
+ * Fetches and caches the JWKS from Azure AD using the provided jwksUri,
+ * or retrieves it from OIDC metadata if jwksUri is not provided.
+ */
+async function getAzureADJwkSet(jwksUri?: string): Promise<ReturnType<typeof createRemoteJWKSet>> {
+    const now = Date.now();
+    if (cachedJWKSetFn && (now - lastJwksFetchTime < JWKS_CACHE_DURATION)) {
+        return cachedJWKSetFn;
+    }
+
+    let resolvedJwksUri = jwksUri;
+
+    // If jwksUri not provided, fetch from OIDC metadata
+    if (!resolvedJwksUri) {
+        try {
+            const oidcMetadata = await getAzureADOidcMetadata();
+            resolvedJwksUri = oidcMetadata.jwks_uri;
+        } catch (error) {
+            console.error("Error getting JWKS URI from OIDC metadata:", error);
+            throw new Error("Could not determine JWKS URI for token validation.");
+        }
+    }
+
+    if (!resolvedJwksUri) {
+        throw new Error("JWKS URI is undefined, cannot create JWK Set.");
+    }
+
+    try {
+        const JWKS = createRemoteJWKSet(new URL(resolvedJwksUri));
+        cachedJWKSetFn = JWKS;
+        lastJwksFetchTime = now;
+        return JWKS;
+    } catch (error) {
+        console.error("Error creating remote JWK Set:", error);
+        throw new Error(`Could not create JWK Set from ${resolvedJwksUri}: ${error}`);
+    }
 }
 
 
 /**
- * Production-ready token validation (commented out for development)
- * This would validate the token signature against Azure AD public keys
+ * Validates an MSAL ID Token.
+ * @param idToken The JWT string to validate.
+ * @returns A MsalValidationResult indicating validity and containing claims if valid.
  */
-export async function validateMsalToken(token: string): Promise<AuthValidationResult> {
-    // Ensure required environment variables are set
-    if (!process.env.AZURE_TENANT_ID || !process.env.AZURE_CLIENT_ID) {
-        return { isValid: false, error: 'Missing AZURE_TENANT_ID or AZURE_CLIENT_ID environment variables.' };
+export async function validateMsalToken(idToken: string): Promise<MsalValidationResult> {
+    try {
+        // First, get the OIDC metadata to obtain the official issuer and JWKS URI
+        const oidcMetadata = await getAzureADOidcMetadata();
+        const expectedIssuer = oidcMetadata.issuer; // This is the dynamically obtained issuer
+
+        // Then, get the JWK Set function using the JWKS URI from the metadata
+        // We pass the jwks_uri explicitly to ensure it's from the fetched metadata.
+        const JWKS = await getAzureADJwkSet(oidcMetadata.jwks_uri);
+
+        // Verify the ID token
+        const { payload } = await jwtVerify(idToken, JWKS, {
+            issuer: expectedIssuer, // Use the dynamically fetched issuer here
+            audience: AZURE_AD_CLIENT_ID,
+            algorithms: ['RS256'], // Azure AD typically uses RS256
+        });
+
+        // Ensure the payload conforms to our expected claims interface
+        const claims = payload as MsalIdTokenClaims;
+
+        // Optional: Add any additional custom validation checks for claims here
+        // For example, if you need to ensure 'oid' is present or matches a certain format.
+        if (!claims.oid) {
+            console.warn("ID Token is missing 'oid' claim.");
+            // return { isValid: false, error: "ID Token is missing required 'oid' claim." };
+        }
+
+        return { isValid: true, claims };
+
+    } catch (error: any) { // Use 'any' for the error type for more flexibility in catching
+        console.error("MSAL ID Token validation failed:", error);
+        // Provide more specific error messages based on jose's errors
+        if (error.code === 'ERR_JWT_EXPIRED') {
+            return { isValid: false, error: 'ID Token expired.' };
+        }
+        if (error.code === 'ERR_JWS_INVALID') {
+            return { isValid: false, error: 'ID Token signature is invalid.' };
+        }
+        if (error.code === 'ERR_JWT_AUDIENCE_MISMATCH') {
+            return { isValid: false, error: `ID Token audience mismatch. Expected: ${AZURE_AD_CLIENT_ID}, Actual: ${error.aud}` };
+        }
+        if (error.code === 'ERR_JWT_ISSUER_MISMATCH') {
+            // Log expected and actual for easier debugging
+            const expected = (error as any).expectedIssuer || 'N/A';
+            const actual = (error as any).actualIssuer || 'N/A';
+            console.error(`Issuer Mismatch: Expected "${expected}", Actual "${actual}"`);
+            return { isValid: false, error: `ID Token issuer mismatch. Expected: ${expected}, Actual: ${actual}` };
+        }
+        if (error.code === 'ERR_JWS_NO_MATCHING_KEY') {
+            return { isValid: false, error: 'No matching public key found for token signature.' };
+        }
+        return { isValid: false, error: `Token validation error: ${error.message}` };
     }
-
-    return new Promise((resolve) => {
-        jwt.verify(
-            token,
-            getKey,
-            {
-                algorithms: ['RS256'], // Azure AD uses RS256 for signing
-                issuer: `https://sts.windows.net/${process.env.AZURE_TENANT_ID}/`, // Check token's issuer
-                audience: process.env.AZURE_CLIENT_ID, // Check token's audience (your API's client ID)
-            },
-            (err, decodedToken) => {
-                if (err) {
-                    console.error('JWT verification error:', err.message);
-                    return resolve({ isValid: false, error: `Token verification failed: ${err.message}` });
-                }
-
-                const payload = decodedToken as jwt.JwtPayload; // Cast to JwtPayload
-
-                const userEmail = payload.preferred_username || payload.email;
-                if (!userEmail) {
-                    console.warn('Token missing "preferred_username" or "email" claim.');
-                    return resolve({ isValid: false, error: 'Token missing required user email claim.' });
-                }
-
-                if (payload.tid !== process.env.AZURE_TENANT_ID) {
-                    console.warn('Token "tid" mismatch:', payload.tid, process.env.AZURE_TENANT_ID);
-                    return resolve({ isValid: false, error: 'Token issued by wrong tenant.' });
-                }
-
-
-                resolve({
-                    isValid: true,
-                    user: {
-                        email: userEmail,
-                        oid: payload.oid
-                    },
-                });
-            }
-        );
-    });
 }
-

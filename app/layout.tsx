@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/components/auth-provider";
+import {MsalClientProvider} from "@/components/msal-client-provider";
+import {getSession, UserSessionData} from "@/lib/session-utils";
+import NavbarWrapper from "@/components/navbar-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,18 +20,19 @@ export const metadata: Metadata = {
   description: "Portal de auditores",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
+export default async function RootLayout({children}: Readonly<{
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>{children}</AuthProvider>
-      </body>
-    </html>
-  );
+    const session: UserSessionData | null = await getSession();
+
+    return (
+        <html lang="es">
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                <MsalClientProvider>
+                    <NavbarWrapper userSession={session}></NavbarWrapper>
+                    {children}
+                </MsalClientProvider>
+            </body>
+        </html>
+    );
 }

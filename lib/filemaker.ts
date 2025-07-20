@@ -1,5 +1,5 @@
 import {Client} from 'fm-data-api-client';
-import {Audit, AuditCard, cardAudit} from "@/types/audit";
+import {Audit, AuditCard } from "@/types/audit";
 import {fakeAudits} from "@/lib/fake-data";
 
 // const revisionesClient = new Client(process.env.FM_HOST,  process.env.FM_REVISIONES_DB, process.env.FM_USERNAME, process.env.FM_PWD);
@@ -35,7 +35,6 @@ export async function getAudits(auditorEmail: string): Promise<AuditCard[]> {
         audits.push(audit);
     });
     audits = sortByDate(audits);
-    console.info('Fetched audits: ', audits);
     return audits;
 }
 

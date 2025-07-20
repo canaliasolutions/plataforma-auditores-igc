@@ -1,25 +1,25 @@
 "use client";
 
-import { useMsal } from "@azure/msal-react";
-import { AccountInfo } from "@azure/msal-browser";
 import styles from "./Navbar.module.css";
 import {useRouter} from "next/navigation";
+import { useMsal } from "@azure/msal-react";
 
 interface NavbarProps {
-  account: AccountInfo;
   activeTab?: string;
+  userSession: {
+    email: string;
+    name: string;
+  };
   onTabChange?: (tab: string) => void;
 }
 
 export function Navbar({
-  account,
-  activeTab = "auditorias",
+  activeTab = "auditorias", userSession,
 }: NavbarProps) {
-
   const { instance } = useMsal();
   const router = useRouter();
-  const handleLogout = () => {
-    instance.logoutPopup({
+  const handleLogout = async () => {
+    await instance.logoutPopup({
       postLogoutRedirectUri: window.location.origin,
     });
   };
@@ -28,14 +28,14 @@ export function Navbar({
     // Navigate to different pages based on tab selection
     switch (tab) {
       case "auditorias":
-        router.push("/dashboard");
+        router.push("/auditorias");
         break;
       default:
-        router.push("/dashboard");
+        router.push("/auditorias");
     }
   };
 
-  const tabs = [{ id: "auditorias", label: "Auditorías" }];
+  const tabs = [];
 
   return (
     <nav className={styles.navbar}>
@@ -59,13 +59,13 @@ export function Navbar({
         <div className={styles["navbar-user"]}>
           <div className={styles["user-info"]}>
             <div className={styles["user-avatar"]}>
-              {account.name ? account.name.charAt(0).toUpperCase() : "U"}
+              {userSession.name ? userSession.name.charAt(0).toUpperCase() : "U"}
             </div>
             <div className={styles["user-details"]}>
               <span className={styles["user-name"]}>
-                {account.name || "Usuario"}
+                {userSession.name || "Usuario"}
               </span>
-              <span className={styles["user-email"]}>{account.username}</span>
+              <span className={styles["user-email"]}>{userSession.email}</span>
             </div>
           </div>
           <button onClick={handleLogout} className={styles["logout-btn"]}>

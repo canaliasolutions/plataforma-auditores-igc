@@ -17,8 +17,8 @@
     "@mui/material": "^7.2.0",
     "better-sqlite3": "^12.2.0",
     "fm-data-api-client": "^2.0.3",
-    "jsonwebtoken": "^9.0.2",
-    "jwks-rsa": "^3.2.0",
+    "jose": "^6.0.12",
+    "nanoid": "^5.1.5",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

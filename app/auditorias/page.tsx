@@ -1,7 +1,5 @@
 
-import {Navbar} from "@/components/navbar";
 import { AuditCard } from "@/components/audit-card";
-import { placeholderAccount } from "@/lib/auth-server"
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import styles from "@/components/Dashboard.module.css";
 import {getAudits} from "@/lib/filemaker";
@@ -10,31 +8,9 @@ import {getAudits} from "@/lib/filemaker";
 
 export default async function AuditoriasPage() {
     const audits = await getAudits("jorge.achurra@certificacionglobal.com");
-  //const { accounts } = useMsal();
-  //const router = useRouter();
-
-  // useEffect(() => {
-  //   // If user is not authenticated, redirect to login
-  //   if (accounts.length === 0) {
-  //     router.push("/login");
-  //   }
-  // }, [accounts, router]);
-
-  // Don't render dashboard if not authenticated
-  // if (accounts.length === 0) {
-  //   return (
-  //     <div className="loading-container">
-  //       <div className="loading-spinner">Redirecting to login...</div>
-  //     </div>
-  //   );
-  // }
-
 
   return (
       <div>
-          <Navbar
-              account={placeholderAccount}
-          />
         <main>
           <div className={styles.dashboard}>
             <div className={styles["dashboard-header"]}>
