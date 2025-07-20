@@ -27,8 +27,28 @@ interface ParticipantsProps {
 }
 
 export function Participants({ auditId }: ParticipantsProps) {
-  const [participants, setParticipants] = useState<Participant[]>([]);
+    const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Load participants from database
+  useEffect(() => {
+    loadParticipants();
+  }, [auditId]);
+
+  const loadParticipants = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/participantes?auditoriaId=${auditId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setParticipants(data);
+      }
+    } catch (error) {
+      console.error('Error loading participants:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
