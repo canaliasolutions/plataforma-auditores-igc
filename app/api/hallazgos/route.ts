@@ -1,54 +1,102 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '@/lib/database';
+import { hallazgosQueries } from '@/lib/database';
 
-// GET: Fetch all non-conformities
-export async function GET() {
-  const stmt = db.prepare('SELECT * FROM hallazgos ORDER BY created_at DESC');
-  const nonConformities = stmt.all();
-  return NextResponse.json(nonConformities);
+// GET: Fetch all hallazgos for a specific audit
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const auditoriaId = searchParams.get('auditoriaId');
+
+  if (!auditoriaId) {
+    return NextResponse.json({ error: 'auditoriaId is required' }, { status: 400 });
+  }
+
+  try {
+    const hallazgos = hallazgosQueries.getAll.all(auditoriaId);
+    return NextResponse.json(hallazgos);
+  } catch (error) {
+    console.error('Error fetching hallazgos:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
-// POST: Add a new non-conformity
+// POST: Add a new hallazgo
 export async function POST(req: NextRequest) {
-  const { title, description, status } = await req.json();
-  if (!title) {
-    return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+  try {
+    const { auditoriaId, titulo, descripcion, clausula, severidad, estado, fechaEncontrado } = await req.json();
+
+    if (!auditoriaId || !titulo || !clausula) {
+      return NextResponse.json({
+        error: 'auditoriaId, titulo and clausula are required'
+      }, { status: 400 });
+    }
+
+    const info = hallazgosQueries.create.run(
+      auditoriaId,
+      titulo,
+      descripcion || '',
+      clausula,
+      severidad || 'menor',
+      estado || 'abierto',
+      fechaEncontrado || new Date().toISOString().split('T')[0]
+    );
+
+    const newHallazgo = hallazgosQueries.getById.get(info.lastInsertRowid);
+    return NextResponse.json(newHallazgo, { status: 201 });
+  } catch (error) {
+    console.error('Error creating hallazgo:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-  const stmt = db.prepare(
-    'INSERT INTO non_conformities (title, description, status) VALUES (?, ?, ?)'
-  );
-  const info = stmt.run(title, description || '', status || 'open');
-  const newItem = db.prepare('SELECT * FROM non_conformities WHERE id = ?').get(info.lastInsertRowid);
-  return NextResponse.json(newItem, { status: 201 });
 }
 
-// PUT: Update a non-conformity by id
+// PUT: Update a hallazgo by id
 export async function PUT(req: NextRequest) {
-  const { id, title, description, status } = await req.json();
-  if (!id) {
-    return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+  try {
+    const { id, titulo, descripcion, clausula, severidad, estado, fechaResuelto } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    const info = hallazgosQueries.update.run(
+      titulo,
+      descripcion,
+      clausula,
+      severidad,
+      estado,
+      fechaResuelto,
+      id
+    );
+
+    if (info.changes === 0) {
+      return NextResponse.json({ error: 'Hallazgo not found' }, { status: 404 });
+    }
+
+    const updatedHallazgo = hallazgosQueries.getById.get(id);
+    return NextResponse.json(updatedHallazgo);
+  } catch (error) {
+    console.error('Error updating hallazgo:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-  const stmt = db.prepare(
-    'UPDATE non_conformities SET title = ?, description = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-  );
-  const info = stmt.run(title, description, status, id);
-  if (info.changes === 0) {
-    return NextResponse.json({ error: 'Non-conformity not found' }, { status: 404 });
-  }
-  const updatedItem = db.prepare('SELECT * FROM non_conformities WHERE id = ?').get(id);
-  return NextResponse.json(updatedItem);
 }
 
-// DELETE: Delete a non-conformity by id
+// DELETE: Delete a hallazgo by id
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-  if (!id) {
-    return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+  try {
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    const info = hallazgosQueries.delete.run(id);
+
+    if (info.changes === 0) {
+      return NextResponse.json({ error: 'Hallazgo not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting hallazgo:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-  const stmt = db.prepare('DELETE FROM non_conformities WHERE id = ?');
-  const info = stmt.run(id);
-  if (info.changes === 0) {
-    return NextResponse.json({ error: 'Non-conformity not found' }, { status: 404 });
-  }
-  return NextResponse.json({ success: true });
 }
