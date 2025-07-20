@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -10,13 +10,16 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import styles from "./Participants.module.css";
 
 interface Participant {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
-  attendedFirstMeeting: boolean;
-  attendedLastMeeting: boolean;
-  dateAdded: string;
+  id: number;
+  auditoria_id: string;
+  nombre_completo: string;
+  cargo_rol: string;
+  correo_electronico: string;
+  asistio_reunion_inicial: number;
+  asistio_reunion_cierre: number;
+  fecha_agregado: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
 }
 
 interface ParticipantsProps {
@@ -24,26 +27,8 @@ interface ParticipantsProps {
 }
 
 export function Participants({ auditId }: ParticipantsProps) {
-  const [participants, setParticipants] = useState<Participant[]>([
-    {
-      id: "1",
-      name: "María García López",
-      role: "Responsable de Seguridad",
-      email: "maria.garcia@empresa.com",
-      attendedFirstMeeting: true,
-      attendedLastMeeting: false,
-      dateAdded: "2024-12-16",
-    },
-    {
-      id: "2",
-      name: "Carlos Rodríguez Pérez",
-      role: "Director de TI",
-      email: "carlos.rodriguez@empresa.com",
-      attendedFirstMeeting: true,
-      attendedLastMeeting: true,
-      dateAdded: "2024-12-16",
-    },
-  ]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
