@@ -220,11 +220,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <label className={styles["form-label"]}>Nombre completo:</label>
                 <input
                   type="text"
-                  value={newParticipant.name}
+                                    value={newParticipant.nombre_completo}
                   onChange={(e) =>
                     setNewParticipant({
                       ...newParticipant,
-                      name: e.target.value,
+                                            nombre_completo: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -236,11 +236,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <label className={styles["form-label"]}>Cargo/Rol:</label>
                 <input
                   type="text"
-                  value={newParticipant.role}
+                                    value={newParticipant.cargo_rol}
                   onChange={(e) =>
                     setNewParticipant({
                       ...newParticipant,
-                      role: e.target.value,
+                                            cargo_rol: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -252,11 +252,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <label className={styles["form-label"]}>Correo electrónico:</label>
                 <input
                   type="email"
-                  value={newParticipant.email}
+                                    value={newParticipant.correo_electronico}
                   onChange={(e) =>
                     setNewParticipant({
                       ...newParticipant,
-                      email: e.target.value,
+                                            correo_electronico: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -348,11 +348,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <label className={styles["form-label"]}>Nombre completo:</label>
                 <input
                   type="text"
-                  value={newParticipant.name}
+                                    value={newParticipant.nombre_completo}
                   onChange={(e) =>
                     setNewParticipant({
                       ...newParticipant,
-                      name: e.target.value,
+                                            nombre_completo: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -364,11 +364,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <label className={styles["form-label"]}>Cargo/Rol:</label>
                 <input
                   type="text"
-                  value={newParticipant.role}
+                                    value={newParticipant.cargo_rol}
                   onChange={(e) =>
                     setNewParticipant({
                       ...newParticipant,
-                      role: e.target.value,
+                                            cargo_rol: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -380,11 +380,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <label className={styles["form-label"]}>Correo electrónico:</label>
                 <input
                   type="email"
-                  value={newParticipant.email}
+                                    value={newParticipant.correo_electronico}
                   onChange={(e) =>
                     setNewParticipant({
                       ...newParticipant,
-                      email: e.target.value,
+                                            correo_electronico: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
