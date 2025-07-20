@@ -63,25 +63,42 @@ export function Participants({ auditId }: ParticipantsProps) {
     asistio_reunion_cierre: false,
   });
 
-  const handleAddParticipant = (e: React.FormEvent) => {
+    const handleAddParticipant = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newId = Date.now().toString();
-    const newItem: Participant = {
-      id: newId,
-      ...newParticipant,
-      dateAdded: new Date().toISOString().split("T")[0],
-    };
+    try {
+      const response = await fetch('/api/participantes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          auditoriaId: auditId,
+          nombreCompleto: newParticipant.nombre_completo,
+          cargoRol: newParticipant.cargo_rol,
+          correoElectronico: newParticipant.correo_electronico,
+          asistioReunionInicial: newParticipant.asistio_reunion_inicial,
+          asistioReunionCierre: newParticipant.asistio_reunion_cierre,
+          fechaAgregado: new Date().toISOString().split("T")[0],
+        }),
+      });
 
-    setParticipants([...participants, newItem]);
-    setNewParticipant({
-      name: "",
-      role: "",
-      email: "",
-      attendedFirstMeeting: false,
-      attendedLastMeeting: false,
-    });
-    setShowAddForm(false);
+      if (response.ok) {
+        await loadParticipants(); // Reload the list
+        setNewParticipant({
+          nombre_completo: "",
+          cargo_rol: "",
+          correo_electronico: "",
+          asistio_reunion_inicial: false,
+          asistio_reunion_cierre: false,
+        });
+        setShowAddForm(false);
+      } else {
+        console.error('Error adding participant');
+      }
+    } catch (error) {
+      console.error('Error adding participant:', error);
+    }
   };
 
   const handleEditParticipant = (item: Participant) => {
