@@ -152,7 +152,7 @@ export function Participants({ auditId }: ParticipantsProps) {
     }
   };
 
-  const handleDeleteParticipant = (id: string) => {
+    const handleDeleteParticipant = (id: number) => {
     setDeletingItemId(id);
     setShowDeleteDialog(true);
   };
