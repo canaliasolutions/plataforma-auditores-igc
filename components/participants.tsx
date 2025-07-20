@@ -157,11 +157,25 @@ export function Participants({ auditId }: ParticipantsProps) {
     setShowDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+    const confirmDelete = async () => {
     if (deletingItemId) {
-      setParticipants(
-        participants.filter((item) => item.id !== deletingItemId),
-      );
+      try {
+        const response = await fetch('/api/participantes', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: deletingItemId }),
+        });
+
+        if (response.ok) {
+          await loadParticipants(); // Reload the list
+        } else {
+          console.error('Error deleting participant');
+        }
+      } catch (error) {
+        console.error('Error deleting participant:', error);
+      }
     }
     setDeletingItemId(null);
     setShowDeleteDialog(false);
