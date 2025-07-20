@@ -101,14 +101,14 @@ export function Participants({ auditId }: ParticipantsProps) {
     }
   };
 
-  const handleEditParticipant = (item: Participant) => {
+    const handleEditParticipant = (item: Participant) => {
     setEditingItem(item);
     setNewParticipant({
-      name: item.name,
-      role: item.role,
-      email: item.email,
-      attendedFirstMeeting: item.attendedFirstMeeting,
-      attendedLastMeeting: item.attendedLastMeeting,
+      nombre_completo: item.nombre_completo,
+      cargo_rol: item.cargo_rol,
+      correo_electronico: item.correo_electronico,
+      asistio_reunion_inicial: Boolean(item.asistio_reunion_inicial),
+      asistio_reunion_cierre: Boolean(item.asistio_reunion_cierre),
     });
     setShowEditForm(true);
   };
