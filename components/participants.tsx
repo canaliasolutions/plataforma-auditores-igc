@@ -53,14 +53,14 @@ export function Participants({ auditId }: ParticipantsProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [editingItem, setEditingItem] = useState<Participant | null>(null);
-  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+    const [editingItem, setEditingItem] = useState<Participant | null>(null);
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [newParticipant, setNewParticipant] = useState({
-    name: "",
-    role: "",
-    email: "",
-    attendedFirstMeeting: false,
-    attendedLastMeeting: false,
+    nombre_completo: "",
+    cargo_rol: "",
+    correo_electronico: "",
+    asistio_reunion_inicial: false,
+    asistio_reunion_cierre: false,
   });
 
   const handleAddParticipant = (e: React.FormEvent) => {
