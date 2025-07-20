@@ -1,11 +1,11 @@
 import {Client} from 'fm-data-api-client';
-import {Audit, AuditCard } from "@/types/audit";
+import {Audit, AuditCardType } from "@/types/audit";
 import {fakeAudits} from "@/lib/fake-data";
 
 // const revisionesClient = new Client(process.env.FM_HOST,  process.env.FM_REVISIONES_DB, process.env.FM_USERNAME, process.env.FM_PWD);
 const informesClient = new Client(process.env.FM_HOST, process.env.FM_INFORMES_DB, process.env.FM_USERNAME, process.env.FM_PWD);
 
-export async function getAudits(auditorEmail: string): Promise<AuditCard[]> {
+export async function getAudits(auditorEmail: string): Promise<AuditCardType[]> {
     let audits: Audit[] = [];
     const layout = informesClient.layout('PlataformaAuditorias');
     let records;

@@ -1,10 +1,10 @@
 "use client";
 
 import styles from "./AuditCard.module.css";
-import {AuditCard} from "@/types/audit";
+import {AuditCardType} from "@/types/audit";
 
 interface AuditCardProps {
-    audit: AuditCard,
+    audit: AuditCardType,
     onClick?: () => void,
     href?: string
 }

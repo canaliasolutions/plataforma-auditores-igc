@@ -23,7 +23,6 @@ export interface UserSessionData {
     expiresAt: number; // Unix timestamp
 }
 
-// --- Session Utility Functions ---
 
 /**
  * Creates and signs a new session cookie payload.
@@ -60,7 +59,7 @@ export async function verifySignedSessionCookie(signedSession: string): Promise<
         });
 
         // Basic type assertion and expiry check
-        const sessionData = payload as UserSessionData;
+        const sessionData = payload as unknown as UserSessionData;
 
         // Additional check for expiration (though jwtVerify handles this for 'exp')
         if (sessionData.expiresAt < Math.floor(Date.now() / 1000)) {

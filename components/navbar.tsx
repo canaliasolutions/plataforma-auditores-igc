@@ -3,13 +3,11 @@
 import styles from "./Navbar.module.css";
 import {useRouter} from "next/navigation";
 import { useMsal } from "@azure/msal-react";
+import {UserSessionData} from "@/lib/session-utils";
 
 interface NavbarProps {
   activeTab?: string;
-  userSession: {
-    email: string;
-    name: string;
-  };
+  userSession: UserSessionData
   onTabChange?: (tab: string) => void;
 }
 
@@ -35,7 +33,7 @@ export function Navbar({
     }
   };
 
-  const tabs = [];
+  const tabs: {id:string, label:string}[] = [];
 
   return (
     <nav className={styles.navbar}>

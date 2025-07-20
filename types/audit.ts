@@ -1,4 +1,4 @@
-export interface AuditCard {
+export interface AuditCardType {
     id: number;
     client: {
         name: string;

@@ -1,5 +1,5 @@
-import { getAudits } from "@/lib/filemaker"
 import { validateMsalToken } from "@/lib/auth-server";
+import { getAudits } from "@/lib/filemaker";
 
 export async function GET(req: Request) {
     const authResult = await validateMsalToken(req.headers.get("Authorization") || "");
@@ -9,7 +9,7 @@ export async function GET(req: Request) {
             headers: { "Content-Type": "application/json" },
         });
     }
-    const user = authResult.email!;
+    const user = authResult.claims?.preferred_username ?? 'unknown_user';
     let audits;
     try {
         audits = await getAudits(user);

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     // These claims are from Azure AD and are now trustworthy
     const userForSession: Omit<UserSessionData, 'sessionId' | 'expiresAt'> = {
       userId: validation.claims.oid || validation.claims.sub,
-      email: validation.claims.email || validation.claims.preferred_username || '',
+      email: validation.claims.preferred_username || '',
       name: validation.claims.name
     };
 
