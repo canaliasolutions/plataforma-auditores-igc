@@ -1,4 +1,3 @@
-// components/NavbarWrapper.tsx
 "use client"; // This component MUST be a Client Component to use usePathname
 
 import { usePathname } from 'next/navigation'; // Hook to get the current route

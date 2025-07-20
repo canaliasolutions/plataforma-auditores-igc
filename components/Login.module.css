@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #00609d;
   padding: 20px;
 }
 
@@ -16,6 +16,12 @@
   max-width: 400px;
   width: 100%;
   text-align: center;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
 .login-header {

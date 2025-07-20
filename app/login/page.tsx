@@ -67,22 +67,12 @@ export default function LoginPage() {
         <div className={styles["login-container"]}>
             <div className={styles["login-card"]}>
                 <div className={styles["login-header"]}>
-                    <svg
-                        className={styles["microsoft-logo"]}
-                        width="48"
-                        height="48"
-                        viewBox="0 0 48 48"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <rect width="23" height="23" fill="#F25022" />
-                        <rect x="25" width="23" height="23" fill="#7FBA00" />
-                        <rect y="25" width="23" height="23" fill="#00A4EF" />
-                        <rect x="25" y="25" width="23" height="23" fill="#FFB900" />
-                    </svg>
-                    <h1 className={styles["login-title"]}>Sign in to your account</h1>
+                    <div className={styles["logo-container"]}>
+                        <img alt={"IGC Logo"} src={"/sello_redondo_IGC.png"}></img>
+                    </div>
+                    <h1 className={styles["login-title"]}>Portal de auditores</h1>
                     <p className={styles["login-subtitle"]}>
-                        Use your Microsoft account to access the application
+                        Utiliza tu cuenta de Microsoft de @certificacionglobal.com para acceder al portal de auditorías.
                     </p>
                 </div>
 
@@ -104,13 +94,13 @@ export default function LoginPage() {
                             <rect y="11" width="10" height="10" fill="#00A4EF" />
                             <rect x="11" y="11" width="10" height="10" fill="#FFB900" />
                         </svg>
-                        Sign in with Microsoft
+                        Iniciar sesión
                     </button>
                 </div>
 
                 <div className={styles["login-footer"]}>
                     <p className={styles["privacy-text"]}>
-                        By signing in, you agree to our terms of service and privacy policy.
+                        Iniciar sesión implica la aceptación de los términos y condiciones del portal de auditorías
                     </p>
                 </div>
             </div>

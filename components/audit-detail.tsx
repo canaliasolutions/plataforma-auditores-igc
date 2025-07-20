@@ -27,6 +27,19 @@ export function AuditDetail({ audit }: AuditDetailProps) {
     });
   };
 
+  const getStandardColor = (std: string) => {
+    if (std.includes("27001")) {
+      return "#9bddb6"; // Green
+    }
+    if (std.includes("9001")) {
+      return "#a9cee7"; // Blue
+    }
+    if (std.includes("14001")) {
+      return "#efca8b"; // Orange
+    }
+    return "#7f8c8d"; // Gray
+  };
+
   const getDuration = () => {
     const start = new Date(audit.startDate);
     const end = new Date(audit.endDate);
@@ -102,7 +115,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
               <div className={styles["client-info"]}>
                 <h1 className={styles["client-name"]}>{audit.client.name}</h1>
                 <div className={styles["audit-meta"]}>
-                  <span className={styles["standard-badge"]}>
+                  <span className={styles["standard-badge"]} style={{"backgroundColor": getStandardColor(audit.standard)}}>
                     {audit.standard}
                   </span>
                   <span className={styles["stage-badge"]}>{audit.stage}</span>

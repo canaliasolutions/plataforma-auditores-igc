@@ -16,7 +16,7 @@ export default async function AuditoriasPage() {
             <div className={styles["dashboard-header"]}>
               <h1 className={styles["dashboard-title"]}>Lista de auditorías</h1>
               <p className={styles["dashboard-subtitle"]}>
-                Gestiona y supervisa todas las auditorías programadas
+                Gestiona y supervisa todas tus auditorías programadas
               </p>
             </div>
 
