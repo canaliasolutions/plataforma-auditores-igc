@@ -311,7 +311,8 @@
     margin-bottom: 24px;
   }
 
-  .remote-questions {
+    .remote-questions,
+  .in-situ-questions {
     gap: 24px;
   }
 }
