@@ -148,28 +148,24 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
             en el apartado 2 del presente informe?
           </h3>
           
-          <div className={styles["answer-options"]}>
-            <button
-              type="button"
-              className={`${styles["answer-button"]} ${styles["answer-yes"]} ${
-                conclusions.objetivos_cumplidos === "si" ? styles["answer-selected"] : ""
-              }`}
+          <div className={styles["options-grid"]}>
+            <OptionButton
+              selected={conclusions.objetivos_cumplidos === "si"}
               onClick={() => handleConclusionChange("objetivos_cumplidos", "si")}
+              icon={getOptionIcon("si")}
+              variant="correct"
             >
-              {getOptionIcon("si")}
-              <span className={styles["answer-text"]}>Sí</span>
-            </button>
+              Sí
+            </OptionButton>
 
-            <button
-              type="button"
-              className={`${styles["answer-button"]} ${styles["answer-no"]} ${
-                conclusions.objetivos_cumplidos === "no" ? styles["answer-selected"] : ""
-              }`}
+            <OptionButton
+              selected={conclusions.objetivos_cumplidos === "no"}
               onClick={() => handleConclusionChange("objetivos_cumplidos", "no")}
+              icon={getOptionIcon("no")}
+              variant="error"
             >
-              {getOptionIcon("no")}
-              <span className={styles["answer-text"]}>No</span>
-            </button>
+              No
+            </OptionButton>
           </div>
 
           {conclusions.objetivos_cumplidos === "no" && (
