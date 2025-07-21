@@ -225,10 +225,6 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .question-section {
-    background: #1a1a1a;
-    border-color: #333;
-  }
 
   .answer-button {
     background: #2a2a2a;
