@@ -326,12 +326,12 @@ export function Participants({ auditId }: ParticipantsProps) {
                 onClick={() => {
                   setShowEditForm(false);
                   setEditingItem(null);
-                  setNewParticipant({
-                    name: "",
-                    role: "",
-                    email: "",
-                    attendedFirstMeeting: false,
-                    attendedLastMeeting: false,
+                                    setNewParticipant({
+                    nombre_completo: "",
+                    cargo_rol: "",
+                    correo_electronico: "",
+                    asistio_reunion_inicial: false,
+                    asistio_reunion_cierre: false,
                   });
                 }}
                 className={styles["close-button"]}
