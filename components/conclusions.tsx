@@ -196,39 +196,33 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
             se considera que se encuentra eficazmente implantado?
           </h3>
           
-          <div className={styles["answer-options"]}>
-            <button
-              type="button"
-              className={`${styles["answer-button"]} ${styles["answer-yes"]} ${
-                conclusions.sistema_cumple_norma === "si" ? styles["answer-selected"] : ""
-              }`}
+          <div className={styles["options-grid"]}>
+            <OptionButton
+              selected={conclusions.sistema_cumple_norma === "si"}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "si")}
+              icon={getOptionIcon("si")}
+              variant="correct"
             >
-              {getOptionIcon("si")}
-              <span className={styles["answer-text"]}>Sí</span>
-            </button>
+              Sí
+            </OptionButton>
 
-            <button
-              type="button"
-              className={`${styles["answer-button"]} ${styles["answer-partial"]} ${
-                conclusions.sistema_cumple_norma === "si_excepto_hallazgos" ? styles["answer-selected"] : ""
-              }`}
+            <OptionButton
+              selected={conclusions.sistema_cumple_norma === "si_excepto_hallazgos"}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "si_excepto_hallazgos")}
+              icon={getOptionIcon("si_excepto_hallazgos")}
+              variant="warning"
             >
-              {getOptionIcon("si_excepto_hallazgos")}
-              <span className={styles["answer-text"]}>Sí, salvo por los hallazgos</span>
-            </button>
+              Sí, salvo por los hallazgos
+            </OptionButton>
 
-            <button
-              type="button"
-              className={`${styles["answer-button"]} ${styles["answer-no"]} ${
-                conclusions.sistema_cumple_norma === "no" ? styles["answer-selected"] : ""
-              }`}
+            <OptionButton
+              selected={conclusions.sistema_cumple_norma === "no"}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "no")}
+              icon={getOptionIcon("no")}
+              variant="error"
             >
-              {getOptionIcon("no")}
-              <span className={styles["answer-text"]}>No</span>
-            </button>
+              No
+            </OptionButton>
           </div>
         </div>
       </div>
