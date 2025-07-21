@@ -51,13 +51,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [editingItem, setEditingItem] = useState<NonConformity | null>(null);
-  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+    const [editingItem, setEditingItem] = useState<NonConformity | null>(null);
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [newNonConformity, setNewNonConformity] = useState({
-    title: "",
-    description: "",
-    clause: "",
-    severity: "minor" as const,
+    titulo: "",
+    descripcion: "",
+    clausula: "",
+    severidad: "menor" as const,
   });
 
   const getSeverityColor = (severity: string) => {
