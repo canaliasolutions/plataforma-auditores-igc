@@ -96,12 +96,12 @@ export const hallazgosQueries = {
   getAll: db.prepare('SELECT * FROM hallazgos WHERE auditoria_id = ? ORDER BY fecha_creacion DESC'),
   getById: db.prepare('SELECT * FROM hallazgos WHERE id = ?'),
   create: db.prepare(`
-    INSERT INTO hallazgos (auditoria_id, titulo, descripcion, clausula, severidad, estado, fecha_encontrado)
+    INSERT INTO hallazgos (auditoria_id, titulo, descripcion, clausula, type, severidad, fecha_encontrado)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `),
   update: db.prepare(`
     UPDATE hallazgos
-    SET titulo = ?, descripcion = ?, clausula = ?, severidad = ?, estado = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
+    SET titulo = ?, descripcion = ?, clausula = ?, type = ?, severidad = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
     WHERE id = ?
   `),
   delete: db.prepare('DELETE FROM hallazgos WHERE id = ?')
