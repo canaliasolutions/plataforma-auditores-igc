@@ -73,13 +73,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-  const getSeverityText = (severity: string) => {
+    const getSeverityText = (severity: string) => {
     switch (severity) {
-      case "critical":
+      case "critica":
         return "Crítica";
-      case "major":
+      case "mayor":
         return "Mayor";
-      case "minor":
+      case "menor":
         return "Menor";
       default:
         return "Desconocida";
@@ -88,11 +88,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "open":
+      case "abierto":
         return "Abierta";
-      case "resolved":
+      case "resuelto":
         return "Resuelta";
-      case "pending":
+      case "pendiente":
         return "Pendiente";
       default:
         return "Desconocido";
