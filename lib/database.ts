@@ -89,4 +89,28 @@ export const participantesQueries = {
   delete: db.prepare('DELETE FROM participantes WHERE id = ?')
 };
 
+// Prepare common queries for verificacion_datos
+export const verificacionDatosQueries = {
+  getByAuditId: db.prepare('SELECT * FROM verificacion_datos WHERE auditoria_id = ?'),
+  create: db.prepare(`
+    INSERT INTO verificacion_datos (auditoria_id, datos_contacto, datos_alcance, datos_facturacion, comentarios_verificacion)
+    VALUES (?, ?, ?, ?, ?)
+  `),
+  update: db.prepare(`
+    UPDATE verificacion_datos
+    SET datos_contacto = ?, datos_alcance = ?, datos_facturacion = ?, comentarios_verificacion = ?, fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE auditoria_id = ?
+  `),
+  upsert: db.prepare(`
+    INSERT INTO verificacion_datos (auditoria_id, datos_contacto, datos_alcance, datos_facturacion, comentarios_verificacion)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(auditoria_id) DO UPDATE SET
+      datos_contacto = excluded.datos_contacto,
+      datos_alcance = excluded.datos_alcance,
+      datos_facturacion = excluded.datos_facturacion,
+      comentarios_verificacion = excluded.comentarios_verificacion,
+      fecha_actualizacion = CURRENT_TIMESTAMP
+  `)
+};
+
 export default db;
