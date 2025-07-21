@@ -99,25 +99,41 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-  const handleAddNonConformity = (e: React.FormEvent) => {
+    const handleAddNonConformity = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newId = Date.now().toString();
-    const newItem: NonConformity = {
-      id: newId,
-      ...newNonConformity,
-      status: "open",
-      dateFound: new Date().toISOString().split("T")[0],
-    };
+    try {
+      const response = await fetch('/api/hallazgos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          auditoriaId: auditId,
+          titulo: newNonConformity.titulo,
+          descripcion: newNonConformity.descripcion,
+          clausula: newNonConformity.clausula,
+          severidad: newNonConformity.severidad,
+          estado: "abierto",
+          fechaEncontrado: new Date().toISOString().split("T")[0],
+        }),
+      });
 
-    setNonConformities([...nonConformities, newItem]);
-    setNewNonConformity({
-      title: "",
-      description: "",
-      clause: "",
-      severity: "minor",
-    });
-    setShowAddForm(false);
+      if (response.ok) {
+        await loadHallazgos(); // Reload the list
+        setNewNonConformity({
+          titulo: "",
+          descripcion: "",
+          clausula: "",
+          severidad: "menor",
+        });
+        setShowAddForm(false);
+      } else {
+        console.error('Error adding hallazgo');
+      }
+    } catch (error) {
+      console.error('Error adding hallazgo:', error);
+    }
   };
 
   const handleEditNonConformity = (item: NonConformity) => {
