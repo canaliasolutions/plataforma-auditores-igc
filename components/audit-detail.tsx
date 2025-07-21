@@ -6,6 +6,7 @@ import { AuditSubNavigation } from "./audit-sub-navigation";
 import { NonConformities } from "./non-conformities";
 import { Files } from "./files";
 import { Participants } from "./participants";
+import { DataVerification } from "./data-verification";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
 import {Audit} from "@/types/audit";
