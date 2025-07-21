@@ -98,10 +98,10 @@
 .option-button {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: 8px;
+  padding: 12px 16px;
   border: 2px solid #e0e0e0;
-  border-radius: 12px;
+  border-radius: 8px;
   background: white;
   cursor: pointer;
   transition: all 0.2s;
