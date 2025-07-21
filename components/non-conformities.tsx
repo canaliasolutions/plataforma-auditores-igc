@@ -312,9 +312,9 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     }
                     className={styles["form-select"]}
                   >
-                    <option value="minor">Menor</option>
-                    <option value="major">Mayor</option>
-                    <option value="critical">Crítica</option>
+                                        <option value="menor">Menor</option>
+                    <option value="mayor">Mayor</option>
+                    <option value="critica">Crítica</option>
                   </select>
                 </div>
               </div>
@@ -345,11 +345,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 onClick={() => {
                   setShowEditForm(false);
                   setEditingItem(null);
-                  setNewNonConformity({
-                    title: "",
-                    description: "",
-                    clause: "",
-                    severity: "minor",
+                                    setNewNonConformity({
+                    titulo: "",
+                    descripcion: "",
+                    clausula: "",
+                    severidad: "menor",
                   });
                 }}
                 className={styles["close-button"]}
@@ -424,9 +424,9 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     }
                     className={styles["form-select"]}
                   >
-                    <option value="minor">Menor</option>
-                    <option value="major">Mayor</option>
-                    <option value="critical">Crítica</option>
+                                        <option value="menor">Menor</option>
+                    <option value="mayor">Mayor</option>
+                    <option value="critica">Crítica</option>
                   </select>
                 </div>
               </div>
@@ -506,38 +506,38 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
             <div key={item.id} className={styles["conformity-card"]}>
               <div className={styles["card-header"]}>
                 <div className={styles["title-section"]}>
-                  <h3 className={styles["conformity-title"]}>{item.title}</h3>
+                                    <h3 className={styles["conformity-title"]}>{item.titulo}</h3>
                   <span className={styles["clause-badge"]}>
-                    Cláusula {item.clause}
+                                        Cláusula {item.clausula}
                   </span>
                 </div>
                 <div className={styles["badges"]}>
                   <span
                     className={styles["severity-badge"]}
-                    style={{ backgroundColor: getSeverityColor(item.severity) }}
+                                        style={{ backgroundColor: getSeverityColor(item.severidad) }}
                   >
-                    {getSeverityText(item.severity)}
+                                        {getSeverityText(item.severidad)}
                   </span>
                   <span className={styles["status-badge"]}>
-                    {getStatusText(item.status)}
+                                        {getStatusText(item.estado)}
                   </span>
                 </div>
               </div>
 
               <p className={styles["conformity-description"]}>
-                {item.description}
+                                {item.descripcion}
               </p>
 
               <div className={styles["card-footer"]}>
                 <div className={styles["date-section"]}>
                   <span className={styles["date-info"]}>
                     Encontrada el:{" "}
-                    {new Date(item.dateFound).toLocaleDateString("es-ES")}
+                                          {new Date(item.fecha_encontrado).toLocaleDateString("es-ES")}
                   </span>
-                  {item.dateResolved && (
+                                    {item.fecha_resuelto && (
                     <span className={styles["date-info"]}>
                       Resuelta el:{" "}
-                      {new Date(item.dateResolved).toLocaleDateString("es-ES")}
+                                            {new Date(item.fecha_resuelto).toLocaleDateString("es-ES")}
                     </span>
                   )}
                 </div>
