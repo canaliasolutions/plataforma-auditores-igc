@@ -52,6 +52,19 @@ CREATE TABLE IF NOT EXISTS verificacion_datos (
 );
 `;
 
+// Create the conclusiones (conclusions) table
+const createConclusionesTable = `
+CREATE TABLE IF NOT EXISTS conclusiones (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  auditoria_id TEXT NOT NULL UNIQUE,
+  objetivos_cumplidos TEXT NOT NULL DEFAULT 'si',
+  desviacion_plan TEXT,
+  sistema_cumple_norma TEXT NOT NULL DEFAULT 'si',
+  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
 // Execute table creation
 db.exec(createHallazgosTable);
 db.exec(createParticipantesTable);
