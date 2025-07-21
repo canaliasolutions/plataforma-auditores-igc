@@ -206,8 +206,8 @@
     align-items: stretch;
   }
 
-  .verification-fields {
-    padding: 24px 16px;
+    .verification-fields {
+    margin-bottom: 24px;
   }
 
   .options-grid {
