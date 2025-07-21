@@ -127,4 +127,27 @@ export const verificacionDatosQueries = {
   `)
 };
 
+// Prepare common queries for conclusiones
+export const conclusionesQueries = {
+  getByAuditId: db.prepare('SELECT * FROM conclusiones WHERE auditoria_id = ?'),
+  create: db.prepare(`
+    INSERT INTO conclusiones (auditoria_id, objetivos_cumplidos, desviacion_plan, sistema_cumple_norma)
+    VALUES (?, ?, ?, ?)
+  `),
+  update: db.prepare(`
+    UPDATE conclusiones
+    SET objetivos_cumplidos = ?, desviacion_plan = ?, sistema_cumple_norma = ?, fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE auditoria_id = ?
+  `),
+  upsert: db.prepare(`
+    INSERT INTO conclusiones (auditoria_id, objetivos_cumplidos, desviacion_plan, sistema_cumple_norma)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(auditoria_id) DO UPDATE SET
+      objetivos_cumplidos = excluded.objetivos_cumplidos,
+      desviacion_plan = excluded.desviacion_plan,
+      sistema_cumple_norma = excluded.sistema_cumple_norma,
+      fecha_actualizacion = CURRENT_TIMESTAMP
+  `)
+};
+
 export default db;
