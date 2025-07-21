@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS verificacion_datos (
 // Execute table creation
 db.exec(createHallazgosTable);
 db.exec(createParticipantesTable);
+db.exec(createVerificacionDatosTable);
 
 // Prepare common queries for hallazgos
 export const hallazgosQueries = {
