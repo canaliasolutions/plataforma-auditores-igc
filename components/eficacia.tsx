@@ -7,6 +7,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import SaveIcon from "@mui/icons-material/Save";
 import { Audit } from "@/types/audit";
+import { OptionButton } from "./option-button";
 import styles from "./Eficacia.module.css";
 
 interface EficaciaData {
