@@ -138,19 +138,9 @@
 }
 
 /* Option Icons */
-.option-icon-yes {
-  color: #4caf50;
-  font-size: 20px;
-}
-
-.option-icon-no {
-  color: #f44336;
-  font-size: 20px;
-}
-
-.option-icon-partial {
-  color: #ff9800;
-  font-size: 20px;
+.option-icon {
+  color: var(--text-secondary);
+  font-size: 18px;
 }
 
 /* Deviation Section */
