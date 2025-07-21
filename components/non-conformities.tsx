@@ -476,10 +476,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     setShowEditForm(false);
                     setEditingItem(null);
                     setNewNonConformity({
-                      title: "",
-                      description: "",
-                      clause: "",
-                      severity: "minor",
+                      titulo: "",
+                      descripcion: "",
+                      clausula: "",
+                      type: "OB",
+                      severidad: "menor",
                     });
                   }}
                   className={styles["cancel-button"]}
