@@ -186,16 +186,30 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-  const handleDeleteNonConformity = (id: string) => {
+    const handleDeleteNonConformity = (id: number) => {
     setDeletingItemId(id);
     setShowDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingItemId) {
-      setNonConformities(
-        nonConformities.filter((item) => item.id !== deletingItemId),
-      );
+      try {
+        const response = await fetch('/api/hallazgos', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: deletingItemId }),
+        });
+
+        if (response.ok) {
+          await loadHallazgos(); // Reload the list
+        } else {
+          console.error('Error deleting hallazgo');
+        }
+      } catch (error) {
+        console.error('Error deleting hallazgo:', error);
+      }
     }
     setDeletingItemId(null);
     setShowDeleteDialog(false);
