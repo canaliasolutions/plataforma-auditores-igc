@@ -230,15 +230,6 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .verification-form {
-    background: #1a1a1a;
-    border-color: #333;
-  }
-
-  .verification-intro {
-    background: #2a2a2a;
-    border-bottom-color: #333;
-  }
 
   .option-button {
     background: #2a2a2a;
