@@ -504,15 +504,15 @@ export function Participants({ auditId }: ParticipantsProps) {
             <div key={participant.id} className={styles["participant-card"]}>
               <div className={styles["card-header"]}>
                 <div className={styles["participant-info"]}>
-                  <h3 className={styles["participant-name"]}>{participant.name}</h3>
+                              <h3 className={styles["participant-name"]}>{participant.nombre_completo}</h3>
                   <div className={styles["participant-details"]}>
                     <div className={styles["detail-item"]}>
                       <WorkIcon className={styles["detail-icon"]} />
-                      <span className={styles["detail-text"]}>{participant.role}</span>
+                                            <span className={styles["detail-text"]}>{participant.cargo_rol}</span>
                     </div>
                     <div className={styles["detail-item"]}>
                       <EmailIcon className={styles["detail-icon"]} />
-                      <span className={styles["detail-text"]}>{participant.email}</span>
+                                            <span className={styles["detail-text"]}>{participant.correo_electronico}</span>
                     </div>
                   </div>
                 </div>
@@ -524,7 +524,7 @@ export function Participants({ auditId }: ParticipantsProps) {
                   <div className={styles["attendance-item"]}>
                     <CheckCircleIcon 
                       className={`${styles["attendance-icon"]} ${
-                        participant.attendedFirstMeeting ? styles["attended"] : styles["not-attended"]
+                                                participant.asistio_reunion_inicial ? styles["attended"] : styles["not-attended"]
                       }`}
                     />
                     <span className={styles["attendance-text"]}>
@@ -534,7 +534,7 @@ export function Participants({ auditId }: ParticipantsProps) {
                   <div className={styles["attendance-item"]}>
                     <CheckCircleIcon 
                       className={`${styles["attendance-icon"]} ${
-                        participant.attendedLastMeeting ? styles["attended"] : styles["not-attended"]
+                                                participant.asistio_reunion_cierre ? styles["attended"] : styles["not-attended"]
                       }`}
                     />
                     <span className={styles["attendance-text"]}>
@@ -548,7 +548,7 @@ export function Participants({ auditId }: ParticipantsProps) {
                 <div className={styles["date-section"]}>
                   <span className={styles["date-info"]}>
                     Agregado el:{" "}
-                    {new Date(participant.dateAdded).toLocaleDateString("es-ES")}
+                                        {new Date(participant.fecha_agregado).toLocaleDateString("es-ES")}
                   </span>
                 </div>
                 <div className={styles["action-buttons"]}>
