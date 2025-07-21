@@ -103,8 +103,8 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           titulo: newNonConformity.titulo,
           descripcion: newNonConformity.descripcion,
           clausula: newNonConformity.clausula,
-          severidad: newNonConformity.severidad,
-          estado: "abierto",
+          type: newNonConformity.type,
+          severidad: newNonConformity.type === "NC" ? newNonConformity.severidad : null,
           fechaEncontrado: new Date().toISOString().split("T")[0],
         }),
       });
