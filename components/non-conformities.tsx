@@ -12,7 +12,7 @@ interface NonConformitiesProps {
 }
 
 export function NonConformities({ auditId }: NonConformitiesProps) {
-  const [nonConformities, setNonConformities] = useState<NonConformity[]>([]);
+  const [nonConformities, setNonConformities] = useState<Hallazgo[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load hallazgos from database
@@ -38,12 +38,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [editingItem, setEditingItem] = useState<NonConformity | null>(null);
+    const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [newNonConformity, setNewNonConformity] = useState({
     titulo: "",
     descripcion: "",
     clausula: "",
+    type: "OB" as const,
     severidad: "menor" as const,
   });
 
