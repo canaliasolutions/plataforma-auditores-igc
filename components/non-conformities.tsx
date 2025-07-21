@@ -5,20 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./NonConformities.module.css";
-
-interface NonConformity {
-  id: number;
-  auditoria_id: string;
-  titulo: string;
-  descripcion: string;
-  clausula: string;
-  severidad: "menor" | "mayor" | "critica";
-  estado: "abierto" | "resuelto" | "pendiente";
-  fecha_encontrado: string;
-  fecha_resuelto?: string;
-  fecha_creacion: string;
-  fecha_actualizacion: string;
-}
+import { Hallazgo } from "../types/audit";
 
 interface NonConformitiesProps {
   auditId: string;
