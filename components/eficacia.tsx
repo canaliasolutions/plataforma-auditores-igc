@@ -179,33 +179,27 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
           <h3 className={styles["question-title"]}>
             Tipo de auditoría
           </h3>
-          <div className={styles["radio-options"]}>
-            <button
-              type="button"
-              className={`${styles["radio-button"]} ${
-                eficaciaData.tipo_auditoria === 'in_situ' ? styles["radio-selected"] : ""
-              }`}
+          <div className={styles["options-grid"]}>
+            <OptionButton
+              selected={eficaciaData.tipo_auditoria === 'in_situ'}
               onClick={() => handleDataChange("tipo_auditoria", "in_situ")}
-            >
-              {eficaciaData.tipo_auditoria === 'in_situ' ? 
-                <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+              icon={eficaciaData.tipo_auditoria === 'in_situ' ?
+                <RadioButtonCheckedIcon /> :
+                <RadioButtonUncheckedIcon />
               }
-              <span>In situ</span>
-            </button>
-            <button
-              type="button"
-              className={`${styles["radio-button"]} ${
-                eficaciaData.tipo_auditoria === 'a distancia' ? styles["radio-selected"] : ""
-              }`}
+            >
+              In situ
+            </OptionButton>
+            <OptionButton
+              selected={eficaciaData.tipo_auditoria === 'a distancia'}
               onClick={() => handleDataChange("tipo_auditoria", "a distancia")}
-            >
-              {eficaciaData.tipo_auditoria === 'a distancia' ? 
-                <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+              icon={eficaciaData.tipo_auditoria === 'a distancia' ?
+                <RadioButtonCheckedIcon /> :
+                <RadioButtonUncheckedIcon />
               }
-              <span>A distancia</span>
-            </button>
+            >
+              A distancia
+            </OptionButton>
           </div>
         </div>
 
