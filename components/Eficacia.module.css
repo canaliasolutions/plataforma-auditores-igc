@@ -249,6 +249,13 @@
   gap: 32px;
 }
 
+/* In-Situ Questions */
+.in-situ-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
 /* In-situ Message */
 .in-situ-message {
   text-align: center;
