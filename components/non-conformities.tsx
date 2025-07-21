@@ -115,6 +115,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           titulo: "",
           descripcion: "",
           clausula: "",
+          type: "OB",
           severidad: "menor",
         });
         setShowAddForm(false);
