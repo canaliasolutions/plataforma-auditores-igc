@@ -1,0 +1,75 @@
+/* Option Buttons */
+.option-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  min-height: 48px;
+}
+
+.option-button:hover {
+  border-color: var(--primary);
+  background: #f8f9fa;
+}
+
+.option-selected {
+  border-color: var(--primary);
+  background: #e3f2fd;
+}
+
+.option-text {
+  font-weight: 500;
+  flex: 1;
+}
+
+.option-icon {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+/* Option Color Variants */
+.option-correct.option-selected {
+  background: #e8f5e8;
+  border-color: #4caf50;
+}
+
+.option-error.option-selected {
+  background: #ffebee;
+  border-color: #f44336;
+}
+
+.option-warning.option-selected {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+.option-info.option-selected {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.option-correct.option-selected .option-icon {
+  color: #4caf50;
+}
+
+.option-error.option-selected .option-icon {
+  color: #f44336;
+}
+
+.option-warning.option-selected .option-icon {
+  color: #ff9800;
+}
+
+.option-info.option-selected .option-icon {
+  color: #2196f3;
+}

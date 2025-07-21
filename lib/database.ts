@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS hallazgos (
   titulo TEXT NOT NULL,
   descripcion TEXT,
   clausula TEXT NOT NULL,
-  severidad TEXT NOT NULL DEFAULT 'menor',
-  estado TEXT NOT NULL DEFAULT 'abierto',
+  type TEXT NOT NULL DEFAULT 'OB',
+  severidad TEXT,
   fecha_encontrado TEXT NOT NULL,
   fecha_resuelto TEXT,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -91,17 +91,62 @@ db.exec(createVerificacionDatosTable);
 db.exec(createEficaciaTable);
 db.exec(createConclusionesTable);
 
+// Migration: Add type column and remove estado dependency
+try {
+  // Check if the type column exists
+  const checkColumn = db.prepare("PRAGMA table_info(hallazgos)");
+  const columns = checkColumn.all();
+  const hasTypeColumn = columns.some((col: any) => col.name === 'type');
+
+  if (!hasTypeColumn) {
+    // Add type column with default value
+    db.exec("ALTER TABLE hallazgos ADD COLUMN type TEXT NOT NULL DEFAULT 'OB'");
+    // Make severidad nullable by creating new table and copying data
+    db.exec(`
+      CREATE TABLE hallazgos_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        auditoria_id TEXT NOT NULL,
+        titulo TEXT NOT NULL,
+        descripcion TEXT,
+        clausula TEXT NOT NULL,
+        type TEXT NOT NULL DEFAULT 'OB',
+        severidad TEXT,
+        fecha_encontrado TEXT NOT NULL,
+        fecha_resuelto TEXT,
+        fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+        fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Copy data from old table to new table
+    db.exec(`
+      INSERT INTO hallazgos_new (id, auditoria_id, titulo, descripcion, clausula, type, severidad, fecha_encontrado, fecha_resuelto, fecha_creacion, fecha_actualizacion)
+      SELECT id, auditoria_id, titulo, descripcion, clausula,
+             CASE WHEN estado = 'abierto' THEN 'NC' ELSE 'OB' END as type,
+             severidad, fecha_encontrado, fecha_resuelto, fecha_creacion, fecha_actualizacion
+      FROM hallazgos;
+    `);
+
+    // Drop old table and rename new one
+    db.exec("DROP TABLE hallazgos");
+    db.exec("ALTER TABLE hallazgos_new RENAME TO hallazgos");
+  }
+} catch (error) {
+  // Table might not exist yet or migration already ran
+  console.log('Migration skipped:', error);
+}
+
 // Prepare common queries for hallazgos
 export const hallazgosQueries = {
   getAll: db.prepare('SELECT * FROM hallazgos WHERE auditoria_id = ? ORDER BY fecha_creacion DESC'),
   getById: db.prepare('SELECT * FROM hallazgos WHERE id = ?'),
   create: db.prepare(`
-    INSERT INTO hallazgos (auditoria_id, titulo, descripcion, clausula, severidad, estado, fecha_encontrado)
+    INSERT INTO hallazgos (auditoria_id, titulo, descripcion, clausula, type, severidad, fecha_encontrado)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `),
   update: db.prepare(`
     UPDATE hallazgos
-    SET titulo = ?, descripcion = ?, clausula = ?, severidad = ?, estado = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
+    SET titulo = ?, descripcion = ?, clausula = ?, type = ?, severidad = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
     WHERE id = ?
   `),
   delete: db.prepare('DELETE FROM hallazgos WHERE id = ?')

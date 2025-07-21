@@ -7,6 +7,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import SaveIcon from "@mui/icons-material/Save";
 import { Audit } from "@/types/audit";
+import { OptionButton } from "./option-button";
 import styles from "./Eficacia.module.css";
 
 interface EficaciaData {
@@ -178,33 +179,27 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
           <h3 className={styles["question-title"]}>
             Tipo de auditoría
           </h3>
-          <div className={styles["radio-options"]}>
-            <button
-              type="button"
-              className={`${styles["radio-button"]} ${
-                eficaciaData.tipo_auditoria === 'in_situ' ? styles["radio-selected"] : ""
-              }`}
+          <div className={styles["options-grid"]}>
+            <OptionButton
+              selected={eficaciaData.tipo_auditoria === 'in_situ'}
               onClick={() => handleDataChange("tipo_auditoria", "in_situ")}
-            >
-              {eficaciaData.tipo_auditoria === 'in_situ' ? 
-                <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+              icon={eficaciaData.tipo_auditoria === 'in_situ' ?
+                <RadioButtonCheckedIcon /> :
+                <RadioButtonUncheckedIcon />
               }
-              <span>In situ</span>
-            </button>
-            <button
-              type="button"
-              className={`${styles["radio-button"]} ${
-                eficaciaData.tipo_auditoria === 'a distancia' ? styles["radio-selected"] : ""
-              }`}
+            >
+              In situ
+            </OptionButton>
+            <OptionButton
+              selected={eficaciaData.tipo_auditoria === 'a distancia'}
               onClick={() => handleDataChange("tipo_auditoria", "a distancia")}
-            >
-              {eficaciaData.tipo_auditoria === 'a distancia' ? 
-                <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+              icon={eficaciaData.tipo_auditoria === 'a distancia' ?
+                <RadioButtonCheckedIcon /> :
+                <RadioButtonUncheckedIcon />
               }
-              <span>A distancia</span>
-            </button>
+            >
+              A distancia
+            </OptionButton>
           </div>
         </div>
 
@@ -266,22 +261,19 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               <h3 className={styles["question-title"]}>
                 1. ��Qué medio se utilizó en la auditoría?
               </h3>
-              <div className={styles["radio-options"]}>
+              <div className={styles["options-grid"]}>
                 {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro'].map((option) => (
-                  <button
+                  <OptionButton
                     key={option}
-                    type="button"
-                    className={`${styles["radio-button"]} ${
-                      eficaciaData.medio_utilizado === option ? styles["radio-selected"] : ""
-                    }`}
+                    selected={eficaciaData.medio_utilizado === option}
                     onClick={() => handleDataChange("medio_utilizado", option)}
-                  >
-                    {eficaciaData.medio_utilizado === option ? 
-                      <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                      <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+                    icon={eficaciaData.medio_utilizado === option ?
+                      <RadioButtonCheckedIcon /> :
+                      <RadioButtonUncheckedIcon />
                     }
-                    <span>{option}</span>
-                  </button>
+                  >
+                    {option}
+                  </OptionButton>
                 ))}
               </div>
               {eficaciaData.medio_utilizado === 'Otro' && (
@@ -303,22 +295,20 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               <h3 className={styles["question-title"]}>
                 2. ¿El medio ha sido efectivo para el logro de los objetivos de la auditoría?
               </h3>
-              <div className={styles["radio-options"]}>
+              <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
-                  <button
+                  <OptionButton
                     key={option}
-                    type="button"
-                    className={`${styles["radio-button"]} ${
-                      eficaciaData.medio_efectivo === option ? styles["radio-selected"] : ""
-                    }`}
+                    selected={eficaciaData.medio_efectivo === option}
                     onClick={() => handleDataChange("medio_efectivo", option)}
-                  >
-                    {eficaciaData.medio_efectivo === option ? 
-                      <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                      <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+                    icon={eficaciaData.medio_efectivo === option ?
+                      <RadioButtonCheckedIcon /> :
+                      <RadioButtonUncheckedIcon />
                     }
-                    <span>{option === 'si' ? 'Sí' : 'No'}</span>
-                  </button>
+                    variant={option === 'si' ? 'correct' : 'error'}
+                  >
+                    {option === 'si' ? 'Sí' : 'No'}
+                  </OptionButton>
                 ))}
               </div>
             </div>
@@ -328,22 +318,20 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               <h3 className={styles["question-title"]}>
                 3. ¿Se han presentado inconvenientes o contratiempos durante la auditoría?
               </h3>
-              <div className={styles["radio-options"]}>
+              <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
-                  <button
+                  <OptionButton
                     key={option}
-                    type="button"
-                    className={`${styles["radio-button"]} ${
-                      eficaciaData.inconvenientes_presentados === option ? styles["radio-selected"] : ""
-                    }`}
+                    selected={eficaciaData.inconvenientes_presentados === option}
                     onClick={() => handleDataChange("inconvenientes_presentados", option)}
-                  >
-                    {eficaciaData.inconvenientes_presentados === option ? 
-                      <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                      <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+                    icon={eficaciaData.inconvenientes_presentados === option ?
+                      <RadioButtonCheckedIcon /> :
+                      <RadioButtonUncheckedIcon />
                     }
-                    <span>{option === 'si' ? 'Sí' : 'No'}</span>
-                  </button>
+                    variant={option === 'si' ? 'warning' : 'correct'}
+                  >
+                    {option === 'si' ? 'Sí' : 'No'}
+                  </OptionButton>
                 ))}
               </div>
             </div>

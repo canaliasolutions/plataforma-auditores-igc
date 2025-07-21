@@ -5,27 +5,14 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./NonConformities.module.css";
-
-interface NonConformity {
-  id: number;
-  auditoria_id: string;
-  titulo: string;
-  descripcion: string;
-  clausula: string;
-  severidad: "menor" | "mayor" | "critica";
-  estado: "abierto" | "resuelto" | "pendiente";
-  fecha_encontrado: string;
-  fecha_resuelto?: string;
-  fecha_creacion: string;
-  fecha_actualizacion: string;
-}
+import { Hallazgo } from "../types/audit";
 
 interface NonConformitiesProps {
   auditId: string;
 }
 
 export function NonConformities({ auditId }: NonConformitiesProps) {
-  const [nonConformities, setNonConformities] = useState<NonConformity[]>([]);
+  const [nonConformities, setNonConformities] = useState<Hallazgo[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load hallazgos from database
@@ -51,12 +38,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [editingItem, setEditingItem] = useState<NonConformity | null>(null);
+    const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [newNonConformity, setNewNonConformity] = useState({
     titulo: "",
     descripcion: "",
     clausula: "",
+    type: "OB" as const,
     severidad: "menor" as const,
   });
 
@@ -86,14 +74,16 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "abierto":
-        return "Abierta";
-      case "resuelto":
-        return "Resuelta";
-      case "pendiente":
-        return "Pendiente";
+  const getTypeText = (type: string) => {
+    switch (type) {
+      case "OB":
+        return "Observación";
+      case "NC":
+        return "No conformidad";
+      case "OM":
+        return "Oportunidad de mejora";
+      case "PF":
+        return "Punto fuerte";
       default:
         return "Desconocido";
     }
@@ -113,8 +103,8 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           titulo: newNonConformity.titulo,
           descripcion: newNonConformity.descripcion,
           clausula: newNonConformity.clausula,
-          severidad: newNonConformity.severidad,
-          estado: "abierto",
+          type: newNonConformity.type,
+          severidad: newNonConformity.type === "NC" ? newNonConformity.severidad : null,
           fechaEncontrado: new Date().toISOString().split("T")[0],
         }),
       });
@@ -125,6 +115,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           titulo: "",
           descripcion: "",
           clausula: "",
+          type: "OB",
           severidad: "menor",
         });
         setShowAddForm(false);
@@ -136,13 +127,14 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-    const handleEditNonConformity = (item: NonConformity) => {
+    const handleEditNonConformity = (item: Hallazgo) => {
     setEditingItem(item);
     setNewNonConformity({
       titulo: item.titulo,
       descripcion: item.descripcion,
       clausula: item.clausula,
-      severidad: item.severidad,
+      type: item.type,
+      severidad: item.severidad || "menor",
     });
     setShowEditForm(true);
   };
@@ -162,8 +154,8 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           titulo: newNonConformity.titulo,
           descripcion: newNonConformity.descripcion,
           clausula: newNonConformity.clausula,
-          severidad: newNonConformity.severidad,
-          estado: editingItem.estado,
+          type: newNonConformity.type,
+          severidad: newNonConformity.type === "NC" ? newNonConformity.severidad : null,
           fechaResuelto: editingItem.fecha_resuelto,
         }),
       });
@@ -174,6 +166,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
           titulo: "",
           descripcion: "",
           clausula: "",
+          type: "OB",
           severidad: "menor",
         });
         setEditingItem(null);
@@ -301,6 +294,26 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 </div>
 
                 <div className={styles["form-group"]}>
+                  <label className={styles["form-label"]}>Tipo:</label>
+                  <select
+                    value={newNonConformity.type}
+                    onChange={(e) =>
+                      setNewNonConformity({
+                        ...newNonConformity,
+                        type: e.target.value as any,
+                      })
+                    }
+                    className={styles["form-select"]}
+                    required
+                  >
+                    <option value="OB">Observación</option>
+                    <option value="NC">No conformidad</option>
+                    <option value="OM">Oportunidad de mejora</option>
+                    <option value="PF">Punto fuerte</option>
+                  </select>
+                </div>
+
+                <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
                                         value={newNonConformity.severidad}
@@ -311,6 +324,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                       })
                     }
                     className={styles["form-select"]}
+                    disabled={newNonConformity.type !== "NC"}
                   >
                                         <option value="menor">Menor</option>
                     <option value="mayor">Mayor</option>
@@ -349,6 +363,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     titulo: "",
                     descripcion: "",
                     clausula: "",
+                    type: "OB",
                     severidad: "menor",
                   });
                 }}
@@ -413,6 +428,26 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 </div>
 
                 <div className={styles["form-group"]}>
+                  <label className={styles["form-label"]}>Tipo:</label>
+                  <select
+                    value={newNonConformity.type}
+                    onChange={(e) =>
+                      setNewNonConformity({
+                        ...newNonConformity,
+                        type: e.target.value as any,
+                      })
+                    }
+                    className={styles["form-select"]}
+                    required
+                  >
+                    <option value="OB">Observación</option>
+                    <option value="NC">No conformidad</option>
+                    <option value="OM">Oportunidad de mejora</option>
+                    <option value="PF">Punto fuerte</option>
+                  </select>
+                </div>
+
+                <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
                                         value={newNonConformity.severidad}
@@ -423,6 +458,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                       })
                     }
                     className={styles["form-select"]}
+                    disabled={newNonConformity.type !== "NC"}
                   >
                                         <option value="menor">Menor</option>
                     <option value="mayor">Mayor</option>
@@ -438,10 +474,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     setShowEditForm(false);
                     setEditingItem(null);
                     setNewNonConformity({
-                      title: "",
-                      description: "",
-                      clause: "",
-                      severity: "minor",
+                      titulo: "",
+                      descripcion: "",
+                      clausula: "",
+                      type: "OB",
+                      severidad: "menor",
                     });
                   }}
                   className={styles["cancel-button"]}
@@ -512,15 +549,17 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   </span>
                 </div>
                 <div className={styles["badges"]}>
-                  <span
-                    className={styles["severity-badge"]}
-                                        style={{ backgroundColor: getSeverityColor(item.severidad) }}
-                  >
-                                        {getSeverityText(item.severidad)}
-                  </span>
                   <span className={styles["status-badge"]}>
-                                        {getStatusText(item.estado)}
+                    {getTypeText(item.type)}
                   </span>
+                  {item.type === "NC" && item.severidad && (
+                    <span
+                      className={styles["severity-badge"]}
+                      style={{ backgroundColor: getSeverityColor(item.severidad) }}
+                    >
+                      {getSeverityText(item.severidad)}
+                    </span>
+                  )}
                 </div>
               </div>
 
