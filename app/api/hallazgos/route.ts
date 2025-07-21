@@ -22,11 +22,11 @@ export async function GET(req: NextRequest) {
 // POST: Add a new hallazgo
 export async function POST(req: NextRequest) {
   try {
-    const { auditoriaId, titulo, descripcion, clausula, severidad, estado, fechaEncontrado } = await req.json();
+    const { auditoriaId, titulo, descripcion, clausula, type, severidad, fechaEncontrado } = await req.json();
 
-    if (!auditoriaId || !titulo || !clausula) {
+    if (!auditoriaId || !titulo || !clausula || !type) {
       return NextResponse.json({
-        error: 'auditoriaId, titulo and clausula are required'
+        error: 'auditoriaId, titulo, clausula and type are required'
       }, { status: 400 });
     }
 
@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
       titulo,
       descripcion || '',
       clausula,
-      severidad || 'menor',
-      estado || 'abierto',
+      type,
+      severidad,
       fechaEncontrado || new Date().toISOString().split('T')[0]
     );
 
