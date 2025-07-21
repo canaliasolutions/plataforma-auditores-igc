@@ -136,13 +136,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-  const handleEditNonConformity = (item: NonConformity) => {
+    const handleEditNonConformity = (item: NonConformity) => {
     setEditingItem(item);
     setNewNonConformity({
-      title: item.title,
-      description: item.description,
-      clause: item.clause,
-      severity: item.severity,
+      titulo: item.titulo,
+      descripcion: item.descripcion,
+      clausula: item.clausula,
+      severidad: item.severidad,
     });
     setShowEditForm(true);
   };
