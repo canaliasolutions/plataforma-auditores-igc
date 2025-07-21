@@ -52,6 +52,25 @@ CREATE TABLE IF NOT EXISTS verificacion_datos (
 );
 `;
 
+// Create the eficacia (effectiveness) table
+const createEficaciaTable = `
+CREATE TABLE IF NOT EXISTS eficacia (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  auditoria_id TEXT NOT NULL UNIQUE,
+  tipo_auditoria TEXT NOT NULL DEFAULT 'in_situ',
+  medio_utilizado TEXT,
+  otro_medio TEXT,
+  medio_efectivo TEXT,
+  inconvenientes_presentados TEXT,
+  tipos_inconvenientes TEXT,
+  otros_inconvenientes TEXT,
+  tecnicas_utilizadas TEXT,
+  otras_tecnicas TEXT,
+  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
 // Create the conclusiones (conclusions) table
 const createConclusionesTable = `
 CREATE TABLE IF NOT EXISTS conclusiones (
