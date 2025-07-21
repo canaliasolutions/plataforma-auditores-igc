@@ -17,11 +17,12 @@ export function AuditSubNavigation({
   activeTab,
   onTabChange,
 }: AuditSubNavigationProps) {
-      const tabs = [
+        const tabs = [
     { id: "overview", label: "Resumen", icon: AssignmentIcon },
     { id: "non-conformities", label: "Hallazgos", icon: WarningIcon },
     { id: "participants", label: "Participantes", icon: PeopleIcon },
     { id: "data-verification", label: "Verificación de datos", icon: VerifiedUserIcon },
+    { id: "conclusions", label: "Conclusiones", icon: AssignmentTurnedInIcon },
   ];
 
   return (
