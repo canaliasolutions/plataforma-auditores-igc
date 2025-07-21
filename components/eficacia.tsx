@@ -146,6 +146,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
   }
 
   const isRemoteAudit = eficaciaData.tipo_auditoria === 'a distancia';
+  const isInSituAudit = eficaciaData.tipo_auditoria === 'in_situ';
 
   return (
     <div className={styles["eficacia"]}>
@@ -172,35 +173,90 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
       )}
 
       <div className={styles["eficacia-content"]}>
-        {/* Audit Type Question */}
+        {/* Audit Type Question - Now Selectable */}
         <div className={styles["question-section"]}>
           <h3 className={styles["question-title"]}>
             Tipo de auditoría
           </h3>
-          <div className={styles["audit-type-display"]}>
-            <div className={`${styles["type-indicator"]} ${
-              eficaciaData.tipo_auditoria === 'in_situ' ? styles["type-active"] : ''
-            }`}>
+          <div className={styles["radio-options"]}>
+            <button
+              type="button"
+              className={`${styles["radio-button"]} ${
+                eficaciaData.tipo_auditoria === 'in_situ' ? styles["radio-selected"] : ""
+              }`}
+              onClick={() => handleDataChange("tipo_auditoria", "in_situ")}
+            >
               {eficaciaData.tipo_auditoria === 'in_situ' ? 
                 <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
                 <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
               }
               <span>In situ</span>
-            </div>
-            <div className={`${styles["type-indicator"]} ${
-              eficaciaData.tipo_auditoria === 'a distancia' ? styles["type-active"] : ''
-            }`}>
+            </button>
+            <button
+              type="button"
+              className={`${styles["radio-button"]} ${
+                eficaciaData.tipo_auditoria === 'a distancia' ? styles["radio-selected"] : ""
+              }`}
+              onClick={() => handleDataChange("tipo_auditoria", "a distancia")}
+            >
               {eficaciaData.tipo_auditoria === 'a distancia' ? 
                 <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
                 <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
               }
               <span>A distancia</span>
+            </button>
+          </div>
+        </div>
+
+        {/* In-Situ Audit Questions */}
+        {isInSituAudit && (
+          <div className={styles["in-situ-questions"]}>
+            {/* Question: Evidence Collection Techniques for In-Situ */}
+            <div className={styles["question-section"]}>
+              <h3 className={styles["question-title"]}>
+                1. Indique las técnicas utilizadas para la recopilación y verificación de las evidencias
+              </h3>
+              <p className={styles["question-subtitle"]}>Seleccione todas las opciones que apliquen:</p>
+              <div className={styles["checkbox-options"]}>
+                {[
+                  'Entrevistas con responsables, trabajadores, personal',
+                  'revisión de registros',
+                  'recorrido por las instalaciones',
+                  'observación en sitio de procesos y actividades',
+                  'observación en sitio de actividades técnicas',
+                  'otro'
+                ].map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`${styles["checkbox-button"]} ${
+                      isOptionSelected("tecnicas_utilizadas", option) ? styles["checkbox-selected"] : ""
+                    }`}
+                    onClick={() => handleMultipleChoice("tecnicas_utilizadas", option, !isOptionSelected("tecnicas_utilizadas", option))}
+                  >
+                    {isOptionSelected("tecnicas_utilizadas", option) ? 
+                      <CheckBoxIcon className={styles["checkbox-icon"]} /> : 
+                      <CheckBoxOutlineBlankIcon className={styles["checkbox-icon"]} />
+                    }
+                    <span className={styles["option-text"]}>{option}</span>
+                  </button>
+                ))}
+              </div>
+              {isOptionSelected("tecnicas_utilizadas", "otro") && (
+                <div className={styles["other-input-section"]}>
+                  <label className={styles["input-label"]}>Especifique cuál:</label>
+                  <input
+                    type="text"
+                    value={eficaciaData.otras_tecnicas}
+                    onChange={(e) => handleDataChange("otras_tecnicas", e.target.value)}
+                    placeholder="Indique otras técnicas utilizadas"
+                    className={styles["text-input"]}
+                  />
+                </div>
+              )}
             </div>
           </div>
-          <p className={styles["info-text"]}>
-            Tipo de auditoría determinado automáticamente según los datos del proyecto.
-          </p>
-        </div>
+        )}
 
         {/* Remote Audit Questions */}
         {isRemoteAudit && (
@@ -208,7 +264,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
             {/* Question 1: Medium Used */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
-                1. ¿Qué medio se utilizó en la auditoría?
+                1. ��Qué medio se utilizó en la auditoría?
               </h3>
               <div className={styles["radio-options"]}>
                 {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro'].map((option) => (
@@ -338,7 +394,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               </div>
             )}
 
-            {/* Question 5: Techniques Used */}
+            {/* Question 5: Remote Techniques Used */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
                 5. Indique las técnicas utilizadas para la recopilación y verificación de las evidencias
@@ -385,15 +441,6 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                 </div>
               )}
             </div>
-          </div>
-        )}
-
-        {/* In-situ message */}
-        {!isRemoteAudit && (
-          <div className={styles["in-situ-message"]}>
-            <p className={styles["message-text"]}>
-              Para auditorías realizadas in situ, no se requieren datos adicionales de eficacia.
-            </p>
           </div>
         )}
       </div>
