@@ -269,11 +269,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                   <label className={styles["checkbox-label"]}>
                     <input
                       type="checkbox"
-                      checked={newParticipant.attendedFirstMeeting}
+                                            checked={newParticipant.asistio_reunion_inicial}
                       onChange={(e) =>
                         setNewParticipant({
                           ...newParticipant,
-                          attendedFirstMeeting: e.target.checked,
+                                                  asistio_reunion_inicial: e.target.checked,
                         })
                       }
                       className={styles["checkbox"]}
@@ -286,11 +286,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                   <label className={styles["checkbox-label"]}>
                     <input
                       type="checkbox"
-                      checked={newParticipant.attendedLastMeeting}
+                                            checked={newParticipant.asistio_reunion_cierre}
                       onChange={(e) =>
                         setNewParticipant({
                           ...newParticipant,
-                          attendedLastMeeting: e.target.checked,
+                                                  asistio_reunion_cierre: e.target.checked,
                         })
                       }
                       className={styles["checkbox"]}
@@ -397,11 +397,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                   <label className={styles["checkbox-label"]}>
                     <input
                       type="checkbox"
-                      checked={newParticipant.attendedFirstMeeting}
+                                            checked={newParticipant.asistio_reunion_inicial}
                       onChange={(e) =>
                         setNewParticipant({
                           ...newParticipant,
-                          attendedFirstMeeting: e.target.checked,
+                                                  asistio_reunion_inicial: e.target.checked,
                         })
                       }
                       className={styles["checkbox"]}
@@ -414,11 +414,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                   <label className={styles["checkbox-label"]}>
                     <input
                       type="checkbox"
-                      checked={newParticipant.attendedLastMeeting}
+                                            checked={newParticipant.asistio_reunion_cierre}
                       onChange={(e) =>
                         setNewParticipant({
                           ...newParticipant,
-                          attendedLastMeeting: e.target.checked,
+                                                  asistio_reunion_cierre: e.target.checked,
                         })
                       }
                       className={styles["checkbox"]}
