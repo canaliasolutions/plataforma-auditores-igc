@@ -38,6 +38,20 @@ CREATE TABLE IF NOT EXISTS participantes (
 );
 `;
 
+// Create the verificacion_datos (data verification) table
+const createVerificacionDatosTable = `
+CREATE TABLE IF NOT EXISTS verificacion_datos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  auditoria_id TEXT NOT NULL UNIQUE,
+  datos_contacto TEXT NOT NULL DEFAULT 'correcto',
+  datos_alcance TEXT NOT NULL DEFAULT 'correcto',
+  datos_facturacion TEXT NOT NULL DEFAULT 'correcto',
+  comentarios_verificacion TEXT,
+  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
 // Execute table creation
 db.exec(createHallazgosTable);
 db.exec(createParticipantesTable);
