@@ -254,11 +254,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <label className={styles["form-label"]}>Título:</label>
                 <input
                   type="text"
-                  value={newNonConformity.title}
+                                    value={newNonConformity.titulo}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      title: e.target.value,
+                                            titulo: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -269,11 +269,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
               <div className={styles["form-group"]}>
                 <label className={styles["form-label"]}>Descripción:</label>
                 <textarea
-                  value={newNonConformity.description}
+                                    value={newNonConformity.descripcion}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      description: e.target.value,
+                                            descripcion: e.target.value,
                     })
                   }
                   className={styles["form-textarea"]}
@@ -287,11 +287,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   <label className={styles["form-label"]}>Cláusula:</label>
                   <input
                     type="text"
-                    value={newNonConformity.clause}
+                                        value={newNonConformity.clausula}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        clause: e.target.value,
+                                                clausula: e.target.value,
                       })
                     }
                     className={styles["form-input"]}
@@ -303,11 +303,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
-                    value={newNonConformity.severity}
+                                        value={newNonConformity.severidad}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        severity: e.target.value as any,
+                                                severidad: e.target.value as any,
                       })
                     }
                     className={styles["form-select"]}
@@ -366,11 +366,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <label className={styles["form-label"]}>Título:</label>
                 <input
                   type="text"
-                  value={newNonConformity.title}
+                                    value={newNonConformity.titulo}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      title: e.target.value,
+                                            titulo: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -381,11 +381,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
               <div className={styles["form-group"]}>
                 <label className={styles["form-label"]}>Descripción:</label>
                 <textarea
-                  value={newNonConformity.description}
+                                    value={newNonConformity.descripcion}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      description: e.target.value,
+                                            descripcion: e.target.value,
                     })
                   }
                   className={styles["form-textarea"]}
@@ -399,11 +399,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   <label className={styles["form-label"]}>Cláusula:</label>
                   <input
                     type="text"
-                    value={newNonConformity.clause}
+                                        value={newNonConformity.clausula}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        clause: e.target.value,
+                                                clausula: e.target.value,
                       })
                     }
                     className={styles["form-input"]}
@@ -415,11 +415,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
-                    value={newNonConformity.severity}
+                                        value={newNonConformity.severidad}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        severity: e.target.value as any,
+                                                severidad: e.target.value as any,
                       })
                     }
                     className={styles["form-select"]}
