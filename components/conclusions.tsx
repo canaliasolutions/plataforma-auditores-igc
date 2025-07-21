@@ -92,18 +92,16 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
     }
   };
 
-  const getOptionIcon = (option: string, isSelected: boolean) => {
-    if (!isSelected) return null;
-    
+  const getOptionIcon = (option: string) => {
     switch (option) {
       case "si":
-        return <CheckCircleIcon className={styles["option-icon-yes"]} />;
+        return <CheckCircleIcon className={styles["option-icon"]} />;
       case "no":
-        return <CancelIcon className={styles["option-icon-no"]} />;
+        return <CancelIcon className={styles["option-icon"]} />;
       case "si_excepto_hallazgos":
-        return <WarningIcon className={styles["option-icon-partial"]} />;
+        return <WarningIcon className={styles["option-icon"]} />;
       default:
-        return null;
+        return <CheckCircleIcon className={styles["option-icon"]} />;
     }
   };
 
@@ -157,7 +155,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
               }`}
               onClick={() => handleConclusionChange("objetivos_cumplidos", "si")}
             >
-              {getOptionIcon("si", conclusions.objetivos_cumplidos === "si")}
+              {getOptionIcon("si")}
               <span className={styles["answer-text"]}>Sí</span>
             </button>
 
@@ -168,7 +166,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
               }`}
               onClick={() => handleConclusionChange("objetivos_cumplidos", "no")}
             >
-              {getOptionIcon("no", conclusions.objetivos_cumplidos === "no")}
+              {getOptionIcon("no")}
               <span className={styles["answer-text"]}>No</span>
             </button>
           </div>
@@ -209,7 +207,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
               }`}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "si")}
             >
-              {getOptionIcon("si", conclusions.sistema_cumple_norma === "si")}
+              {getOptionIcon("si")}
               <span className={styles["answer-text"]}>Sí</span>
             </button>
 
@@ -220,7 +218,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
               }`}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "si_excepto_hallazgos")}
             >
-              {getOptionIcon("si_excepto_hallazgos", conclusions.sistema_cumple_norma === "si_excepto_hallazgos")}
+              {getOptionIcon("si_excepto_hallazgos")}
               <span className={styles["answer-text"]}>Sí, salvo por los hallazgos</span>
             </button>
 
@@ -231,7 +229,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
               }`}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "no")}
             >
-              {getOptionIcon("no", conclusions.sistema_cumple_norma === "no")}
+              {getOptionIcon("no")}
               <span className={styles["answer-text"]}>No</span>
             </button>
           </div>
