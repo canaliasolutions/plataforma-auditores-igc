@@ -446,9 +446,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     <option value="PF">Punto fuerte</option>
                   </select>
                 </div>
-              </div>
 
-              {newNonConformity.type === "NC" && (
                 <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
@@ -460,13 +458,14 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                       })
                     }
                     className={styles["form-select"]}
+                    disabled={newNonConformity.type !== "NC"}
                   >
                                         <option value="menor">Menor</option>
                     <option value="mayor">Mayor</option>
                     <option value="critica">Crítica</option>
                   </select>
                 </div>
-              )}
+              </div>
 
               <div className={styles["form-actions"]}>
                 <button
