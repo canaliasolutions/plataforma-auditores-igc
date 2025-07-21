@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS conclusiones (
 db.exec(createHallazgosTable);
 db.exec(createParticipantesTable);
 db.exec(createVerificacionDatosTable);
+db.exec(createEficaciaTable);
 db.exec(createConclusionesTable);
 
 // Prepare common queries for hallazgos
