@@ -4,6 +4,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import WarningIcon from "@mui/icons-material/Warning";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import styles from "./AuditSubNavigation.module.css";
 
 interface AuditSubNavigationProps {
