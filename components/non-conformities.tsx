@@ -25,28 +25,28 @@ interface NonConformitiesProps {
 }
 
 export function NonConformities({ auditId }: NonConformitiesProps) {
-  const [nonConformities, setNonConformities] = useState<NonConformity[]>([
-    {
-      id: "1",
-      title: "Falta de política de contraseñas",
-      description:
-        "No se encontró una política formal de contraseñas que establezca los requisitos mínimos de complejidad.",
-      clause: "A.9.4.3",
-      severity: "major",
-      status: "open",
-      dateFound: "2024-12-16",
-    },
-    {
-      id: "2",
-      title: "Acceso no autorizado a sala de servidores",
-      description:
-        "Se observó que la sala de servidores no cuenta con control de acceso biométrico según procedimiento.",
-      clause: "A.11.1.1",
-      severity: "critical",
-      status: "pending",
-      dateFound: "2024-12-17",
-    },
-  ]);
+  const [nonConformities, setNonConformities] = useState<NonConformity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load hallazgos from database
+  useEffect(() => {
+    loadHallazgos();
+  }, [auditId]);
+
+  const loadHallazgos = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/hallazgos?auditoriaId=${auditId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setNonConformities(data);
+      }
+    } catch (error) {
+      console.error('Error loading hallazgos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
