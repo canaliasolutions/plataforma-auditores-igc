@@ -1,20 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./NonConformities.module.css";
 
 interface NonConformity {
-  id: string;
-  title: string;
-  description: string;
-  clause: string;
-  severity: "minor" | "major" | "critical";
-  status: "open" | "resolved" | "pending";
-  dateFound: string;
-  dateResolved?: string;
+  id: number;
+  auditoria_id: string;
+  titulo: string;
+  descripcion: string;
+  clausula: string;
+  severidad: "menor" | "mayor" | "critica";
+  estado: "abierto" | "resuelto" | "pendiente";
+  fecha_encontrado: string;
+  fecha_resuelto?: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
 }
 
 interface NonConformitiesProps {
