@@ -5,6 +5,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import FolderIcon from "@mui/icons-material/Folder";
 import PeopleIcon from "@mui/icons-material/People";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import styles from "./AuditSubNavigation.module.css";
 
