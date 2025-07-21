@@ -74,14 +74,16 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "abierto":
-        return "Abierta";
-      case "resuelto":
-        return "Resuelta";
-      case "pendiente":
-        return "Pendiente";
+  const getTypeText = (type: string) => {
+    switch (type) {
+      case "OB":
+        return "Observación";
+      case "NC":
+        return "No conformidad";
+      case "OM":
+        return "Oportunidad de mejora";
+      case "PF":
+        return "Punto fuerte";
       default:
         return "Desconocido";
     }
