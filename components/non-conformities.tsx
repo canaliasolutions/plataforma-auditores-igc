@@ -294,6 +294,28 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 </div>
 
                 <div className={styles["form-group"]}>
+                  <label className={styles["form-label"]}>Tipo:</label>
+                  <select
+                    value={newNonConformity.type}
+                    onChange={(e) =>
+                      setNewNonConformity({
+                        ...newNonConformity,
+                        type: e.target.value as any,
+                      })
+                    }
+                    className={styles["form-select"]}
+                    required
+                  >
+                    <option value="OB">Observación</option>
+                    <option value="NC">No conformidad</option>
+                    <option value="OM">Oportunidad de mejora</option>
+                    <option value="PF">Punto fuerte</option>
+                  </select>
+                </div>
+              </div>
+
+              {newNonConformity.type === "NC" && (
+                <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
                                         value={newNonConformity.severidad}
@@ -310,7 +332,7 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                     <option value="critica">Crítica</option>
                   </select>
                 </div>
-              </div>
+              )}
 
               <div className={styles["form-actions"]}>
                 <button
