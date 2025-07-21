@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 // PUT: Update a hallazgo by id
 export async function PUT(req: NextRequest) {
   try {
-    const { id, titulo, descripcion, clausula, severidad, estado, fechaResuelto } = await req.json();
+    const { id, titulo, descripcion, clausula, type, severidad, fechaResuelto } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -61,8 +61,8 @@ export async function PUT(req: NextRequest) {
       titulo,
       descripcion,
       clausula,
+      type,
       severidad,
-      estado,
       fechaResuelto,
       id
     );
