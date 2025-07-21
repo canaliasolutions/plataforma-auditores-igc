@@ -203,60 +203,51 @@ export function DataVerification({ auditId }: DataVerificationProps) {
         </button>
       </div>
 
-      <div className={styles["verification-form"]}>
-        <div className={styles["verification-intro"]}>
-          <p className={styles["intro-text"]}>
-            Confirma la exactitud de los siguientes datos seleccionando la opción 
-            correspondiente para cada categoría:
+      {hasChanges && (
+        <div className={styles["changes-notice"]}>
+          <p className={styles["changes-text"]}>
+            Tienes cambios sin guardar. Haz clic en "Guardar cambios" para confirmar.
           </p>
         </div>
+      )}
 
-        <div className={styles["verification-fields"]}>
-          {renderVerificationField(
-            "1. Datos del contacto",
-            "datos_contacto",
-            verification.datos_contacto
-          )}
-
-          {renderVerificationField(
-            "2. Datos del alcance",
-            "datos_alcance", 
-            verification.datos_alcance
-          )}
-
-          {renderVerificationField(
-            "3. Datos de facturación",
-            "datos_facturacion",
-            verification.datos_facturacion
-          )}
-        </div>
-
-        <div className={styles["comments-section"]}>
-          <h3 className={styles["comments-label"]}>
-            Comentarios adicionales sobre la verificación
-          </h3>
-          <p className={styles["comments-description"]}>
-            Proporciona detalles adicionales sobre cualquier error detectado, 
-            cambio solicitado o nota importante:
-          </p>
-          <textarea
-            value={verification.comentarios_verificacion}
-            onChange={(e) => 
-              handleVerificationChange("comentarios_verificacion", e.target.value)
-            }
-            placeholder="Escribe aquí los detalles de los errores, cambios solicitados o notas adicionales..."
-            className={styles["comments-textarea"]}
-            rows={6}
-          />
-        </div>
-
-        {hasChanges && (
-          <div className={styles["changes-notice"]}>
-            <p className={styles["changes-text"]}>
-              Tienes cambios sin guardar. Haz clic en "Guardar cambios" para confirmar.
-            </p>
-          </div>
+      <div className={styles["verification-fields"]}>
+        {renderVerificationField(
+          "1. Datos del contacto",
+          "datos_contacto",
+          verification.datos_contacto
         )}
+
+        {renderVerificationField(
+          "2. Datos del alcance",
+          "datos_alcance", 
+          verification.datos_alcance
+        )}
+
+        {renderVerificationField(
+          "3. Datos de facturación",
+          "datos_facturacion",
+          verification.datos_facturacion
+        )}
+      </div>
+
+      <div className={styles["comments-section"]}>
+        <h3 className={styles["comments-label"]}>
+          Comentarios adicionales sobre la verificación
+        </h3>
+        <p className={styles["comments-description"]}>
+          Proporciona detalles adicionales sobre cualquier error detectado, 
+          cambio solicitado o nota importante:
+        </p>
+        <textarea
+          value={verification.comentarios_verificacion}
+          onChange={(e) => 
+            handleVerificationChange("comentarios_verificacion", e.target.value)
+          }
+          placeholder="Escribe aquí los detalles de los errores, cambios solicitados o notas adicionales..."
+          className={styles["comments-textarea"]}
+          rows={6}
+        />
       </div>
     </div>
   );
