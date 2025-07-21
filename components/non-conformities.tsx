@@ -550,15 +550,17 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   </span>
                 </div>
                 <div className={styles["badges"]}>
-                  <span
-                    className={styles["severity-badge"]}
-                                        style={{ backgroundColor: getSeverityColor(item.severidad) }}
-                  >
-                                        {getSeverityText(item.severidad)}
-                  </span>
                   <span className={styles["status-badge"]}>
-                                        {getStatusText(item.estado)}
+                    {getTypeText(item.type)}
                   </span>
+                  {item.type === "NC" && item.severidad && (
+                    <span
+                      className={styles["severity-badge"]}
+                      style={{ backgroundColor: getSeverityColor(item.severidad) }}
+                    >
+                      {getSeverityText(item.severidad)}
+                    </span>
+                  )}
                 </div>
               </div>
 
