@@ -147,29 +147,43 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     setShowEditForm(true);
   };
 
-  const handleUpdateNonConformity = (e: React.FormEvent) => {
+    const handleUpdateNonConformity = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
 
-    const updatedItem: NonConformity = {
-      ...editingItem,
-      ...newNonConformity,
-    };
+    try {
+      const response = await fetch('/api/hallazgos', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editingItem.id,
+          titulo: newNonConformity.titulo,
+          descripcion: newNonConformity.descripcion,
+          clausula: newNonConformity.clausula,
+          severidad: newNonConformity.severidad,
+          estado: editingItem.estado,
+          fechaResuelto: editingItem.fecha_resuelto,
+        }),
+      });
 
-    setNonConformities(
-      nonConformities.map((item) =>
-        item.id === editingItem.id ? updatedItem : item,
-      ),
-    );
-
-    setNewNonConformity({
-      title: "",
-      description: "",
-      clause: "",
-      severity: "minor",
-    });
-    setEditingItem(null);
-    setShowEditForm(false);
+      if (response.ok) {
+        await loadHallazgos(); // Reload the list
+        setNewNonConformity({
+          titulo: "",
+          descripcion: "",
+          clausula: "",
+          severidad: "menor",
+        });
+        setEditingItem(null);
+        setShowEditForm(false);
+      } else {
+        console.error('Error updating hallazgo');
+      }
+    } catch (error) {
+      console.error('Error updating hallazgo:', error);
+    }
   };
 
   const handleDeleteNonConformity = (id: string) => {
