@@ -295,22 +295,20 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               <h3 className={styles["question-title"]}>
                 2. ¿El medio ha sido efectivo para el logro de los objetivos de la auditoría?
               </h3>
-              <div className={styles["radio-options"]}>
+              <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
-                  <button
+                  <OptionButton
                     key={option}
-                    type="button"
-                    className={`${styles["radio-button"]} ${
-                      eficaciaData.medio_efectivo === option ? styles["radio-selected"] : ""
-                    }`}
+                    selected={eficaciaData.medio_efectivo === option}
                     onClick={() => handleDataChange("medio_efectivo", option)}
-                  >
-                    {eficaciaData.medio_efectivo === option ? 
-                      <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                      <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+                    icon={eficaciaData.medio_efectivo === option ?
+                      <RadioButtonCheckedIcon /> :
+                      <RadioButtonUncheckedIcon />
                     }
-                    <span>{option === 'si' ? 'Sí' : 'No'}</span>
-                  </button>
+                    variant={option === 'si' ? 'correct' : 'error'}
+                  >
+                    {option === 'si' ? 'Sí' : 'No'}
+                  </OptionButton>
                 ))}
               </div>
             </div>
