@@ -195,8 +195,8 @@
     align-items: stretch;
   }
 
-  .question-section {
-    padding: 24px 20px;
+    .question-section {
+    margin-bottom: 32px;
   }
 
   .question-title {
