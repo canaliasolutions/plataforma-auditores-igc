@@ -60,13 +60,13 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
     severidad: "menor" as const,
   });
 
-  const getSeverityColor = (severity: string) => {
+    const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "critical":
+      case "critica":
         return "#e74c3c";
-      case "major":
+      case "mayor":
         return "#f39c12";
-      case "minor":
+      case "menor":
         return "#f1c40f";
       default:
         return "#95a5a6";
