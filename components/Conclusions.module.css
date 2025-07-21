@@ -72,15 +72,7 @@
 
 /* Question Section */
 .question-section {
-  background: white;
-  border: 1px solid var(--tertiary);
-  border-radius: 12px;
-  padding: 32px;
-  transition: box-shadow 0.2s;
-}
-
-.question-section:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
 }
 
 .question-title {
