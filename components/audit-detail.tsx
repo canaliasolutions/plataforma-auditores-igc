@@ -84,12 +84,14 @@ export function AuditDetail({ audit }: AuditDetailProps) {
             </div>
           </div>
         );
-                  case "non-conformities":
+                        case "non-conformities":
         return <NonConformities auditId={audit.id} />;
       case "participants":
         return <Participants auditId={audit.id} />;
       case "data-verification":
         return <DataVerification auditId={audit.id} />;
+      case "conclusions":
+        return <Conclusions auditId={audit.id} audit={audit} />;
       case "files":
         return <Files auditId={audit.id} />;
       default:
