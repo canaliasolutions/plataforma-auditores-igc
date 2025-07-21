@@ -261,22 +261,19 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               <h3 className={styles["question-title"]}>
                 1. ��Qué medio se utilizó en la auditoría?
               </h3>
-              <div className={styles["radio-options"]}>
+              <div className={styles["options-grid"]}>
                 {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro'].map((option) => (
-                  <button
+                  <OptionButton
                     key={option}
-                    type="button"
-                    className={`${styles["radio-button"]} ${
-                      eficaciaData.medio_utilizado === option ? styles["radio-selected"] : ""
-                    }`}
+                    selected={eficaciaData.medio_utilizado === option}
                     onClick={() => handleDataChange("medio_utilizado", option)}
-                  >
-                    {eficaciaData.medio_utilizado === option ? 
-                      <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                      <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+                    icon={eficaciaData.medio_utilizado === option ?
+                      <RadioButtonCheckedIcon /> :
+                      <RadioButtonUncheckedIcon />
                     }
-                    <span>{option}</span>
-                  </button>
+                  >
+                    {option}
+                  </OptionButton>
                 ))}
               </div>
               {eficaciaData.medio_utilizado === 'Otro' && (
