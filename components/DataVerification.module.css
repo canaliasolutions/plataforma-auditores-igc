@@ -125,24 +125,12 @@
 }
 
 /* Option Icons */
-.option-icon-correct {
-  color: #4caf50;
-  font-size: 20px;
-}
-
-.option-icon-error {
-  color: #f44336;
-  font-size: 20px;
-}
-
-.option-icon-change {
-  color: #ff9800;
-  font-size: 20px;
-}
-
+.option-icon-correct,
+.option-icon-error,
+.option-icon-change,
 .option-icon-note {
-  color: #2196f3;
-  font-size: 20px;
+  color: var(--text-secondary);
+  font-size: 18px;
 }
 
 /* Option Color Variants */
