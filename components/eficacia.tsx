@@ -318,22 +318,20 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               <h3 className={styles["question-title"]}>
                 3. ¿Se han presentado inconvenientes o contratiempos durante la auditoría?
               </h3>
-              <div className={styles["radio-options"]}>
+              <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
-                  <button
+                  <OptionButton
                     key={option}
-                    type="button"
-                    className={`${styles["radio-button"]} ${
-                      eficaciaData.inconvenientes_presentados === option ? styles["radio-selected"] : ""
-                    }`}
+                    selected={eficaciaData.inconvenientes_presentados === option}
                     onClick={() => handleDataChange("inconvenientes_presentados", option)}
-                  >
-                    {eficaciaData.inconvenientes_presentados === option ? 
-                      <RadioButtonCheckedIcon className={styles["radio-icon"]} /> : 
-                      <RadioButtonUncheckedIcon className={styles["radio-icon"]} />
+                    icon={eficaciaData.inconvenientes_presentados === option ?
+                      <RadioButtonCheckedIcon /> :
+                      <RadioButtonUncheckedIcon />
                     }
-                    <span>{option === 'si' ? 'Sí' : 'No'}</span>
-                  </button>
+                    variant={option === 'si' ? 'warning' : 'correct'}
+                  >
+                    {option === 'si' ? 'Sí' : 'No'}
+                  </OptionButton>
                 ))}
               </div>
             </div>
