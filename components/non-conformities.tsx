@@ -1,20 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./NonConformities.module.css";
 
 interface NonConformity {
-  id: string;
-  title: string;
-  description: string;
-  clause: string;
-  severity: "minor" | "major" | "critical";
-  status: "open" | "resolved" | "pending";
-  dateFound: string;
-  dateResolved?: string;
+  id: number;
+  auditoria_id: string;
+  titulo: string;
+  descripcion: string;
+  clausula: string;
+  severidad: "menor" | "mayor" | "critica";
+  estado: "abierto" | "resuelto" | "pendiente";
+  fecha_encontrado: string;
+  fecha_resuelto?: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
 }
 
 interface NonConformitiesProps {
@@ -22,61 +25,61 @@ interface NonConformitiesProps {
 }
 
 export function NonConformities({ auditId }: NonConformitiesProps) {
-  const [nonConformities, setNonConformities] = useState<NonConformity[]>([
-    {
-      id: "1",
-      title: "Falta de política de contraseñas",
-      description:
-        "No se encontró una política formal de contraseñas que establezca los requisitos mínimos de complejidad.",
-      clause: "A.9.4.3",
-      severity: "major",
-      status: "open",
-      dateFound: "2024-12-16",
-    },
-    {
-      id: "2",
-      title: "Acceso no autorizado a sala de servidores",
-      description:
-        "Se observó que la sala de servidores no cuenta con control de acceso biométrico según procedimiento.",
-      clause: "A.11.1.1",
-      severity: "critical",
-      status: "pending",
-      dateFound: "2024-12-17",
-    },
-  ]);
+  const [nonConformities, setNonConformities] = useState<NonConformity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load hallazgos from database
+  useEffect(() => {
+    loadHallazgos();
+  }, [auditId]);
+
+  const loadHallazgos = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/hallazgos?auditoriaId=${auditId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setNonConformities(data);
+      }
+    } catch (error) {
+      console.error('Error loading hallazgos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [editingItem, setEditingItem] = useState<NonConformity | null>(null);
-  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+    const [editingItem, setEditingItem] = useState<NonConformity | null>(null);
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
   const [newNonConformity, setNewNonConformity] = useState({
-    title: "",
-    description: "",
-    clause: "",
-    severity: "minor" as const,
+    titulo: "",
+    descripcion: "",
+    clausula: "",
+    severidad: "menor" as const,
   });
 
-  const getSeverityColor = (severity: string) => {
+    const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "critical":
+      case "critica":
         return "#e74c3c";
-      case "major":
+      case "mayor":
         return "#f39c12";
-      case "minor":
+      case "menor":
         return "#f1c40f";
       default:
         return "#95a5a6";
     }
   };
 
-  const getSeverityText = (severity: string) => {
+    const getSeverityText = (severity: string) => {
     switch (severity) {
-      case "critical":
+      case "critica":
         return "Crítica";
-      case "major":
+      case "mayor":
         return "Mayor";
-      case "minor":
+      case "menor":
         return "Menor";
       default:
         return "Desconocida";
@@ -85,84 +88,128 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "open":
+      case "abierto":
         return "Abierta";
-      case "resolved":
+      case "resuelto":
         return "Resuelta";
-      case "pending":
+      case "pendiente":
         return "Pendiente";
       default:
         return "Desconocido";
     }
   };
 
-  const handleAddNonConformity = (e: React.FormEvent) => {
+    const handleAddNonConformity = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newId = Date.now().toString();
-    const newItem: NonConformity = {
-      id: newId,
-      ...newNonConformity,
-      status: "open",
-      dateFound: new Date().toISOString().split("T")[0],
-    };
+    try {
+      const response = await fetch('/api/hallazgos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          auditoriaId: auditId,
+          titulo: newNonConformity.titulo,
+          descripcion: newNonConformity.descripcion,
+          clausula: newNonConformity.clausula,
+          severidad: newNonConformity.severidad,
+          estado: "abierto",
+          fechaEncontrado: new Date().toISOString().split("T")[0],
+        }),
+      });
 
-    setNonConformities([...nonConformities, newItem]);
-    setNewNonConformity({
-      title: "",
-      description: "",
-      clause: "",
-      severity: "minor",
-    });
-    setShowAddForm(false);
+      if (response.ok) {
+        await loadHallazgos(); // Reload the list
+        setNewNonConformity({
+          titulo: "",
+          descripcion: "",
+          clausula: "",
+          severidad: "menor",
+        });
+        setShowAddForm(false);
+      } else {
+        console.error('Error adding hallazgo');
+      }
+    } catch (error) {
+      console.error('Error adding hallazgo:', error);
+    }
   };
 
-  const handleEditNonConformity = (item: NonConformity) => {
+    const handleEditNonConformity = (item: NonConformity) => {
     setEditingItem(item);
     setNewNonConformity({
-      title: item.title,
-      description: item.description,
-      clause: item.clause,
-      severity: item.severity,
+      titulo: item.titulo,
+      descripcion: item.descripcion,
+      clausula: item.clausula,
+      severidad: item.severidad,
     });
     setShowEditForm(true);
   };
 
-  const handleUpdateNonConformity = (e: React.FormEvent) => {
+    const handleUpdateNonConformity = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
 
-    const updatedItem: NonConformity = {
-      ...editingItem,
-      ...newNonConformity,
-    };
+    try {
+      const response = await fetch('/api/hallazgos', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editingItem.id,
+          titulo: newNonConformity.titulo,
+          descripcion: newNonConformity.descripcion,
+          clausula: newNonConformity.clausula,
+          severidad: newNonConformity.severidad,
+          estado: editingItem.estado,
+          fechaResuelto: editingItem.fecha_resuelto,
+        }),
+      });
 
-    setNonConformities(
-      nonConformities.map((item) =>
-        item.id === editingItem.id ? updatedItem : item,
-      ),
-    );
-
-    setNewNonConformity({
-      title: "",
-      description: "",
-      clause: "",
-      severity: "minor",
-    });
-    setEditingItem(null);
-    setShowEditForm(false);
+      if (response.ok) {
+        await loadHallazgos(); // Reload the list
+        setNewNonConformity({
+          titulo: "",
+          descripcion: "",
+          clausula: "",
+          severidad: "menor",
+        });
+        setEditingItem(null);
+        setShowEditForm(false);
+      } else {
+        console.error('Error updating hallazgo');
+      }
+    } catch (error) {
+      console.error('Error updating hallazgo:', error);
+    }
   };
 
-  const handleDeleteNonConformity = (id: string) => {
+    const handleDeleteNonConformity = (id: number) => {
     setDeletingItemId(id);
     setShowDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingItemId) {
-      setNonConformities(
-        nonConformities.filter((item) => item.id !== deletingItemId),
-      );
+      try {
+        const response = await fetch('/api/hallazgos', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: deletingItemId }),
+        });
+
+        if (response.ok) {
+          await loadHallazgos(); // Reload the list
+        } else {
+          console.error('Error deleting hallazgo');
+        }
+      } catch (error) {
+        console.error('Error deleting hallazgo:', error);
+      }
     }
     setDeletingItemId(null);
     setShowDeleteDialog(false);
@@ -207,11 +254,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <label className={styles["form-label"]}>Título:</label>
                 <input
                   type="text"
-                  value={newNonConformity.title}
+                                    value={newNonConformity.titulo}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      title: e.target.value,
+                                            titulo: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -222,11 +269,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
               <div className={styles["form-group"]}>
                 <label className={styles["form-label"]}>Descripción:</label>
                 <textarea
-                  value={newNonConformity.description}
+                                    value={newNonConformity.descripcion}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      description: e.target.value,
+                                            descripcion: e.target.value,
                     })
                   }
                   className={styles["form-textarea"]}
@@ -240,11 +287,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   <label className={styles["form-label"]}>Cláusula:</label>
                   <input
                     type="text"
-                    value={newNonConformity.clause}
+                                        value={newNonConformity.clausula}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        clause: e.target.value,
+                                                clausula: e.target.value,
                       })
                     }
                     className={styles["form-input"]}
@@ -256,18 +303,18 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
-                    value={newNonConformity.severity}
+                                        value={newNonConformity.severidad}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        severity: e.target.value as any,
+                                                severidad: e.target.value as any,
                       })
                     }
                     className={styles["form-select"]}
                   >
-                    <option value="minor">Menor</option>
-                    <option value="major">Mayor</option>
-                    <option value="critical">Crítica</option>
+                                        <option value="menor">Menor</option>
+                    <option value="mayor">Mayor</option>
+                    <option value="critica">Crítica</option>
                   </select>
                 </div>
               </div>
@@ -298,11 +345,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 onClick={() => {
                   setShowEditForm(false);
                   setEditingItem(null);
-                  setNewNonConformity({
-                    title: "",
-                    description: "",
-                    clause: "",
-                    severity: "minor",
+                                    setNewNonConformity({
+                    titulo: "",
+                    descripcion: "",
+                    clausula: "",
+                    severidad: "menor",
                   });
                 }}
                 className={styles["close-button"]}
@@ -319,11 +366,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <label className={styles["form-label"]}>Título:</label>
                 <input
                   type="text"
-                  value={newNonConformity.title}
+                                    value={newNonConformity.titulo}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      title: e.target.value,
+                                            titulo: e.target.value,
                     })
                   }
                   className={styles["form-input"]}
@@ -334,11 +381,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
               <div className={styles["form-group"]}>
                 <label className={styles["form-label"]}>Descripción:</label>
                 <textarea
-                  value={newNonConformity.description}
+                                    value={newNonConformity.descripcion}
                   onChange={(e) =>
                     setNewNonConformity({
                       ...newNonConformity,
-                      description: e.target.value,
+                                            descripcion: e.target.value,
                     })
                   }
                   className={styles["form-textarea"]}
@@ -352,11 +399,11 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                   <label className={styles["form-label"]}>Cláusula:</label>
                   <input
                     type="text"
-                    value={newNonConformity.clause}
+                                        value={newNonConformity.clausula}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        clause: e.target.value,
+                                                clausula: e.target.value,
                       })
                     }
                     className={styles["form-input"]}
@@ -368,18 +415,18 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
                 <div className={styles["form-group"]}>
                   <label className={styles["form-label"]}>Severidad:</label>
                   <select
-                    value={newNonConformity.severity}
+                                        value={newNonConformity.severidad}
                     onChange={(e) =>
                       setNewNonConformity({
                         ...newNonConformity,
-                        severity: e.target.value as any,
+                                                severidad: e.target.value as any,
                       })
                     }
                     className={styles["form-select"]}
                   >
-                    <option value="minor">Menor</option>
-                    <option value="major">Mayor</option>
-                    <option value="critical">Crítica</option>
+                                        <option value="menor">Menor</option>
+                    <option value="mayor">Mayor</option>
+                    <option value="critica">Crítica</option>
                   </select>
                 </div>
               </div>
@@ -459,38 +506,38 @@ export function NonConformities({ auditId }: NonConformitiesProps) {
             <div key={item.id} className={styles["conformity-card"]}>
               <div className={styles["card-header"]}>
                 <div className={styles["title-section"]}>
-                  <h3 className={styles["conformity-title"]}>{item.title}</h3>
+                                    <h3 className={styles["conformity-title"]}>{item.titulo}</h3>
                   <span className={styles["clause-badge"]}>
-                    Cláusula {item.clause}
+                                        Cláusula {item.clausula}
                   </span>
                 </div>
                 <div className={styles["badges"]}>
                   <span
                     className={styles["severity-badge"]}
-                    style={{ backgroundColor: getSeverityColor(item.severity) }}
+                                        style={{ backgroundColor: getSeverityColor(item.severidad) }}
                   >
-                    {getSeverityText(item.severity)}
+                                        {getSeverityText(item.severidad)}
                   </span>
                   <span className={styles["status-badge"]}>
-                    {getStatusText(item.status)}
+                                        {getStatusText(item.estado)}
                   </span>
                 </div>
               </div>
 
               <p className={styles["conformity-description"]}>
-                {item.description}
+                                {item.descripcion}
               </p>
 
               <div className={styles["card-footer"]}>
                 <div className={styles["date-section"]}>
                   <span className={styles["date-info"]}>
                     Encontrada el:{" "}
-                    {new Date(item.dateFound).toLocaleDateString("es-ES")}
+                                          {new Date(item.fecha_encontrado).toLocaleDateString("es-ES")}
                   </span>
-                  {item.dateResolved && (
+                                    {item.fecha_resuelto && (
                     <span className={styles["date-info"]}>
                       Resuelta el:{" "}
-                      {new Date(item.dateResolved).toLocaleDateString("es-ES")}
+                                            {new Date(item.fecha_resuelto).toLocaleDateString("es-ES")}
                     </span>
                   )}
                 </div>

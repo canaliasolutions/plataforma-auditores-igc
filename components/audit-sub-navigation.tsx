@@ -3,6 +3,10 @@
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import WarningIcon from "@mui/icons-material/Warning";
 import FolderIcon from "@mui/icons-material/Folder";
+import PeopleIcon from "@mui/icons-material/People";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import styles from "./AuditSubNavigation.module.css";
 
 interface AuditSubNavigationProps {
@@ -14,9 +18,13 @@ export function AuditSubNavigation({
   activeTab,
   onTabChange,
 }: AuditSubNavigationProps) {
-  const tabs = [
+          const tabs = [
     { id: "overview", label: "Resumen", icon: AssignmentIcon },
     { id: "non-conformities", label: "Hallazgos", icon: WarningIcon },
+    { id: "participants", label: "Participantes", icon: PeopleIcon },
+    { id: "data-verification", label: "Verificación de datos", icon: VerifiedUserIcon },
+    { id: "eficacia", label: "Eficacia", icon: TrendingUpIcon },
+    { id: "conclusions", label: "Conclusiones", icon: AssignmentTurnedInIcon },
   ];
 
   return (

@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { AuditSubNavigation } from "./audit-sub-navigation";
 import { NonConformities } from "./non-conformities";
 import { Files } from "./files";
+import { Participants } from "./participants";
+import { DataVerification } from "./data-verification";
+import { Eficacia } from "./eficacia";
+import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
 import {Audit} from "@/types/audit";
@@ -81,8 +85,16 @@ export function AuditDetail({ audit }: AuditDetailProps) {
             </div>
           </div>
         );
-      case "non-conformities":
+                              case "non-conformities":
         return <NonConformities auditId={audit.id} />;
+      case "participants":
+        return <Participants auditId={audit.id} />;
+      case "data-verification":
+        return <DataVerification auditId={audit.id} />;
+      case "eficacia":
+        return <Eficacia auditId={audit.id} audit={audit} />;
+      case "conclusions":
+        return <Conclusions auditId={audit.id} audit={audit} />;
       case "files":
         return <Files auditId={audit.id} />;
       default:
