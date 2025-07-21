@@ -147,6 +147,35 @@ export const verificacionDatosQueries = {
   `)
 };
 
+// Prepare common queries for eficacia
+export const eficaciaQueries = {
+  getByAuditId: db.prepare('SELECT * FROM eficacia WHERE auditoria_id = ?'),
+  create: db.prepare(`
+    INSERT INTO eficacia (auditoria_id, tipo_auditoria, medio_utilizado, otro_medio, medio_efectivo, inconvenientes_presentados, tipos_inconvenientes, otros_inconvenientes, tecnicas_utilizadas, otras_tecnicas)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `),
+  update: db.prepare(`
+    UPDATE eficacia
+    SET tipo_auditoria = ?, medio_utilizado = ?, otro_medio = ?, medio_efectivo = ?, inconvenientes_presentados = ?, tipos_inconvenientes = ?, otros_inconvenientes = ?, tecnicas_utilizadas = ?, otras_tecnicas = ?, fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE auditoria_id = ?
+  `),
+  upsert: db.prepare(`
+    INSERT INTO eficacia (auditoria_id, tipo_auditoria, medio_utilizado, otro_medio, medio_efectivo, inconvenientes_presentados, tipos_inconvenientes, otros_inconvenientes, tecnicas_utilizadas, otras_tecnicas)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(auditoria_id) DO UPDATE SET
+      tipo_auditoria = excluded.tipo_auditoria,
+      medio_utilizado = excluded.medio_utilizado,
+      otro_medio = excluded.otro_medio,
+      medio_efectivo = excluded.medio_efectivo,
+      inconvenientes_presentados = excluded.inconvenientes_presentados,
+      tipos_inconvenientes = excluded.tipos_inconvenientes,
+      otros_inconvenientes = excluded.otros_inconvenientes,
+      tecnicas_utilizadas = excluded.tecnicas_utilizadas,
+      otras_tecnicas = excluded.otras_tecnicas,
+      fecha_actualizacion = CURRENT_TIMESTAMP
+  `)
+};
+
 // Prepare common queries for conclusiones
 export const conclusionesQueries = {
   getByAuditId: db.prepare('SELECT * FROM conclusiones WHERE auditoria_id = ?'),
