@@ -135,9 +135,10 @@
 
 /* Comments Section */
 .comments-section {
-  padding: 32px 24px;
-  border-top: 1px solid var(--tertiary);
+  padding: 24px;
   background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid var(--tertiary);
 }
 
 .comments-label {
