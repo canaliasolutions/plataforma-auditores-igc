@@ -7,6 +7,7 @@ import { NonConformities } from "./non-conformities";
 import { Files } from "./files";
 import { Participants } from "./participants";
 import { DataVerification } from "./data-verification";
+import { Eficacia } from "./eficacia";
 import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
