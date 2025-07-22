@@ -23,7 +23,7 @@ export function AuditSubNavigation({
     { id: "non-conformities", label: "Hallazgos", icon: WarningIcon },
     { id: "participants", label: "Participantes", icon: PeopleIcon },
     { id: "data-verification", label: "Verificación de datos", icon: VerifiedUserIcon },
-    { id: "eficacia", label: "Eficacia", icon: TrendingUpIcon },
+    { id: "eficacia", label: "Eficacia del método de auditoría", icon: TrendingUpIcon },
     { id: "conclusions", label: "Conclusiones", icon: AssignmentTurnedInIcon },
   ];
 

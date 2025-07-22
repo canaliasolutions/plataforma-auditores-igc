@@ -213,19 +213,19 @@ export function DataVerification({ auditId }: DataVerificationProps) {
 
       <div className={styles["verification-fields"]}>
         {renderVerificationField(
-          "1. Datos del contacto",
+          "Datos del contacto (responsable del sistema, alta gerencia, etc.)",
           "datos_contacto",
           verification.datos_contacto
         )}
 
         {renderVerificationField(
-          "2. Datos del alcance",
+          "Datos del alcance (actividades, número de trabajadores, sedes, etc.)",
           "datos_alcance", 
           verification.datos_alcance
         )}
 
         {renderVerificationField(
-          "3. Datos de facturación",
+          "Datos de facturación (CIF, razón social, banco, forma de pago, etc.)",
           "datos_facturacion",
           verification.datos_facturacion
         )}
@@ -235,10 +235,6 @@ export function DataVerification({ auditId }: DataVerificationProps) {
         <h3 className={styles["comments-label"]}>
           Comentarios adicionales sobre la verificación
         </h3>
-        <p className={styles["comments-description"]}>
-          Proporciona detalles adicionales sobre cualquier error detectado, 
-          cambio solicitado o nota importante:
-        </p>
         <textarea
           value={verification.comentarios_verificacion}
           onChange={(e) => 

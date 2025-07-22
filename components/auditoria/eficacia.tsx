@@ -152,7 +152,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
   return (
     <div className={styles["eficacia"]}>
       <div className={styles["section-header"]}>
-        <h2 className={styles["section-title"]}>Eficacia</h2>
+        <h2 className={styles["section-title"]}>Eficacia del método de auditoría</h2>
         <button
           onClick={handleSave}
           disabled={!hasChanges || saving}
