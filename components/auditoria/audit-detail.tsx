@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuditSubNavigation } from "./audit-sub-navigation";
-import { NonConformities } from "./non-conformities";
-import { Files } from "./files";
+import { Hallazgos } from "./hallazgos";
 import { Participants } from "./participants";
 import { DataVerification } from "./data-verification";
 import { Eficacia } from "./eficacia";
@@ -17,7 +16,7 @@ interface AuditDetailProps {
   audit: Audit | null;
 }
 
-export function AuditDetail({ audit }: AuditDetailProps) {
+export default function AuditDetail({ audit }: AuditDetailProps) {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
@@ -85,8 +84,8 @@ export function AuditDetail({ audit }: AuditDetailProps) {
             </div>
           </div>
         );
-                              case "non-conformities":
-        return <NonConformities auditId={audit.id} />;
+      case "non-conformities":
+        return <Hallazgos auditId={audit.id} />;
       case "participants":
         return <Participants auditId={audit.id} />;
       case "data-verification":
@@ -95,8 +94,6 @@ export function AuditDetail({ audit }: AuditDetailProps) {
         return <Eficacia auditId={audit.id} audit={audit} />;
       case "conclusions":
         return <Conclusions auditId={audit.id} audit={audit} />;
-      case "files":
-        return <Files auditId={audit.id} />;
       default:
         return null;
     }

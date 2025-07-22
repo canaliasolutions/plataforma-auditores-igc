@@ -1,7 +1,7 @@
 
-import { AuditCard } from "@/components/audit-card";
+import { AuditCard } from "@/components/auditorias/audit-card";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import styles from "@/components/Dashboard.module.css";
+import styles from "@/components/auditorias/Dashboard.module.css";
 import {getAudits} from "@/lib/filemaker";
 
 

@@ -33,7 +33,7 @@ export interface Hallazgo {
     descripcion: string;
     clausula: string;
     type: "OB" | "NC" | "OM" | "PF";
-    severidad: "menor" | "mayor" | "critica";
+    severidad: "menor" | "mayor" | "critica" | "";
     fecha_encontrado: string;
     fecha_resuelto?: string;
     fecha_creacion: string;

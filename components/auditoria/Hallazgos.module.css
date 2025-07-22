@@ -99,11 +99,11 @@
 
 .form-group {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 20px;
 }
 
@@ -133,6 +133,15 @@
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(0, 96, 157, 0.1);
+}
+
+.form-input:disabled,
+.form-textarea:disabled,
+.form-select:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  border-color: #ced4da;
 }
 
 .form-textarea {
@@ -410,10 +419,6 @@
 
   .add-form {
     padding: 24px 16px;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
   }
 
   .card-header {

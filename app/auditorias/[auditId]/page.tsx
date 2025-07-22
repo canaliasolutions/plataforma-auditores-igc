@@ -1,5 +1,5 @@
 
-import { AuditDetail } from "@/components/audit-detail";
+import AuditDetail from "@/components/auditoria/audit-detail";
 import { getAuditById } from "@/lib/filemaker";
 
 interface AuditDetailPageProps {

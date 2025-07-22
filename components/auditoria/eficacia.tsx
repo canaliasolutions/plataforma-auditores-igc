@@ -203,23 +203,21 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
           </div>
         </div>
 
-        {/* In-Situ Audit Questions */}
         {isInSituAudit && (
           <div className={styles["in-situ-questions"]}>
-            {/* Question: Evidence Collection Techniques for In-Situ */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
-                1. Indique las técnicas utilizadas para la recopilación y verificación de las evidencias
+                Indique las técnicas utilizadas para la recopilación y verificación de las evidencias
               </h3>
               <p className={styles["question-subtitle"]}>Seleccione todas las opciones que apliquen:</p>
               <div className={styles["checkbox-options"]}>
                 {[
                   'Entrevistas con responsables, trabajadores, personal',
-                  'revisión de registros',
-                  'recorrido por las instalaciones',
-                  'observación en sitio de procesos y actividades',
-                  'observación en sitio de actividades técnicas',
-                  'otro'
+                  'Revisión de registros',
+                  'Recorrido por las instalaciones',
+                  'Observación en sitio de procesos y actividades',
+                  'Observación en sitio de actividades técnicas',
+                  'Otro'
                 ].map((option) => (
                   <button
                     key={option}
@@ -253,16 +251,14 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
           </div>
         )}
 
-        {/* Remote Audit Questions */}
         {isRemoteAudit && (
           <div className={styles["remote-questions"]}>
-            {/* Question 1: Medium Used */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
-                1. ��Qué medio se utilizó en la auditoría?
+                ¿Qué medio se utilizó en la auditoría?
               </h3>
               <div className={styles["options-grid"]}>
-                {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro'].map((option) => (
+                {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro medio'].map((option) => (
                   <OptionButton
                     key={option}
                     selected={eficaciaData.medio_utilizado === option}
@@ -276,7 +272,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                   </OptionButton>
                 ))}
               </div>
-              {eficaciaData.medio_utilizado === 'Otro' && (
+              {eficaciaData.medio_utilizado === 'Otro medio' && (
                 <div className={styles["other-input-section"]}>
                   <label className={styles["input-label"]}>Especifique cuál:</label>
                   <input
@@ -290,10 +286,9 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               )}
             </div>
 
-            {/* Question 2: Medium Effectiveness */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
-                2. ¿El medio ha sido efectivo para el logro de los objetivos de la auditoría?
+                ¿El medio ha sido efectivo para el logro de los objetivos de la auditoría?
               </h3>
               <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
@@ -313,10 +308,9 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               </div>
             </div>
 
-            {/* Question 3: Issues Presented */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
-                3. ¿Se han presentado inconvenientes o contratiempos durante la auditoría?
+                ¿Se han presentado inconvenientes o contratiempos durante la auditoría?
               </h3>
               <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
@@ -340,16 +334,16 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
             {eficaciaData.inconvenientes_presentados === 'si' && (
               <div className={styles["question-section"]}>
                 <h3 className={styles["question-title"]}>
-                  4. ¿En caso tal, cuáles?
+                  ¿En caso tal, cuáles?
                 </h3>
                 <p className={styles["question-subtitle"]}>Seleccione todas las opciones que apliquen:</p>
                 <div className={styles["checkbox-options"]}>
                   {[
-                    'interlocutores no disponibles',
-                    'información documentada no disponible en formato digital',
-                    'cuestiones relacionadas con la confidencialidad de la información',
-                    'dificultades para la observación de las actividades técnicas',
-                    'otro'
+                    'Interlocutores no disponibles',
+                    'Información documentada no disponible en formato digital',
+                    'Cuestiones relacionadas con la confidencialidad de la información',
+                    'Dificultades para la observación de las actividades técnicas',
+                    'Otro inconveniente'
                   ].map((option) => (
                     <button
                       key={option}
@@ -367,7 +361,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                     </button>
                   ))}
                 </div>
-                {isOptionSelected("tipos_inconvenientes", "otro") && (
+                {isOptionSelected("tipos_inconvenientes", "Otro inconveniente") && (
                   <div className={styles["other-input-section"]}>
                     <label className={styles["input-label"]}>Especifique cuál:</label>
                     <input
@@ -382,23 +376,22 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
               </div>
             )}
 
-            {/* Question 5: Remote Techniques Used */}
             <div className={styles["question-section"]}>
               <h3 className={styles["question-title"]}>
-                5. Indique las técnicas utilizadas para la recopilación y verificación de las evidencias
+                Indique las técnicas utilizadas para la recopilación y verificación de las evidencias
               </h3>
               <p className={styles["question-subtitle"]}>Seleccione todas las opciones que apliquen:</p>
               <div className={styles["checkbox-options"]}>
                 {[
-                  'entrevistas por video conferencia',
-                  'recorrido por las instalaciones por video conferencia',
-                  'observación de procesos y actividades por video conferencia',
-                  'revisión documental',
-                  'revisión de registros online y en pantalla',
-                  'acceso a plataformas o a repositorios de archivos informáticos',
-                  'grabaciones de actividades técnicas',
-                  'intercambio de fotografias',
-                  'otro'
+                  'Entrevistas por video conferencia',
+                  'Recorrido por las instalaciones por video conferencia',
+                  'Observación de procesos y actividades por video conferencia',
+                  'Revisión documental',
+                  'Revisión de registros online y en pantalla',
+                  'Acceso a plataformas o a repositorios de archivos informáticos',
+                  'Grabaciones de actividades técnicas',
+                  'Intercambio de fotografias',
+                  'Otra técnica'
                 ].map((option) => (
                   <button
                     key={option}
@@ -416,7 +409,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                   </button>
                 ))}
               </div>
-              {isOptionSelected("tecnicas_utilizadas", "otro") && (
+              {isOptionSelected("tecnicas_utilizadas", "Otra técnica") && (
                 <div className={styles["other-input-section"]}>
                   <label className={styles["input-label"]}>Especifique cuál:</label>
                   <input

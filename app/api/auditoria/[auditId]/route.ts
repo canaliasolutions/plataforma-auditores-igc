@@ -9,7 +9,7 @@ export async function GET(req: Request, { params }: { params: { auditId: string 
             headers: { "Content-Type": "application/json" },
         });
     }
-    const user = authResult.email!;
+    const user = authResult.claims?.preferred_username ?? 'unknown_user';
     let audit;
     try {
         audit = await getAuditById(user, params.auditId);
