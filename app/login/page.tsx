@@ -15,8 +15,6 @@ export default function LoginPage() {
 
             // Check if login was successful and we got an ID Token
             if (loginResponse && loginResponse.idToken) {
-                console.log("MSAL Login successful. Sending ID Token to backend.");
-
                 const apiResponse = await fetch("/api/login", {
                     method: "POST",
                     headers: {
@@ -34,18 +32,7 @@ export default function LoginPage() {
                 });
 
                 if (apiResponse.ok) {
-                    console.log("Backend session established successfully!");
-                    // Optional: Parse response if your backend sends back user data or session status
-                    // const data = await apiResponse.json();
-
-                    // After successful API call, navigate to the protected page
-                    router.push("/auditorias");
-
-                    // If you still need the original onLoginSuccess callback for other client-side logic:
-                    // if (onLoginSuccess) {
-                    //   onLoginSuccess(loginResponse.account);
-                    // }
-
+                    router.push('/auditorias');
                 } else {
                     // Handle API error
                     const errorData = await apiResponse.json();

@@ -80,7 +80,6 @@
 
 /* Question Section */
 .question-section {
-  margin-bottom: 32px;
 }
 
 .question-title {
@@ -316,7 +315,6 @@
   }
 
   .question-section {
-    margin-bottom: 24px;
   }
 
     .remote-questions,

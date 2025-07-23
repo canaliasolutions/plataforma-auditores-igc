@@ -102,7 +102,7 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
   return (
     <div className={styles["audit-detail"]}>
       <div className={styles["detail-header"]}>
-        <button onClick={() => router.back()} className={styles["back-button"]}>
+        <button onClick={() => router.push("/auditorias")} className={styles["back-button"]}>
           ← Volver
         </button>
         <div className={styles["header-content"]}>

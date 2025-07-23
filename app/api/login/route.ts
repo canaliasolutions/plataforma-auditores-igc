@@ -29,15 +29,7 @@ export async function POST(req: NextRequest) {
     const signedSessionValue = await createSignedSessionCookie(userForSession);
 
     // 5. Create the response object and set the secure HTTP-only session cookie
-    const response = NextResponse.json({
-      success: true,
-      user: {
-        email: userForSession.email,
-        name: userForSession.name,
-        userId: userForSession.userId,
-      },
-      message: "Authentication successful, session established.",
-    });
+    const response = NextResponse.redirect(new URL('/auditorias', req.url));
 
     setSessionCookie(response, signedSessionValue);
 

@@ -24,6 +24,7 @@ export default async function RootLayout({children}: Readonly<{
     children: React.ReactNode;
 }>) {
     const session: UserSessionData | null = await getSession();
+    console.log("Session data in RootLayout:", session);
 
     return (
         <html lang="es">

@@ -95,11 +95,11 @@ export function deleteSessionCookie(response: NextResponse) {
  * Helper to get the session from the incoming request (e.g., in Route Handlers or Server Components).
  */
 export async function getSession(): Promise<UserSessionData | null> {
-    const cookieStore = await cookies(); // Available in Server Components and Route Handlers
+    const cookieStore = await cookies();
     const signedSession = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
     if (!signedSession) {
-        return {name: "test", email: "emailtest"};
+        return null;
     }
 
     return verifySignedSessionCookie(signedSession);

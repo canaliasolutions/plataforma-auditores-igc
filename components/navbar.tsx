@@ -17,9 +17,25 @@ export function Navbar({
   const { instance } = useMsal();
   const router = useRouter();
   const handleLogout = async () => {
-    await instance.logoutPopup({
-      postLogoutRedirectUri: window.location.origin,
-    });
+    try {
+
+      await instance.logoutPopup();
+
+      const response = await fetch('/api/logout', {
+        method: 'POST', // Use POST as defined in your API route
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server logout failed: ${response.statusText}`);
+      }
+
+      router.push('/login');
+
+      console.log("User successfully logged out (client-side MSAL and server-side session invalidated).");
+
+    } catch (error) {
+      console.error("Error during logout process:", error);
+    }
   };
 
   const onTabChange = (tab: string) => {
@@ -57,13 +73,13 @@ export function Navbar({
         <div className={styles["navbar-user"]}>
           <div className={styles["user-info"]}>
             <div className={styles["user-avatar"]}>
-              {userSession.name ? userSession.name.charAt(0).toUpperCase() : "U"}
+              {userSession?.name ? userSession.name.charAt(0).toUpperCase() : "U"}
             </div>
             <div className={styles["user-details"]}>
               <span className={styles["user-name"]}>
-                {userSession.name || "Usuario"}
+                {userSession?.name || "Usuario"}
               </span>
-              <span className={styles["user-email"]}>{userSession.email}</span>
+              <span className={styles["user-email"]}>{userSession?.email}</span>
             </div>
           </div>
           <button onClick={handleLogout} className={styles["logout-btn"]}>
