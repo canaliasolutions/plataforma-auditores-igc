@@ -11,7 +11,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const hallazgos = hallazgosQueries.getAll.all(auditoriaId);
+    const hallazgosRaw = hallazgosQueries.getAll.all(auditoriaId);
+    const hallazgos = hallazgosRaw.map(({ clausula_id, clausula_label, ...hallazgo }) => ({
+      ...hallazgo,
+      clausula: {
+        value: clausula_id || '',
+        label: clausula_label || ''
+      }
+    }));
     return NextResponse.json(hallazgos);
   } catch (error) {
     console.error('Error fetching hallazgos:', error);
@@ -22,19 +29,20 @@ export async function GET(req: NextRequest) {
 // POST: Add a new hallazgo
 export async function POST(req: NextRequest) {
   try {
-    const { auditoriaId, titulo, descripcion, clausula, type, severidad, fechaEncontrado } = await req.json();
+    const { auditoriaId, evidencia, descripcion, clausula, type, severidad, fechaEncontrado } = await req.json();
 
-    if (!auditoriaId || !titulo || !clausula || !type) {
+    if (!auditoriaId || !evidencia || !clausula || !type) {
       return NextResponse.json({
-        error: 'auditoriaId, titulo, clausula and type are required'
+        error: 'auditoriaId, evidencia, clausula and type are required'
       }, { status: 400 });
     }
 
     const info = hallazgosQueries.create.run(
       auditoriaId,
-      titulo,
+      evidencia,
       descripcion || '',
-      clausula,
+      clausula.value,
+      clausula.label,
       type,
       severidad,
       fechaEncontrado || new Date().toISOString().split('T')[0]
@@ -51,16 +59,17 @@ export async function POST(req: NextRequest) {
 // PUT: Update a hallazgo by id
 export async function PUT(req: NextRequest) {
   try {
-    const { id, titulo, descripcion, clausula, type, severidad, fechaResuelto } = await req.json();
+    const { id, evidencia, descripcion, clausula, type, severidad, fechaResuelto } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
     const info = hallazgosQueries.update.run(
-      titulo,
+      evidencia,
       descripcion,
-      clausula,
+      clausula.value,
+      clausula.label,
       type,
       severidad,
       fechaResuelto,

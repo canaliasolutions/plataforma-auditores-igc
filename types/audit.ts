@@ -29,13 +29,17 @@ export interface Audit {
 export interface Hallazgo {
     id: number;
     auditoria_id: string;
-    titulo: string;
+    evidencia: string;
     descripcion: string;
-    clausula: string;
+    clausula: {value: string, label: string};
     type: "OB" | "NC" | "OM" | "PF";
-    severidad: "menor" | "mayor" | "critica" | "";
+    severidad: "menor" | "mayor" | "";
     fecha_encontrado: string;
     fecha_resuelto?: string;
     fecha_creacion: string;
     fecha_actualizacion: string;
+}
+
+export interface Informe {
+
 }

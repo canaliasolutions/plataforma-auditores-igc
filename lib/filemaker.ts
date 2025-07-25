@@ -1,5 +1,5 @@
 import {Client} from 'fm-data-api-client';
-import {Audit, AuditCardType } from "@/types/audit";
+import {Audit, AuditCardType, Hallazgo} from "@/types/audit";
 import {fakeAudits} from "@/lib/fake-data";
 
 // const revisionesClient = new Client(process.env.FM_HOST,  process.env.FM_REVISIONES_DB, process.env.FM_USERNAME, process.env.FM_PWD);
@@ -86,6 +86,31 @@ export async function getAuditById(auditId: string, auditorEmail: string): Promi
         type: auditRawItem['Tipo'],
         auditor: auditRawItem['Auditor_Jefe'],
     };
+}
+
+function submitInforme(informe: Informe) {
+
+}
+
+async function submitHallazho(hallazgos: Hallazgo[]): Promise<void> {
+    const layout = informesClient.layout('Hallazgos');
+    try {
+        for (const hallazgo of hallazgos) {
+            await layout.create({
+                "auditoria_id": hallazgo.auditoria_id,
+                "evidencia": hallazgo.evidencia,
+                "descripcion": hallazgo.descripcion,
+                "clausula": hallazgo.clausula,
+                "type": hallazgo.type,
+                "severidad": hallazgo.severidad,
+                "fecha_encontrado": hallazgo.fecha_encontrado,
+                "fecha_resuelto": hallazgo.fecha_resuelto || null
+            });
+        }
+    } catch (error) {
+        console.error("Error submitting hallazgos:", error);
+        throw error;
+    }
 }
 
 function sortByDate(audits: Audit[]): Audit[] {
