@@ -29,11 +29,11 @@ export async function GET(req: NextRequest) {
 // POST: Add a new hallazgo
 export async function POST(req: NextRequest) {
   try {
-    const { auditoriaId, evidencia, descripcion, clausula, type, severidad, fechaEncontrado } = await req.json();
+    const { auditoriaId, evidencia, descripcion, norma, clausula, tipo, severidad, fechaEncontrado } = await req.json();
 
-    if (!auditoriaId || !evidencia || !clausula || !type) {
+    if (!auditoriaId || !evidencia || !clausula || !tipo || !norma) {
       return NextResponse.json({
-        error: 'auditoriaId, evidencia, clausula and type are required'
+        error: 'auditoriaId, evidencia, clausula and tipo are required'
       }, { status: 400 });
     }
 
@@ -41,9 +41,10 @@ export async function POST(req: NextRequest) {
       auditoriaId,
       evidencia,
       descripcion || '',
+      norma,
       clausula.value,
       clausula.label,
-      type,
+      tipo,
       severidad,
       fechaEncontrado || new Date().toISOString().split('T')[0]
     );
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
 // PUT: Update a hallazgo by id
 export async function PUT(req: NextRequest) {
   try {
-    const { id, evidencia, descripcion, clausula, type, severidad, fechaResuelto } = await req.json();
+    const { id, evidencia, descripcion, norma, clausula, tipo, severidad, fechaResuelto } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -68,9 +69,10 @@ export async function PUT(req: NextRequest) {
     const info = hallazgosQueries.update.run(
       evidencia,
       descripcion,
+      norma,
       clausula.value,
       clausula.label,
-      type,
+      tipo,
       severidad,
       fechaResuelto,
       id

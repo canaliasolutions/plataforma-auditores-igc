@@ -39,42 +39,35 @@ export async function GET(req: NextRequest) {
 // POST/PUT: Save or update eficacia data
 export async function POST(req: NextRequest) {
   try {
-    const { 
-      auditoriaId,
-      tipoAuditoria,
-      medioUtilizado,
-      otroMedio,
-      medioEfectivo,
-      inconvenientesPresentados,
-      tiposInconvenientes,
-      otrosInconvenientes,
-      tecnicasUtilizadas,
-      otrasTecnicas
+    const {
+      eficacia
     } = await req.json();
     
-    if (!auditoriaId) {
+    if (!eficacia) {
       return NextResponse.json({ 
-        error: 'auditoriaId is required' 
+        error: 'Falta el campo eficacia'
       }, { status: 400 });
     }
 
     // Use upsert to either insert or update
     const info = eficaciaQueries.upsert.run(
-      auditoriaId,
-      tipoAuditoria || 'in_situ',
-      medioUtilizado || '',
-      otroMedio || '',
-      medioEfectivo || '',
-      inconvenientesPresentados || '',
-      tiposInconvenientes || '',
-      otrosInconvenientes || '',
-      tecnicasUtilizadas || '',
-      otrasTecnicas || ''
+        eficacia.auditoria_id,
+        eficacia.tipo_auditoria || 'in_situ',
+        eficacia.medio_utilizado || '',
+        eficacia.otro_medio || '',
+        eficacia.medio_efectivo || '',
+        eficacia.inconvenientes_presentados || '',
+        eficacia.tipos_inconvenientes || '',
+        eficacia.otros_inconvenientes || '',
+        eficacia.tecnicas_utilizadas || '',
+        eficacia.tecnicas_insitu_utilizadas || '',
+        eficacia.otras_tecnicas || '',
+        eficacia.otras_tecnicas_insitu || ''
     );
 
     // Fetch the updated record
-    const eficacia = eficaciaQueries.getByAuditId.get(auditoriaId);
-    return NextResponse.json(eficacia, { status: 200 });
+    const eficacias = eficaciaQueries.getByAuditId.get(eficacia.auditoria_id);
+    return NextResponse.json(eficacias, { status: 200 });
   } catch (error) {
     console.error('Error saving eficacia data:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

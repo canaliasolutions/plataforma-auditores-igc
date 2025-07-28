@@ -12,9 +12,10 @@ CREATE TABLE IF NOT EXISTS hallazgos (
   auditoria_id TEXT NOT NULL,
   evidencia TEXT NOT NULL,
   descripcion TEXT,
+  norma TEXT NOT NULL,
   clausula_id TEXT,
   clausula_label TEXT,
-  type TEXT NOT NULL DEFAULT 'OB',
+  tipo TEXT NOT NULL DEFAULT 'OB',
   severidad TEXT,
   fecha_encontrado TEXT NOT NULL,
   fecha_resuelto TEXT,
@@ -66,7 +67,9 @@ CREATE TABLE IF NOT EXISTS eficacia (
   tipos_inconvenientes TEXT,
   otros_inconvenientes TEXT,
   tecnicas_utilizadas TEXT,
+  tecnicas_insitu_utilizadas TEXT,
   otras_tecnicas TEXT,
+  otras_tecnicas_insitu TEXT,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
   fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -97,12 +100,12 @@ export const hallazgosQueries = {
   getAll: db.prepare('SELECT * FROM hallazgos WHERE auditoria_id = ? ORDER BY fecha_creacion DESC'),
   getById: db.prepare('SELECT * FROM hallazgos WHERE id = ?'),
   create: db.prepare(`
-    INSERT INTO hallazgos (auditoria_id, evidencia, descripcion, clausula_id, clausula_label, type, severidad, fecha_encontrado)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO hallazgos (auditoria_id, evidencia, descripcion, norma, clausula_id, clausula_label, tipo, severidad, fecha_encontrado)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `),
   update: db.prepare(`
     UPDATE hallazgos
-    SET evidencia = ?, descripcion = ?, clausula_id = ?, clausula_label = ?, type = ?, severidad = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
+    SET evidencia = ?, descripcion = ?, norma = ?, clausula_id = ?, clausula_label = ?, tipo = ?, severidad = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
     WHERE id = ?
   `),
   delete: db.prepare('DELETE FROM hallazgos WHERE id = ?')
@@ -161,8 +164,8 @@ export const eficaciaQueries = {
     WHERE auditoria_id = ?
   `),
   upsert: db.prepare(`
-    INSERT INTO eficacia (auditoria_id, tipo_auditoria, medio_utilizado, otro_medio, medio_efectivo, inconvenientes_presentados, tipos_inconvenientes, otros_inconvenientes, tecnicas_utilizadas, otras_tecnicas)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO eficacia (auditoria_id, tipo_auditoria, medio_utilizado, otro_medio, medio_efectivo, inconvenientes_presentados, tipos_inconvenientes, otros_inconvenientes, tecnicas_utilizadas, tecnicas_insitu_utilizadas, otras_tecnicas, otras_tecnicas_insitu)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(auditoria_id) DO UPDATE SET
       tipo_auditoria = excluded.tipo_auditoria,
       medio_utilizado = excluded.medio_utilizado,
@@ -172,7 +175,9 @@ export const eficaciaQueries = {
       tipos_inconvenientes = excluded.tipos_inconvenientes,
       otros_inconvenientes = excluded.otros_inconvenientes,
       tecnicas_utilizadas = excluded.tecnicas_utilizadas,
+      tecnicas_insitu_utilizadas = excluded.tecnicas_insitu_utilizadas,
       otras_tecnicas = excluded.otras_tecnicas,
+      otras_tecnicas_insitu = excluded.otras_tecnicas_insitu,
       fecha_actualizacion = CURRENT_TIMESTAMP
   `)
 };

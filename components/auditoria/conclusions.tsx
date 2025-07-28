@@ -5,7 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import WarningIcon from "@mui/icons-material/Warning";
 import SaveIcon from "@mui/icons-material/Save";
-import { Audit } from "@/types/audit";
+import { Auditoria } from "@/types/tipos";
 import { OptionButton } from "./option-button";
 import styles from "./Conclusions.module.css";
 
@@ -21,10 +21,10 @@ interface Conclusions {
 
 interface ConclusionsProps {
   auditId: string;
-  audit: Audit | null;
+  auditoria: Auditoria | null;
 }
 
-export function Conclusions({ auditId, audit }: ConclusionsProps) {
+export function Conclusions({ auditId, auditoria }: ConclusionsProps) {
   const [conclusions, setConclusions] = useState<Conclusions>({
     auditoria_id: auditId,
     objetivos_cumplidos: "si",
@@ -135,7 +135,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
       {hasChanges && (
         <div className={styles["changes-notice"]}>
           <p className={styles["changes-text"]}>
-            Tienes cambios sin guardar. Haz clic en "Guardar conclusiones" para confirmar.
+            Tienes cambios sin guardar. Haz clic en &#34;Guardar conclusiones&#34; para confirmar.
           </p>
         </div>
       )}
@@ -190,7 +190,7 @@ export function Conclusions({ auditId, audit }: ConclusionsProps) {
         <div className={styles["question-section"]}>
           <h3 className={styles["question-title"]}>
             2. ¿El Sistema de gestión cumple con los requisitos de la norma{" "}
-            <strong>{audit?.standard || "[norma]"}</strong> y con los criterios de 
+            <strong>{auditoria?.norma || "[norma]"}</strong> y con los criterios de
             auditoría (requisitos legales y reglamentarios, requisitos del cliente 
             y de otras partes interesadas, requisitos de la propia organización) y 
             se considera que se encuentra eficazmente implantado?

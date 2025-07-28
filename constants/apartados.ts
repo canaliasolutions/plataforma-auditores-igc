@@ -2,7 +2,7 @@
      {
          "clausula": "",
          "titulo": "",
-         "id": 0,
+         "id": "",
          "descripcion": ""
      },
     {

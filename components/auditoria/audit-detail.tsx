@@ -10,13 +10,13 @@ import { Eficacia } from "./eficacia";
 import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
-import {Audit} from "@/types/audit";
+import {Auditoria} from "@/types/tipos";
 
 interface AuditDetailProps {
-  audit: Audit | null;
+  auditoria: Auditoria;
 }
 
-export default function AuditDetail({ audit }: AuditDetailProps) {
+export default function AuditDetail({ auditoria }: AuditDetailProps) {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
@@ -44,8 +44,8 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
   };
 
   const getDuration = () => {
-    const start = new Date(audit.startDate);
-    const end = new Date(audit.endDate);
+    const start = new Date(auditoria.fechaInicio);
+    const end = new Date(auditoria.fechaFinal);
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   };
 
@@ -59,41 +59,41 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
                 <h3 className={styles["info-title"]}>Información General</h3>
                 <div className={styles["info-item"]}>
                   <span className={styles["info-label"]}>Auditor:</span>
-                  <span className={styles["info-value"]}>{audit.auditor}</span>
+                  <span className={styles["info-value"]}>{auditoria.nombreAuditor}</span>
                 </div>
                 <div className={styles["info-item"]}>
                   <span className={styles["info-label"]}>Ubicación:</span>
-                  <span className={styles["info-value"]}>{audit.location}</span>
+                  <span className={styles["info-value"]}>{auditoria.ubicacion}</span>
                 </div>
                 <div className={styles["info-item"]}>
                   <span className={styles["info-label"]}>Tipo:</span>
-                  <span className={styles["info-value"]}>{audit.type}</span>
+                  <span className={styles["info-value"]}>{auditoria.tipo}</span>
                 </div>
                 <div className={styles["info-item"]}>
                   <span className={styles["info-label"]}>Duración:</span>
                   <span className={styles["info-value"]}>
-                    {getDuration()} días
+                    {getDuration()} día(s)
                   </span>
                 </div>
               </div>
 
               <div className={styles["info-card"]}>
                 <h3 className={styles["info-title"]}>Alcance</h3>
-                <p className={styles["description"]}>{audit.scope}</p>
+                <p className={styles["description"]}>{auditoria.alcance}</p>
               </div>
             </div>
           </div>
         );
       case "non-conformities":
-        return <Hallazgos auditId={audit.id} />;
+        return <Hallazgos auditoria={auditoria} />;
       case "participants":
-        return <Participants auditId={audit.id} />;
+        return <Participants auditId={auditoria.id} />;
       case "data-verification":
-        return <DataVerification auditId={audit.id} />;
+        return <DataVerification auditId={auditoria.id} />;
       case "eficacia":
-        return <Eficacia auditId={audit.id} audit={audit} />;
+        return <Eficacia auditId={auditoria.id} auditoria={auditoria} />;
       case "conclusions":
-        return <Conclusions auditId={audit.id} audit={audit} />;
+        return <Conclusions auditId={auditoria.id} auditoria={auditoria} />;
       default:
         return null;
     }
@@ -109,25 +109,25 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
           <div className={styles["header-main"]}>
             <div className={styles["client-section"]}>
               <div className={styles["client-logo"]}>
-                {audit.client.logo ? (
+                {auditoria.cliente.logo ? (
                   <img
-                    src={audit.client.logo}
-                    alt={`${audit.client.name} logo`}
+                    src={auditoria.cliente.logo}
+                    alt={`${auditoria.cliente.nombre} logo`}
                     className={styles["logo-image"]}
                   />
                 ) : (
                   <div className={styles["logo-placeholder"]}>
-                    {audit.client.name.charAt(0).toUpperCase()}
+                    {auditoria.cliente.nombre.charAt(0).toUpperCase()}
                   </div>
                 )}
               </div>
               <div className={styles["client-info"]}>
-                <h1 className={styles["client-name"]}>{audit.client.name}</h1>
+                <h1 className={styles["client-name"]}>{auditoria.cliente.nombre}</h1>
                 <div className={styles["audit-meta"]}>
-                  <span className={styles["standard-badge"]} style={{"backgroundColor": getStandardColor(audit.standard)}}>
-                    {audit.standard}
+                  <span className={styles["standard-badge"]} style={{"backgroundColor": getStandardColor(auditoria.norma)}}>
+                    {auditoria.norma}
                   </span>
-                  <span className={styles["stage-badge"]}>{audit.stage}</span>
+                  <span className={styles["stage-badge"]}>{auditoria.etapa}</span>
                 </div>
               </div>
             </div>
@@ -136,13 +136,13 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
               <div className={styles["date-item"]}>
                 <span className={styles["date-label"]}>Fecha de inicio:</span>
                 <span className={styles["date-value"]}>
-                  {formatDate(audit.startDate)}
+                  {formatDate(auditoria.fechaInicio)}
                 </span>
               </div>
               <div className={styles["date-item"]}>
                 <span className={styles["date-label"]}>Fecha de fin:</span>
                 <span className={styles["date-value"]}>
-                  {formatDate(audit.endDate)}
+                  {formatDate(auditoria.fechaFinal)}
                 </span>
               </div>
             </div>
@@ -153,7 +153,7 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
               onClick={() => setShowReportModal(true)}
               className={styles["generate-report-btn"]}
             >
-              Generar Informe
+              Enviar resultados
             </button>
           </div>
         </div>
@@ -166,12 +166,23 @@ export default function AuditDetail({ audit }: AuditDetailProps) {
       {showReportModal && (
         <ReportGenerationModal
           onClose={() => setShowReportModal(false)}
-          onConfirm={() => {
-            // TODO: Implement report generation
-            console.log("Generating report for audit:", audit.id);
+          onConfirm={async () => {
+            const response = await fetch('/api/informe', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({"auditoria": auditoria
+              }),
+            });
+            if (response.ok) {
+              alert('Datos de auditoría subidos exitosamente')
+            } else {
+              alert('Ha habido un error subiendo los datos de auditoría. Si el error persiste, comunícate con soporte@certificacionglobal.com')
+            }
             setShowReportModal(false);
           }}
-          auditName={audit.client.name}
+          auditName={auditoria.cliente.nombre}
         />
       )}
     </div>

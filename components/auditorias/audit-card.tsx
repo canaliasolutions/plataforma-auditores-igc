@@ -1,10 +1,10 @@
 "use client";
 
 import styles from "./AuditCard.module.css";
-import {AuditCardType} from "@/types/audit";
+import {ResumenAuditoria} from "@/types/tipos";
 
 interface AuditCardProps {
-    audit: AuditCardType,
+    audit: ResumenAuditoria,
     onClick?: () => void,
     href?: string
 }
@@ -30,27 +30,27 @@ export function AuditCard({
             <div className={styles["audit-card-header"]}>
                 <div className={styles["client-info"]}>
                     <div className={styles["client-logo"]}>
-                        {audit.client.logo ? (
+                        {audit.cliente.logo ? (
                             <img
-                                src={audit.client.logo}
-                                alt={`${audit.client.name} logo`}
+                                src={audit.cliente.logo}
+                                alt={`${audit.cliente.nombre} logo`}
                                 className={styles["logo-image"]}
                             />
                         ) : (
                             <div className={styles["logo-placeholder"]}>
-                                {audit.client.name?.charAt(0).toUpperCase()}
+                                {audit.cliente.nombre?.charAt(0).toUpperCase()}
                             </div>
                         )}
                     </div>
-                    <h3 className={styles["client-name"]}>{audit.client.name}</h3>
+                    <h3 className={styles["client-name"]}>{audit.cliente.nombre}</h3>
                 </div>
             </div>
 
             <div className={styles["audit-card-body"]}>
                 <div className={styles["standard-info"]}>
                     <span className={styles["standard-badge"]}
-                          style={{"backgroundColor": getStandardColor(audit.standard)}}>{audit.standard}</span>
-                    <span className={styles["standard-badge"]}>{audit.stage}</span>
+                          style={{"backgroundColor": getStandardColor(audit.norma)}}>{audit.norma}</span>
+                    <span className={styles["standard-badge"]}>{audit.etapa}</span>
                 </div>
 
                 <div className={styles["date-info"]}>
@@ -60,7 +60,7 @@ export function AuditCard({
               {new Intl.DateTimeFormat('es-ES', {
                   dateStyle: 'long',
                   timeZone: 'America/Panama',
-              }).format(new Date(audit.startDate))}
+              }).format(new Date(audit.fechaInicio))}
             </span>
                     </div>
                 </div>
@@ -70,11 +70,11 @@ export function AuditCard({
         <span className={styles["duration-info"]}>
           Duración:{" "}
             {Math.ceil(
-                (new Date(audit.endDate).getTime() -
-                    new Date(audit.startDate).getTime()) /
+                (new Date(audit.fechaFinal).getTime() -
+                    new Date(audit.fechaInicio).getTime()) /
                 (1000 * 60 * 60 * 24),
             ) + 1}{" "}
-            días
+            día(s)
         </span>
             </div>
         </a>

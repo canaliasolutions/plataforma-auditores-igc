@@ -435,11 +435,11 @@ export function Participants({ auditId }: ParticipantsProps) {
                     setShowEditForm(false);
                     setEditingItem(null);
                     setNewParticipant({
-                      name: "",
-                      role: "",
-                      email: "",
-                      attendedFirstMeeting: false,
-                      attendedLastMeeting: false,
+                      nombre_completo: "",
+                      cargo_rol: "",
+                      correo_electronico: "",
+                      asistio_reunion_inicial: false,
+                      asistio_reunion_cierre: false,
                     });
                   }}
                   className={styles["cancel-button"]}

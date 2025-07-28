@@ -5,29 +5,38 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./Hallazgos.module.css";
-import {Hallazgo} from "@/types/audit";
+import {Auditoria, Hallazgo} from "@/types/tipos";
 import {apartados} from "@/constants/apartados";
 
-interface NonConformitiesProps {
-    auditId: string;
+interface HallazgosProps {
+    auditoria: Auditoria;
 }
 
-export function Hallazgos({auditId}: NonConformitiesProps) {
-    const [nonConformities, setNonConformities] = useState<Hallazgo[]>([]);
+const hallazgoVacio = {
+    evidencia: "",
+    descripcion: "",
+    clausula: {value: "", label: ""},
+    tipo: "OB" as const,
+    severidad: "" as const,
+    norma: "",
+}
+
+export function Hallazgos({auditoria}: HallazgosProps) {
+    const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Load hallazgos from database
     useEffect(() => {
-        loadHallazgos();
-    }, [auditId]);
+        cargarHallazgos();
+    }, [auditoria.id]);
 
-    const loadHallazgos = async () => {
+    const cargarHallazgos = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`/api/hallazgos?auditoriaId=${auditId}`);
+            const response = await fetch(`/api/hallazgos?auditoriaId=${auditoria.id}`);
             if (response.ok) {
                 const data = await response.json();
-                setNonConformities(data);
+                setHallazgos(data);
             }
         } catch (error) {
             console.error('Error loading hallazgos:', error);
@@ -41,13 +50,7 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
-    const [newNonConformity, setNewNonConformity] = useState({
-        evidencia: "",
-        descripcion: "",
-        clausula: {value: "", label: ""},
-        type: "OB" as const,
-        severidad: "" as const,
-    });
+    const [newNonConformity, setNewNonConformity] = useState(hallazgoVacio);
 
     const getSeverityColor = (severity: string) => {
         switch (severity) {
@@ -96,25 +99,20 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    auditoriaId: auditId,
+                    auditoriaId: auditoria.id,
                     evidencia: newNonConformity.evidencia,
                     descripcion: newNonConformity.descripcion,
                     clausula: newNonConformity.clausula,
-                    type: newNonConformity.type,
-                    severidad: newNonConformity.type === "NC" ? newNonConformity.severidad : null,
+                    tipo: newNonConformity.tipo,
+                    norma: auditoria.norma,
+                    severidad: newNonConformity.tipo === "NC" ? newNonConformity.severidad : null,
                     fechaEncontrado: new Date().toISOString().split("T")[0],
                 }),
             });
 
             if (response.ok) {
-                await loadHallazgos(); // Reload the list
-                setNewNonConformity({
-                    evidencia: "",
-                    descripcion: "",
-                    clausula: {value: "", label: ""},
-                    type: "OB",
-                    severidad: "",
-                });
+                await cargarHallazgos(); // Reload the list
+                setNewNonConformity(hallazgoVacio);
                 setShowAddForm(false);
             } else {
                 console.error('Error adding hallazgo');
@@ -131,7 +129,7 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
             evidencia: item.evidencia,
             descripcion: item.descripcion,
             clausula: item.clausula,
-            type: item.type,
+            tipo: item.tipo,
             severidad: item.severidad || "",
         });
         setShowEditForm(true);
@@ -152,21 +150,16 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                     evidencia: newNonConformity.evidencia,
                     descripcion: newNonConformity.descripcion,
                     clausula: newNonConformity.clausula,
-                    type: newNonConformity.type,
-                    severidad: newNonConformity.type === "NC" ? newNonConformity.severidad : null,
+                    tipo: newNonConformity.tipo,
+                    norma: auditoria.norma,
+                    severidad: newNonConformity.tipo === "NC" ? newNonConformity.severidad : null,
                     fechaResuelto: editingItem.fecha_resuelto,
                 }),
             });
 
             if (response.ok) {
-                await loadHallazgos(); // Reload the list
-                setNewNonConformity({
-                    evidencia: "",
-                    descripcion: "",
-                    clausula: {value: "", label: ""},
-                    type: "OB",
-                    severidad: "",
-                });
+                await cargarHallazgos(); // Reload the list
+                setNewNonConformity(hallazgoVacio);
                 setEditingItem(null);
                 setShowEditForm(false);
             } else {
@@ -194,7 +187,7 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                 });
 
                 if (response.ok) {
-                    await loadHallazgos(); // Reload the list
+                    await cargarHallazgos(); // Reload the list
                 } else {
                     console.error('Error deleting hallazgo');
                 }
@@ -274,29 +267,13 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
 
                             <div className={styles["form-row"]}>
                                 <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Cláusula:</label>
-                                    <select
-                                        value={newNonConformity.clausula.value}
-                                        onChange={(e) =>
-                                            setNewNonConformity({
-                                                ...newNonConformity,
-                                                clausula: {value: e.target.value, label: e.target.options[e.target.selectedIndex].text},
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                    >
-                                        {apartados.map((apartado) => <option key={apartado.id} value={String(apartado.id)}>{apartado.clausula}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Tipo:</label>
                                     <select
-                                        value={newNonConformity.type}
+                                        value={newNonConformity.tipo}
                                         onChange={(e) =>
                                             setNewNonConformity({
                                                 ...newNonConformity,
-                                                type: e.target.value as any,
+                                                tipo: e.target.value as any,
                                             })
                                         }
                                         className={styles["form-select"]}
@@ -306,6 +283,28 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                                         <option value="NC">No conformidad</option>
                                         <option value="OM">Oportunidad de mejora</option>
                                         <option value="PF">Punto fuerte</option>
+                                    </select>
+                                </div>
+
+                                <div className={styles["form-group"]}>
+                                    <label className={styles["form-label"]}>Cláusula:</label>
+                                    <select
+                                        value={newNonConformity.clausula.value}
+                                        onChange={(e) =>
+                                            setNewNonConformity({
+                                                ...newNonConformity,
+                                                clausula: {
+                                                    value: e.target.value,
+                                                    label: e.target.options[e.target.selectedIndex].text
+                                                },
+                                            })
+                                        }
+                                        className={styles["form-select"]}
+                                        disabled={newNonConformity.tipo !== "NC"}
+                                        required={newNonConformity.tipo === "NC"}
+                                    >
+                                        {apartados.map((apartado) => <option key={apartado.id}
+                                                                             value={String(apartado.id)}>{apartado.clausula}</option>)}
                                     </select>
                                 </div>
 
@@ -320,7 +319,8 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                                             })
                                         }
                                         className={styles["form-select"]}
-                                        disabled={newNonConformity.type !== "NC"}
+                                        disabled={newNonConformity.tipo !== "NC"}
+                                        required={newNonConformity.tipo === "NC"}
                                     >
                                         <option value=""></option>
                                         <option value="menor">Menor</option>
@@ -355,13 +355,7 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                                 onClick={() => {
                                     setShowEditForm(false);
                                     setEditingItem(null);
-                                    setNewNonConformity({
-                                        evidencia: "",
-                                        descripcion: "",
-                                        clausula: {value: "", label: ""},
-                                        type: "OB",
-                                        severidad: "",
-                                    });
+                                    setNewNonConformity(hallazgoVacio);
                                 }}
                                 className={styles["close-button"]}
                             >
@@ -407,6 +401,26 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
 
                             <div className={styles["form-row"]}>
                                 <div className={styles["form-group"]}>
+                                    <label className={styles["form-label"]}>Tipo:</label>
+                                    <select
+                                        value={newNonConformity.tipo}
+                                        onChange={(e) =>
+                                            setNewNonConformity({
+                                                ...newNonConformity,
+                                                tipo: e.target.value as any,
+                                            })
+                                        }
+                                        className={styles["form-select"]}
+                                        required
+                                    >
+                                        <option value="OB">Observación</option>
+                                        <option value="NC">No conformidad</option>
+                                        <option value="OM">Oportunidad de mejora</option>
+                                        <option value="PF">Punto fuerte</option>
+                                    </select>
+                                </div>
+
+                                <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Cláusula:</label>
                                     <select
                                         value={newNonConformity.clausula.value}
@@ -420,29 +434,11 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                                             })
                                         }
                                         className={styles["form-select"]}
+                                        disabled={newNonConformity.tipo !== "NC"}
+                                        required={newNonConformity.tipo === "NC"}
                                     >
                                         {apartados.map((apartado) => <option
                                             key={apartado.id} value={String(apartado.id)}>{apartado.clausula}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Tipo:</label>
-                                    <select
-                                        value={newNonConformity.type}
-                                        onChange={(e) =>
-                                            setNewNonConformity({
-                                                ...newNonConformity,
-                                                type: e.target.value as any,
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        required
-                                    >
-                                    <option value="OB">Observación</option>
-                                        <option value="NC">No conformidad</option>
-                                        <option value="OM">Oportunidad de mejora</option>
-                                        <option value="PF">Punto fuerte</option>
                                     </select>
                                 </div>
 
@@ -457,7 +453,8 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                                             })
                                         }
                                         className={styles["form-select"]}
-                                        disabled={newNonConformity.type !== "NC"}
+                                        disabled={newNonConformity.tipo !== "NC"}
+                                        required={newNonConformity.tipo === "NC"}
                                     >
                                         <option value=""></option>
                                         <option value="menor">Menor</option>
@@ -472,13 +469,7 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                                     onClick={() => {
                                         setShowEditForm(false);
                                         setEditingItem(null);
-                                        setNewNonConformity({
-                                            evidencia: "",
-                                            descripcion: "",
-                                            clausula: {value: "", label: ""},
-                                            type: "OB",
-                                            severidad: "",
-                                        });
+                                        setNewNonConformity(hallazgoVacio);
                                     }}
                                     className={styles["cancel-button"]}
                                 >
@@ -526,7 +517,7 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
             )}
 
             <div className={styles["conformities-list"]}>
-                {nonConformities.length === 0 ? (
+                {hallazgos.length === 0 ? (
                     <div className={styles["empty-state"]}>
                         <CheckCircleIcon
                             className={styles["empty-icon"]}
@@ -538,20 +529,21 @@ export function Hallazgos({auditId}: NonConformitiesProps) {
                         </p>
                     </div>
                 ) : (
-                    nonConformities.map((item) => (
+                    hallazgos.map((item) => (
                         <div key={item.id} className={styles["conformity-card"]}>
                             <div className={styles["card-header"]}>
                                 <div className={styles["title-section"]}>
                                     <h3 className={styles["conformity-title"]}>{item.evidencia}</h3>
-                                    <span className={styles["clause-badge"]}>
+                                    {(item.clausula.label !== "") ?
+                                        (<span className={styles["clause-badge"]}>
                                         Cláusula {item.clausula.label}
-                  </span>
+                                    </span>) : null}
                                 </div>
                                 <div className={styles["badges"]}>
                   <span className={styles["status-badge"]}>
-                    {getTypeText(item.type)}
+                    {getTypeText(item.tipo)}
                   </span>
-                                    {item.type === "NC" && item.severidad && (
+                                    {item.tipo === "NC" && item.severidad && (
                                         <span
                                             className={styles["severity-badge"]}
                                             style={{backgroundColor: getSeverityColor(item.severidad)}}

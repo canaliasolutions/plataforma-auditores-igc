@@ -6,7 +6,7 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import SaveIcon from "@mui/icons-material/Save";
-import { Audit } from "@/types/audit";
+import { Auditoria } from "@/types/tipos";
 import { OptionButton } from "./option-button";
 import styles from "./Eficacia.module.css";
 
@@ -21,20 +21,22 @@ interface EficaciaData {
   tipos_inconvenientes: string;
   otros_inconvenientes: string;
   tecnicas_utilizadas: string;
+  tecnicas_insitu_utilizadas: string;
   otras_tecnicas: string;
+  otras_tecnicas_insitu: string;
   fecha_creacion?: string;
   fecha_actualizacion?: string;
 }
 
 interface EficaciaProps {
   auditId: string;
-  audit: Audit | null;
+  auditoria: Auditoria | null;
 }
 
-export function Eficacia({ auditId, audit }: EficaciaProps) {
+export function Eficacia({ auditId, auditoria }: EficaciaProps) {
   const [eficaciaData, setEficaciaData] = useState<EficaciaData>({
     auditoria_id: auditId,
-    tipo_auditoria: audit?.type || 'in_situ',
+    tipo_auditoria: auditoria?.tipo || 'in_situ',
     medio_utilizado: '',
     otro_medio: '',
     medio_efectivo: '',
@@ -42,7 +44,9 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
     tipos_inconvenientes: '',
     otros_inconvenientes: '',
     tecnicas_utilizadas: '',
-    otras_tecnicas: ''
+    tecnicas_insitu_utilizadas: '',
+    otras_tecnicas: '',
+    otras_tecnicas_insitu: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -62,7 +66,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
         // Pre-fill audit type from audit data if not already set
         setEficaciaData({
           ...data,
-          tipo_auditoria: data.tipo_auditoria || audit?.type || 'in_situ'
+          tipo_auditoria: data.tipo_auditoria || auditoria?.tipo || 'in_situ'
         });
       }
     } catch (error) {
@@ -82,7 +86,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
 
   const handleMultipleChoice = (field: keyof EficaciaData, option: string, isChecked: boolean) => {
     const currentValues = eficaciaData[field] as string;
-    const valuesArray = currentValues ? currentValues.split(',').map(v => v.trim()) : [];
+    const valuesArray = currentValues ? currentValues.split(' \\r').map(v => v.trim()) : [];
     
     let newValues: string[];
     if (isChecked) {
@@ -91,35 +95,26 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
       newValues = valuesArray.filter(v => v !== option);
     }
     
-    handleDataChange(field, newValues.join(', '));
+    handleDataChange(field, newValues.join(' \\r'));
   };
 
   const isOptionSelected = (field: keyof EficaciaData, option: string): boolean => {
     const currentValues = eficaciaData[field] as string;
     if (!currentValues) return false;
-    return currentValues.split(',').map(v => v.trim()).includes(option);
+    return currentValues.split(' \\r').map(v => v.trim()).includes(option);
   };
 
   const handleSave = async () => {
     try {
       setSaving(true);
+      const eficaciaBody = eficaciaData;
+      eficaciaBody.auditoria_id = auditId;
       const response = await fetch('/api/eficacia', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          auditoriaId: auditId,
-          tipoAuditoria: eficaciaData.tipo_auditoria,
-          medioUtilizado: eficaciaData.medio_utilizado,
-          otroMedio: eficaciaData.otro_medio,
-          medioEfectivo: eficaciaData.medio_efectivo,
-          inconvenientesPresentados: eficaciaData.inconvenientes_presentados,
-          tiposInconvenientes: eficaciaData.tipos_inconvenientes,
-          otrosInconvenientes: eficaciaData.otros_inconvenientes,
-          tecnicasUtilizadas: eficaciaData.tecnicas_utilizadas,
-          otrasTecnicas: eficaciaData.otras_tecnicas,
-        }),
+        body: JSON.stringify({eficacia: eficaciaBody}),
       });
 
       if (response.ok) {
@@ -168,7 +163,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
       {hasChanges && (
         <div className={styles["changes-notice"]}>
           <p className={styles["changes-text"]}>
-            Tienes cambios sin guardar. Haz clic en "Guardar cambios" para confirmar.
+            Tienes cambios sin guardar. Haz clic en &#34;Guardar cambios&#34; para confirmar.
           </p>
         </div>
       )}
@@ -218,9 +213,9 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                   'Observación en sitio de procesos y actividades',
                   'Observación en sitio de actividades técnicas',
                   'Otro'
-                ].map((option) => (
+                ].map((option, index) => (
                   <button
-                    key={option}
+                    key={index}
                     type="button"
                     className={`${styles["checkbox-button"]} ${
                       isOptionSelected("tecnicas_utilizadas", option) ? styles["checkbox-selected"] : ""
@@ -235,7 +230,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                   </button>
                 ))}
               </div>
-              {isOptionSelected("tecnicas_utilizadas", "otro") && (
+              {isOptionSelected("tecnicas_utilizadas", "Otro") && (
                 <div className={styles["other-input-section"]}>
                   <label className={styles["input-label"]}>Especifique cuál:</label>
                   <input
@@ -409,7 +404,7 @@ export function Eficacia({ auditId, audit }: EficaciaProps) {
                   </button>
                 ))}
               </div>
-              {isOptionSelected("tecnicas_utilizadas", "Otra técnica") && (
+              {isOptionSelected("tecnicas_insitu_utilizadas", "Otra técnica") && (
                 <div className={styles["other-input-section"]}>
                   <label className={styles["input-label"]}>Especifique cuál:</label>
                   <input
