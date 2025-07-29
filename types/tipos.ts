@@ -35,3 +35,5 @@ export type Hallazgo = {
 export type Informe = {
 
 }
+
+export type Objeto = { [key: string]: string };

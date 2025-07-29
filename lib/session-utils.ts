@@ -24,7 +24,7 @@ export interface UserSessionData {
  * Creates and signs a new session cookie payload.
  * Generates a unique sessionId and calculates expiry.
  */
-export async function createSignedSessionCookie(userData: Omit<UserSessionData, 'sessionId' | 'expiresAt'>): Promise<string> {
+export async function createSignedSessionCookie(userData: Omit<UserSessionData, 'sessionId' | 'exp'>): Promise<string> {
     const sessionId = nanoid(); // Generate a unique ID for this session
     const expiresAt = Math.floor(Date.now() / 1000) + SESSION_MAX_AGE; // Convert ms to seconds
 

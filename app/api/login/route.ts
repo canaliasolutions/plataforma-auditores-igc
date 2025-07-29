@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Extract necessary user data from the validated ID Token claims
     // These claims are from Azure AD and are now trustworthy
-    const userForSession: Omit<UserSessionData, 'sessionId' | 'expiresAt'> = {
+    const userForSession: Omit<UserSessionData, 'sessionId' | 'exp'> = {
       userId: validation.claims.oid || validation.claims.sub,
       email: validation.claims.preferred_username || '',
       name: validation.claims.name

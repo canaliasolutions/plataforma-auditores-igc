@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hallazgosQueries } from '@/lib/database';
+import {Hallazgo} from "@/types/tipos";
 
 // GET: Fetch all hallazgos for a specific audit
 export async function GET(req: NextRequest) {
@@ -12,13 +13,18 @@ export async function GET(req: NextRequest) {
 
   try {
     const hallazgosRaw = hallazgosQueries.getAll.all(auditoriaId);
-    const hallazgos = hallazgosRaw.map(({ clausula_id, clausula_label, ...hallazgo }) => ({
-      ...hallazgo,
-      clausula: {
-        value: clausula_id || '',
-        label: clausula_label || ''
-      }
-    }));
+    const hallazgos: Hallazgo[] = hallazgosRaw.map(
+        (row: { clausula_id: string; clausula_label: string; [key: string]: unknown }) => {
+          const { clausula_id, clausula_label, ...hallazgo } = row;
+          return {
+            ...hallazgo,
+            clausula: {
+              value: clausula_id || '',
+              label: clausula_label || ''
+            }
+          };
+        }
+    );
     return NextResponse.json(hallazgos);
   } catch (error) {
     console.error('Error fetching hallazgos:', error);

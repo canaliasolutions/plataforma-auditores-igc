@@ -1,5 +1,5 @@
 import {Client} from 'fm-data-api-client';
-import {Auditoria, Hallazgo, ResumenAuditoria} from "@/types/tipos";
+import {Auditoria, Hallazgo, Objeto, ResumenAuditoria} from "@/types/tipos";
 import {fakeAudits} from "@/lib/fake-data";
 import {
     conclusionesQueries,
@@ -27,8 +27,8 @@ export async function getAudits(auditorEmail: string): Promise<ResumenAuditoria[
         console.warn("Using fake records, failed fetch from filemaker: ",e);
         records = {data: fakeAudits};
     }
-    const auditsRawData = records.data.map(item => item.fieldData);
-    auditsRawData.forEach((auditRawItem, index) => {
+    const auditsRawData = records.data.map((item: Objeto) => item.fieldData);
+    auditsRawData.forEach((auditRawItem: Objeto) => {
         const auditoria: ResumenAuditoria = {
             id: '',
             fechaInicio: '',
@@ -164,13 +164,19 @@ export async function subirInforme(auditoria: Auditoria) {
 async function subirHallazgos(auditoria: Auditoria, informeId: string, idAuditor: number): Promise<void> {
     const layout = informesClient.layout('Hallazgos');
     try {
-        const hallazgos: Hallazgo[] = hallazgosQueries.getAll.all(auditoria.id).map(({ clausula_id, clausula_label, ...hallazgo }) => ({
-            ...hallazgo,
-            clausula: {
-                value: clausula_id || '',
-                label: clausula_label || ''
+        const hallazgosRaw = hallazgosQueries.getAll.all(auditoria.id);
+        const hallazgos: Hallazgo[] = hallazgosRaw.map(
+            (row: { clausula_id: string; clausula_label: string; [key: string]: unknown }) => {
+                const { clausula_id, clausula_label, ...hallazgo } = row;
+                return {
+                    ...hallazgo,
+                    clausula: {
+                        value: clausula_id || '',
+                        label: clausula_label || ''
+                    }
+                };
             }
-        }));
+        );
         for (const [index, hallazgo] of hallazgos.entries()) {
             const hallazgoFM = {
                 "Apartado": hallazgo.clausula.value != '0' ? Number(hallazgo.clausula.value) : '',

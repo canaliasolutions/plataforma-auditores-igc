@@ -1,14 +1,16 @@
-// app/providers.tsx (A common place for client-side providers)
 "use client";
 
 import { MsalProvider } from "@azure/msal-react";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { msalConfig } from "@/lib/auth-config";
+import { ReactNode } from "react";
 
-// Create the MSAL instance once outside the component to avoid re-instantiation
 const msalInstance = new PublicClientApplication(msalConfig);
 
-export function MsalClientProvider({ children }) {
+interface MsalClientProviderProps {
+  children: ReactNode;
+}
 
+export function MsalClientProvider({ children }: MsalClientProviderProps) {
   return <MsalProvider instance={msalInstance}>{children}</MsalProvider>;
 }
