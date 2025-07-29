@@ -5,7 +5,7 @@ import { Navbar } from '@/components/navbar';
 import { UserSessionData } from '@/lib/session-utils';
 
 interface NavbarWrapperProps {
-    userSession: UserSessionData;
+    userSession: UserSessionData | null;
 }
 
 export default function NavbarWrapper({ userSession }: NavbarWrapperProps) {

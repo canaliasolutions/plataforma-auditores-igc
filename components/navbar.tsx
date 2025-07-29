@@ -7,7 +7,7 @@ import {UserSessionData} from "@/lib/session-utils";
 
 interface NavbarProps {
   activeTab?: string;
-  userSession: UserSessionData
+  userSession: UserSessionData | null;
   onTabChange?: (tab: string) => void;
 }
 

@@ -16,7 +16,7 @@ export interface UserSessionData {
     userId: string; // The user's unique ID from MSAL claims (oid or sub)
     email: string;
     name?: string;
-    expiresAt: number; // Unix timestamp
+    exp: number; // Unix timestamp
 }
 
 
@@ -29,12 +29,13 @@ export async function createSignedSessionCookie(userData: Omit<UserSessionData, 
     const expiresAt = Math.floor(Date.now() / 1000) + SESSION_MAX_AGE; // Convert ms to seconds
 
     const sessionData: UserSessionData = {
-        exp: expiresAt,
         ...userData,
+        sessionId,
+        exp: expiresAt,
     };
 
     // Sign the session data using JWS (JSON Web Signature) for integrity
-    const jws = await new SignJWT(sessionData)
+    const jws = await new SignJWT(sessionData as unknown as import('jose').JWTPayload)
         .setProtectedHeader({ alg: 'HS256' }) // HMAC-SHA256 algorithm
         .setIssuedAt()
         .setJti(sessionId) // JWT ID
@@ -51,14 +52,13 @@ export async function verifySignedSessionCookie(signedSession: string): Promise<
     try {
         const { payload } = await jwtVerify(signedSession, encodedSecret, {
             algorithms: ['HS256'],
-            maxAge: `${SESSION_MAX_AGE}s`, // Verify JWT expiration matches cookie max age
         });
 
         // Basic type assertion and expiry check
         const sessionData = payload as unknown as UserSessionData;
 
         // Additional check for expiration (though jwtVerify handles this for 'exp')
-        if (sessionData.expiresAt < Math.floor(Date.now() / 1000)) {
+        if (sessionData.exp < Math.floor(Date.now() / 1000)) {
             console.warn('Session expired based on custom expiresAt.');
             return null;
         }

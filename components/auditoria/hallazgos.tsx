@@ -16,8 +16,8 @@ const hallazgoVacio = {
     evidencia: "",
     descripcion: "",
     clausula: {value: "", label: ""},
-    tipo: "OB" as const,
-    severidad: "" as const,
+    tipo: "OB",
+    severidad: "",
     norma: "",
 }
 
@@ -126,11 +126,12 @@ export function Hallazgos({auditoria}: HallazgosProps) {
         console.log("editing hallazgo", item);
         setEditingItem(item);
         setNewNonConformity({
+            norma: "",
             evidencia: item.evidencia,
             descripcion: item.descripcion,
             clausula: item.clausula,
             tipo: item.tipo,
-            severidad: item.severidad || "",
+            severidad: item.severidad || ""
         });
         setShowEditForm(true);
     };
@@ -273,7 +274,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                         onChange={(e) =>
                                             setNewNonConformity({
                                                 ...newNonConformity,
-                                                tipo: e.target.value as any,
+                                                tipo: e.target.value,
                                             })
                                         }
                                         className={styles["form-select"]}
@@ -315,7 +316,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                         onChange={(e) =>
                                             setNewNonConformity({
                                                 ...newNonConformity,
-                                                severidad: e.target.value as any,
+                                                severidad: e.target.value,
                                             })
                                         }
                                         className={styles["form-select"]}
@@ -407,7 +408,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                         onChange={(e) =>
                                             setNewNonConformity({
                                                 ...newNonConformity,
-                                                tipo: e.target.value as any,
+                                                tipo: e.target.value,
                                             })
                                         }
                                         className={styles["form-select"]}
@@ -449,7 +450,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                         onChange={(e) =>
                                             setNewNonConformity({
                                                 ...newNonConformity,
-                                                severidad: e.target.value as any,
+                                                severidad: e.target.value,
                                             })
                                         }
                                         className={styles["form-select"]}

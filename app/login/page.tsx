@@ -4,10 +4,54 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "@/lib/auth-config";
 import { useRouter } from "next/navigation";
 import styles from "@/components/Login.module.css";
+import {useEffect, useState} from "react";
 
 export default function LoginPage() {
     const { instance } = useMsal();
     const router = useRouter();
+
+    const [sessionChecked, setSessionChecked] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        async function checkAuthenticationStatus() {
+            const accounts = instance.getAllAccounts();
+            const msalAuthenticated = accounts.length > 0;
+
+            let serverSessionAuthenticated = false;
+            try {
+                const res = await fetch('/api/check-session');
+                if (res.ok) {
+                    const data = await res.json();
+                    serverSessionAuthenticated = data.isAuthenticated;
+                }
+            } catch (error) {
+                console.error("Failed to check server session:", error);
+            }
+            setIsAuthenticated(msalAuthenticated || serverSessionAuthenticated);
+            setSessionChecked(true);
+        }
+
+        checkAuthenticationStatus();
+    }, [instance]); // Run once on mount and if MSAL instance changes
+
+    useEffect(() => {
+
+        if (sessionChecked && isAuthenticated) {
+            console.log("User is already logged in. Redirecting from /login to /auditorias.");
+            router.push('/auditorias');
+        }
+    }, [sessionChecked, isAuthenticated, router]);
+
+    // If we're still checking the session or are about to redirect, show a loading state
+    if (!sessionChecked) {
+        return (
+            <main style={{padding: '2rem', textAlign: 'center'}}>
+                    <div className="spinner"></div>
+                    Cargando ...
+            </main>
+        );
+    }
 
     const handleLogin = async () => {
         try {
