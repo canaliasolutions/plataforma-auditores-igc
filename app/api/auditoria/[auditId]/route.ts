@@ -1,7 +1,12 @@
 import { getAuditById } from "@/lib/filemaker"
 import { validateMsalToken } from "@/lib/auth-server";
 
-export async function GET(req: Request, { params }: { params: { auditId: string } }) {
+interface RouteParams {
+    auditId: string;
+}
+
+export async function GET(req: Request, context: { params: RouteParams }) {
+    const { params } = context;
     const authResult = await validateMsalToken(req.headers.get("Authorization") || "");
     if (!authResult.isValid) {
         return new Response(JSON.stringify({ error: authResult.error }), {
