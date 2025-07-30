@@ -4,7 +4,7 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "@/lib/auth-config";
 import { useRouter } from "next/navigation";
 import styles from "@/components/Login.module.css";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Image from 'next/image'
 
 export default function LoginPage() {
@@ -47,9 +47,9 @@ export default function LoginPage() {
     // If we're still checking the session or are about to redirect, show a loading state
     if (!sessionChecked) {
         return (
-            <main style={{padding: '2rem', textAlign: 'center'}}>
-                    <div className="spinner"></div>
-                    Cargando ...
+            <main style={{ padding: '2rem', textAlign: 'center' }}>
+                <div className="spinner"></div>
+                Cargando ...
             </main>
         );
     }
@@ -100,7 +100,12 @@ export default function LoginPage() {
             <div className={styles["login-card"]}>
                 <div className={styles["login-header"]}>
                     <div className={styles["logo-container"]}>
-                        <Image alt={"IGC Logo"} src={"/sello_redondo_IGC.png"}/>
+                        <Image
+                            alt="IGC Logo"
+                            src="/sello_redondo_IGC.png"
+                            width={200}
+                            height={200}
+                        />
                     </div>
                     <h1 className={styles["login-title"]}>Portal de auditores</h1>
                     <p className={styles["login-subtitle"]}>

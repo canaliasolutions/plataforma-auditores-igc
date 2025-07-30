@@ -1,12 +1,12 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./Hallazgos.module.css";
-import {Auditoria, Hallazgo} from "@/types/tipos";
-import {apartados} from "@/constants/apartados";
+import { Auditoria, Hallazgo } from "@/types/tipos";
+import { apartados } from "@/constants/apartados";
 
 interface HallazgosProps {
     auditoria: Auditoria;
@@ -15,13 +15,13 @@ interface HallazgosProps {
 const hallazgoVacio = {
     evidencia: "",
     descripcion: "",
-    clausula: {value: "", label: ""},
+    clausula: { value: "", label: "" },
     tipo: "OB",
     severidad: "",
     norma: "",
 }
 
-export function Hallazgos({auditoria}: HallazgosProps) {
+export function Hallazgos({ auditoria }: HallazgosProps) {
     const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -184,7 +184,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({id: deletingItemId}),
+                    body: JSON.stringify({ id: deletingItemId }),
                 });
 
                 if (response.ok) {
@@ -223,7 +223,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                     onClick={() => setShowAddForm(true)}
                     className={styles["add-button"]}
                 >
-                    <AddIcon sx={{fontSize: 16, marginRight: 1}}/>
+                    <AddIcon sx={{ fontSize: 16, marginRight: 1 }} />
                     Agregar hallazgo
                 </button>
             </div>
@@ -237,122 +237,124 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 onClick={() => setShowAddForm(false)}
                                 className={styles["close-button"]}
                             >
-                                <CloseIcon sx={{fontSize: 20}}/>
+                                <CloseIcon sx={{ fontSize: 20 }} />
                             </button>
                         </div>
-
                         <form
                             onSubmit={handleAddNonConformity}
                             className={styles["add-form"]}
                         >
-                            <div className={styles["form-group"]}>
-                                <label className={styles["form-label"]}>Evidencia:</label>
-                                <input
-                                    type="text"
-                                    value={newNonConformity.evidencia}
-                                    onChange={(e) =>
-                                        setNewNonConformity({
-                                            ...newNonConformity,
-                                            evidencia: e.target.value,
-                                        })
-                                    }
-                                    className={styles["form-input"]}
-                                />
-                            </div>
-
-                            <div className={styles["form-group"]}>
-                                <label className={styles["form-label"]}>Descripción:</label>
-                                <textarea
-                                    value={newNonConformity.descripcion}
-                                    onChange={(e) =>
-                                        setNewNonConformity({
-                                            ...newNonConformity,
-                                            descripcion: e.target.value,
-                                        })
-                                    }
-                                    className={styles["form-textarea"]}
-                                    rows={4}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles["form-row"]}>
+                            <div className={styles["modal-body"]}>
                                 <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Tipo:</label>
-                                    <select
-                                        value={newNonConformity.tipo}
+                                    <label className={styles["form-label"]}>Evidencia:</label>
+                                    <input
+                                        type="text"
+                                        value={newNonConformity.evidencia}
                                         onChange={(e) =>
                                             setNewNonConformity({
                                                 ...newNonConformity,
-                                                tipo: e.target.value,
+                                                evidencia: e.target.value,
                                             })
                                         }
-                                        className={styles["form-select"]}
+                                        className={styles["form-input"]}
+                                    />
+                                </div>
+
+                                <div className={styles["form-group"]}>
+                                    <label className={styles["form-label"]}>Descripción:</label>
+                                    <textarea
+                                        value={newNonConformity.descripcion}
+                                        onChange={(e) =>
+                                            setNewNonConformity({
+                                                ...newNonConformity,
+                                                descripcion: e.target.value,
+                                            })
+                                        }
+                                        className={styles["form-textarea"]}
+                                        rows={4}
                                         required
-                                    >
-                                        <option value="OB">Observación</option>
-                                        <option value="NC">No conformidad</option>
-                                        <option value="OM">Oportunidad de mejora</option>
-                                        <option value="PF">Punto fuerte</option>
-                                    </select>
+                                    />
                                 </div>
 
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Cláusula:</label>
-                                    <select
-                                        value={newNonConformity.clausula.value}
-                                        onChange={(e) =>
-                                            setNewNonConformity({
-                                                ...newNonConformity,
-                                                clausula: {
-                                                    value: e.target.value,
-                                                    label: e.target.options[e.target.selectedIndex].text
-                                                },
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        disabled={newNonConformity.tipo !== "NC"}
-                                        required={newNonConformity.tipo === "NC"}
-                                    >
-                                        {apartados.map((apartado) => <option key={apartado.id}
-                                                                             value={String(apartado.id)}>{apartado.clausula}</option>)}
-                                    </select>
-                                </div>
+                                <div className={styles["form-row"]}>
+                                    <div className={styles["form-group"]}>
+                                        <label className={styles["form-label"]}>Tipo:</label>
+                                        <select
+                                            value={newNonConformity.tipo}
+                                            onChange={(e) =>
+                                                setNewNonConformity({
+                                                    ...newNonConformity,
+                                                    tipo: e.target.value,
+                                                })
+                                            }
+                                            className={styles["form-select"]}
+                                            required
+                                        >
+                                            <option value="OB">Observación</option>
+                                            <option value="NC">No conformidad</option>
+                                            <option value="OM">Oportunidad de mejora</option>
+                                            <option value="PF">Punto fuerte</option>
+                                        </select>
+                                    </div>
 
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Severidad:</label>
-                                    <select
-                                        value={newNonConformity.severidad}
-                                        onChange={(e) =>
-                                            setNewNonConformity({
-                                                ...newNonConformity,
-                                                severidad: e.target.value,
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        disabled={newNonConformity.tipo !== "NC"}
-                                        required={newNonConformity.tipo === "NC"}
-                                    >
-                                        <option value=""></option>
-                                        <option value="menor">Menor</option>
-                                        <option value="mayor">Mayor</option>
-                                    </select>
-                                </div>
-                            </div>
+                                    <div className={styles["form-group"]}>
+                                        <label className={styles["form-label"]}>Cláusula:</label>
+                                        <select
+                                            value={newNonConformity.clausula.value}
+                                            onChange={(e) =>
+                                                setNewNonConformity({
+                                                    ...newNonConformity,
+                                                    clausula: {
+                                                        value: e.target.value,
+                                                        label: e.target.options[e.target.selectedIndex].text
+                                                    },
+                                                })
+                                            }
+                                            className={styles["form-select"]}
+                                            disabled={newNonConformity.tipo !== "NC"}
+                                            required={newNonConformity.tipo === "NC"}
+                                        >
+                                            {apartados.map((apartado) => <option key={apartado.id}
+                                                value={String(apartado.id)}>{apartado.clausula}</option>)}
+                                        </select>
+                                    </div>
 
-                            <div className={styles["form-actions"]}>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddForm(false)}
-                                    className={styles["cancel-button"]}
-                                >
-                                    Cancelar
-                                </button>
-                                <button type="submit" className={styles["submit-button"]}>
-                                    Agregar hallazgo
-                                </button>
+                                    <div className={styles["form-group"]}>
+                                        <label className={styles["form-label"]}>Severidad:</label>
+                                        <select
+                                            value={newNonConformity.severidad}
+                                            onChange={(e) =>
+                                                setNewNonConformity({
+                                                    ...newNonConformity,
+                                                    severidad: e.target.value,
+                                                })
+                                            }
+                                            className={styles["form-select"]}
+                                            disabled={newNonConformity.tipo !== "NC"}
+                                            required={newNonConformity.tipo === "NC"}
+                                        >
+                                            <option value=""></option>
+                                            <option value="menor">Menor</option>
+                                            <option value="mayor">Mayor</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </form>
+
+
+                        <div className={styles["form-actions"]}>
+                            <button
+                                type="button"
+                                onClick={() => setShowAddForm(false)}
+                                className={styles["cancel-button"]}
+                            >
+                                Cancelar
+                            </button>
+                            <button type="submit" className={styles["submit-button"]}>
+                                Agregar hallazgo
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -370,7 +372,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 }}
                                 className={styles["close-button"]}
                             >
-                                <CloseIcon sx={{fontSize: 20}}/>
+                                <CloseIcon sx={{ fontSize: 20 }} />
                             </button>
                         </div>
 
@@ -532,7 +534,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                     <div className={styles["empty-state"]}>
                         <CheckCircleIcon
                             className={styles["empty-icon"]}
-                            sx={{fontSize: 64}}
+                            sx={{ fontSize: 64 }}
                         />
                         <h3 className={styles["empty-title"]}>No hay hallazgos</h3>
                         <p className={styles["empty-description"]}>
@@ -547,20 +549,20 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <h3 className={styles["conformity-title"]}>{item.evidencia}</h3>
                                     {(item.clausula.label !== "") ?
                                         (<span className={styles["clause-badge"]}>
-                                        Cláusula {item.clausula.label}
-                                    </span>) : null}
+                                            Cláusula {item.clausula.label}
+                                        </span>) : null}
                                 </div>
                                 <div className={styles["badges"]}>
-                  <span className={styles["status-badge"]}>
-                    {getTypeText(item.tipo)}
-                  </span>
+                                    <span className={styles["status-badge"]}>
+                                        {getTypeText(item.tipo)}
+                                    </span>
                                     {item.tipo === "NC" && item.severidad && (
                                         <span
                                             className={styles["severity-badge"]}
-                                            style={{backgroundColor: getSeverityColor(item.severidad)}}
+                                            style={{ backgroundColor: getSeverityColor(item.severidad) }}
                                         >
-                      {getSeverityText(item.severidad)}
-                    </span>
+                                            {getSeverityText(item.severidad)}
+                                        </span>
                                     )}
                                 </div>
                             </div>
@@ -571,15 +573,15 @@ export function Hallazgos({auditoria}: HallazgosProps) {
 
                             <div className={styles["card-footer"]}>
                                 <div className={styles["date-section"]}>
-                  <span className={styles["date-info"]}>
-                    Encontrada el:{" "}
-                      {new Date(item.fecha_encontrado).toLocaleDateString("es-ES")}
-                  </span>
+                                    <span className={styles["date-info"]}>
+                                        Encontrada el:{" "}
+                                        {new Date(item.fecha_encontrado).toLocaleDateString("es-ES")}
+                                    </span>
                                     {item.fecha_resuelto && (
                                         <span className={styles["date-info"]}>
-                      Resuelta el:{" "}
+                                            Resuelta el:{" "}
                                             {new Date(item.fecha_resuelto).toLocaleDateString("es-ES")}
-                    </span>
+                                        </span>
                                     )}
                                 </div>
                                 <div className={styles["action-buttons"]}>

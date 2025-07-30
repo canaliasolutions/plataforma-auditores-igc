@@ -23,6 +23,7 @@
 
 .brand-title {
   font-size: 20px;
+  padding-left: 8px;
   font-weight: 600;
   color: white;
   margin: 0;
@@ -140,4 +141,90 @@
   .user-details {
     display: none;
   }
+}
+
+.avatar-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-dropdown-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #004f84;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.avatar-dropdown-button:hover {
+  background-color: #4d91c6;
+}
+
+.avatar-dropdown-card {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  padding: 24px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+}
+
+.avatar-dropdown-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.avatar-dropdown-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+.avatar-dropdown-email {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 20px;
+  text-align: center;
+  word-break: break-word;
+}
+
+.avatar-dropdown-logout {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.avatar-dropdown-logout:hover {
+  background-color: #003b66;
 }
