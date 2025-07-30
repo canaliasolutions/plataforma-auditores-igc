@@ -146,7 +146,7 @@
   margin-bottom: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark-disable-for-now) {
   .profile-details {
     background: #1a1a1a;
   }
@@ -164,7 +164,7 @@
   border-bottom: none;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark-disable-for-now) {
   .detail-item {
     border-bottom-color: #333;
   }

@@ -50,7 +50,7 @@ export function ReportGenerationModal({
               <ul className={styles["notice-list"]}>
                 <li>No se podrán agregar más hallazgos</li>
                 <li>No se podrán modificar los hallazgos existentes</li>
-                <li>El estado de la auditoría cambiará a "Completada"</li>
+                <li>El estado de la auditoría cambiará a &#34;Completada&#34;</li>
               </ul>
             </div>
             <p className={styles["confirmation-question"]}>

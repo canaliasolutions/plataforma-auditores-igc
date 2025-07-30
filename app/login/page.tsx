@@ -5,6 +5,7 @@ import { loginRequest } from "@/lib/auth-config";
 import { useRouter } from "next/navigation";
 import styles from "@/components/Login.module.css";
 import {useEffect, useState} from "react";
+import Image from 'next/image'
 
 export default function LoginPage() {
     const { instance } = useMsal();
@@ -99,7 +100,7 @@ export default function LoginPage() {
             <div className={styles["login-card"]}>
                 <div className={styles["login-header"]}>
                     <div className={styles["logo-container"]}>
-                        <img alt={"IGC Logo"} src={"/sello_redondo_IGC.png"}></img>
+                        <Image alt={"IGC Logo"} src={"/sello_redondo_IGC.png"}/>
                     </div>
                     <h1 className={styles["login-title"]}>Portal de auditores</h1>
                     <p className={styles["login-subtitle"]}>

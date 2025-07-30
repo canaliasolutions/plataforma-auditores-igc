@@ -54,27 +54,27 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
 
   // Load eficacia data from database
   useEffect(() => {
+    const loadEficacia = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/eficacia?auditoriaId=${auditId}`);
+        if (response.ok) {
+          const data = await response.json();
+          // Pre-fill audit type from audit data if not already set
+          setEficaciaData({
+            ...data,
+            tipo_auditoria: data.tipo_auditoria || 'in_situ'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading eficacia data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadEficacia();
   }, [auditId]);
-
-  const loadEficacia = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/eficacia?auditoriaId=${auditId}`);
-      if (response.ok) {
-        const data = await response.json();
-        // Pre-fill audit type from audit data if not already set
-        setEficaciaData({
-          ...data,
-          tipo_auditoria: data.tipo_auditoria || auditoria?.tipo || 'in_situ'
-        });
-      }
-    } catch (error) {
-      console.error('Error loading eficacia data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDataChange = (field: keyof EficaciaData, value: string) => {
     setEficaciaData(prev => ({

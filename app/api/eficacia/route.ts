@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Use upsert to either insert or update
-    const info = eficaciaQueries.upsert.run(
+    eficaciaQueries.upsert.run(
         eficacia.auditoria_id,
         eficacia.tipo_auditoria || 'in_situ',
         eficacia.medio_utilizado || '',

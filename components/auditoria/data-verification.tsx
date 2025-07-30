@@ -39,23 +39,22 @@ export function DataVerification({ auditId }: DataVerificationProps) {
 
   // Load verification data from database
   useEffect(() => {
+    const loadVerification = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/verificacion-datos?auditoriaId=${auditId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setVerification(data);
+        }
+      } catch (error) {
+        console.error('Error loading verification data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadVerification();
   }, [auditId]);
-
-  const loadVerification = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/verificacion-datos?auditoriaId=${auditId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setVerification(data);
-      }
-    } catch (error) {
-      console.error('Error loading verification data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleVerificationChange = (field: keyof DataVerification, value: string) => {
     setVerification(prev => ({
@@ -206,7 +205,7 @@ export function DataVerification({ auditId }: DataVerificationProps) {
       {hasChanges && (
         <div className={styles["changes-notice"]}>
           <p className={styles["changes-text"]}>
-            Tienes cambios sin guardar. Haz clic en "Guardar cambios" para confirmar.
+            Tienes cambios sin guardar. Haz clic en &#34;Guardar cambios&#34; para confirmar.
           </p>
         </div>
       )}

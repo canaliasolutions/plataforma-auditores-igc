@@ -186,6 +186,16 @@ export function Participants({ auditId }: ParticipantsProps) {
     setShowDeleteDialog(false);
   };
 
+  if (loading) {
+    return (
+        <div className={styles["participants"]}>
+          <div className={styles["loading-state"]}>
+            <p>Cargando participantes...</p>
+          </div>
+        </div>
+    );
+  }
+
   return (
     <div className={styles["participants"]}>
       <div className={styles["section-header"]}>

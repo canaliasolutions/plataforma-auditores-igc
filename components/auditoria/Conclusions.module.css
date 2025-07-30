@@ -227,7 +227,7 @@
 }
 
 /* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark-disable-for-now) {
 
   .answer-button {
     background: #2a2a2a;

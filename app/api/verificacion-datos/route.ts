@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Use upsert to either insert or update
-    const info = verificacionDatosQueries.upsert.run(
+    verificacionDatosQueries.upsert.run(
       auditoriaId,
       datosContacto || 'correcto',
       datosAlcance || 'correcto', 

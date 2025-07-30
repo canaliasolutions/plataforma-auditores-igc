@@ -149,28 +149,8 @@ export async function validateMsalToken(idToken: string): Promise<MsalValidation
 
         return { isValid: true, claims };
 
-    } catch (error: any) { // Use 'any' for the error type for more flexibility in catching
+    } catch (error) {
         console.error("MSAL ID Token validation failed:", error);
-        // Provide more specific error messages based on jose's errors
-        if (error.code === 'ERR_JWT_EXPIRED') {
-            return { isValid: false, error: 'ID Token expired.' };
-        }
-        if (error.code === 'ERR_JWS_INVALID') {
-            return { isValid: false, error: 'ID Token signature is invalid.' };
-        }
-        if (error.code === 'ERR_JWT_AUDIENCE_MISMATCH') {
-            return { isValid: false, error: `ID Token audience mismatch. Expected: ${AZURE_AD_CLIENT_ID}, Actual: ${error.aud}` };
-        }
-        if (error.code === 'ERR_JWT_ISSUER_MISMATCH') {
-            // Log expected and actual for easier debugging
-            const expected = (error as any).expectedIssuer || 'N/A';
-            const actual = (error as any).actualIssuer || 'N/A';
-            console.error(`Issuer Mismatch: Expected "${expected}", Actual "${actual}"`);
-            return { isValid: false, error: `ID Token issuer mismatch. Expected: ${expected}, Actual: ${actual}` };
-        }
-        if (error.code === 'ERR_JWS_NO_MATCHING_KEY') {
-            return { isValid: false, error: 'No matching public key found for token signature.' };
-        }
-        return { isValid: false, error: `Token validation error: ${error.message}` };
+        return { isValid: false, error: `Token validation error: ${error}` };
     }
 }

@@ -218,7 +218,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark-disable-for-now) {
   .modal-content {
     background: #1a1a1a;
   }

@@ -205,6 +205,16 @@ export function Hallazgos({auditoria}: HallazgosProps) {
         setShowDeleteDialog(false);
     };
 
+    if (loading) {
+        return (
+            <div className={styles["non-conformities"]}>
+                <div className={styles["loading-state"]}>
+                    <p>Cargando hallazgos...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles["non-conformities"]}>
             <div className={styles["section-header"]}>

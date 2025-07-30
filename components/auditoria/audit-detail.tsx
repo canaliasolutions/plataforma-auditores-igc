@@ -11,6 +11,7 @@ import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
 import {Auditoria} from "@/types/tipos";
+import Image from "next/image";
 
 interface AuditDetailProps {
   auditoria: Auditoria;
@@ -110,7 +111,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
             <div className={styles["client-section"]}>
               <div className={styles["client-logo"]}>
                 {auditoria.cliente.logo ? (
-                  <img
+                  <Image
                     src={auditoria.cliente.logo}
                     alt={`${auditoria.cliente.nombre} logo`}
                     className={styles["logo-image"]}

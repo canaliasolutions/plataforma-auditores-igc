@@ -3,6 +3,12 @@
   padding: 32px;
 }
 
+.loading-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-secondary);
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -445,7 +451,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark-disable-for-now) {
   .conformity-card {
     background: #1a1a1a;
   }

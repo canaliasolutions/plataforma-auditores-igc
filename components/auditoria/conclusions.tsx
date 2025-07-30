@@ -37,23 +37,23 @@ export function Conclusions({ auditId, auditoria }: ConclusionsProps) {
 
   // Load conclusions data from database
   useEffect(() => {
+    const loadConclusions = async () => { // Defined INSIDE useEffect
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/conclusiones?auditoriaId=${auditId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setConclusions(data);
+        }
+      } catch (error) {
+        console.error('Error loading conclusions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadConclusions();
   }, [auditId]);
-
-  const loadConclusions = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/conclusiones?auditoriaId=${auditId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setConclusions(data);
-      }
-    } catch (error) {
-      console.error('Error loading conclusions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleConclusionChange = (field: keyof Conclusions, value: string) => {
     setConclusions(prev => ({

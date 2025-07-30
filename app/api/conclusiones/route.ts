@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Use upsert to either insert or update
-    const info = conclusionesQueries.upsert.run(
+    conclusionesQueries.upsert.run(
       auditoriaId,
       objetivosCumplidos || 'si',
       desviacionPlan || '', 
