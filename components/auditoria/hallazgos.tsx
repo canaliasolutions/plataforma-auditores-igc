@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect, useCallback} from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -25,12 +25,7 @@ export function Hallazgos({ auditoria }: HallazgosProps) {
     const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Load hallazgos from database
-    useEffect(() => {
-        cargarHallazgos();
-    }, [auditoria.id]);
-
-    const cargarHallazgos = async () => {
+    const cargarHallazgos = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch(`/api/hallazgos?auditoriaId=${auditoria.id}`);
@@ -43,7 +38,12 @@ export function Hallazgos({ auditoria }: HallazgosProps) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [auditoria.id]);
+
+    // Load hallazgos from database
+    useEffect(() => {
+        cargarHallazgos();
+    }, [cargarHallazgos]);
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);

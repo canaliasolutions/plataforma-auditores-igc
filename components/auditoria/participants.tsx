@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect, useCallback} from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -30,25 +30,25 @@ export function Participants({ auditId }: ParticipantsProps) {
     const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load participants from database
-  useEffect(() => {
-    loadParticipants();
-  }, [auditId]);
-
-  const loadParticipants = async () => {
+  const loadParticipants = useCallback(async () => {
     try {
-      setLoading(true);
-      const response = await fetch(`/api/participantes?auditoriaId=${auditId}`);
+      setLoading(true); // setLoading is a stable function reference
+      const response = await fetch(`/api/participantes?auditoriaId=${auditId}`); // auditId is a dependency
       if (response.ok) {
         const data = await response.json();
-        setParticipants(data);
+        setParticipants(data); // setParticipants is a stable function reference
       }
     } catch (error) {
       console.error('Error loading participants:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [auditId]);
+
+  // Load participants from database
+  useEffect(() => {
+    loadParticipants();
+  }, [loadParticipants]);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);

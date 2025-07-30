@@ -11,7 +11,6 @@ import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./AuditDetail.module.css";
 import {Auditoria} from "@/types/tipos";
-import Image from "next/image";
 
 interface AuditDetailProps {
   auditoria: Auditoria;
@@ -47,7 +46,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
   const getDuration = () => {
     const start = new Date(auditoria.fechaInicio);
     const end = new Date(auditoria.fechaFinal);
-    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   };
 
   const renderContent = () => {
@@ -111,7 +110,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
             <div className={styles["client-section"]}>
               <div className={styles["client-logo"]}>
                 {auditoria.cliente.logo ? (
-                  <Image
+                  <img
                     src={auditoria.cliente.logo}
                     alt={`${auditoria.cliente.nombre} logo`}
                     className={styles["logo-image"]}
