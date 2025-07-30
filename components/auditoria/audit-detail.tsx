@@ -46,7 +46,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
   const getDuration = () => {
     const start = new Date(auditoria.fechaInicio);
     const end = new Date(auditoria.fechaFinal);
-    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
   };
 
   const renderContent = () => {
