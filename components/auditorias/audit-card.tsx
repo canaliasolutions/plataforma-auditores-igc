@@ -2,7 +2,6 @@
 
 import styles from "./AuditCard.module.css";
 import {ResumenAuditoria} from "@/types/tipos";
-import Image from "next/image";
 
 interface AuditCardProps {
     audit: ResumenAuditoria,
@@ -32,7 +31,7 @@ export function AuditCard({
                 <div className={styles["client-info"]}>
                     <div className={styles["client-logo"]}>
                         {audit.cliente.logo ? (
-                            <Image
+                            <img
                                 src={audit.cliente.logo}
                                 alt={`${audit.cliente.nombre} logo`}
                                 className={styles["logo-image"]}
