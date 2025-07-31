@@ -26,13 +26,6 @@ interface OidcMetadata {
     // You might include other fields if needed, e.g., authorization_endpoint, token_endpoint
 }
 
-const AZURE_AD_CLIENT_ID = process.env.NEXT_PUBLIC_AZURE_CLIENT_ID;
-const AZURE_AD_TENANT_ID = process.env.NEXT_PUBLIC_AZURE_TENANT_ID;
-
-if (!AZURE_AD_CLIENT_ID || !AZURE_AD_TENANT_ID) {
-    throw new Error("Missing Azure AD environment variables. Please set NEXT_PUBLIC_AZURE_CLIENT_ID and AZURE_TENANT_ID.");
-}
-
 let cachedOidcMetadata: OidcMetadata | undefined;
 let lastMetadataFetchTime: number = 0;
 const METADATA_CACHE_DURATION = 60 * 60 * 1000; // Cache for 1 hour
@@ -43,16 +36,29 @@ let cachedJWKSetFn: ReturnType<typeof createRemoteJWKSet> | undefined;
 let lastJwksFetchTime: number = 0;
 const JWKS_CACHE_DURATION = 60 * 60 * 1000; // Cache for 1 hour
 
+
+function getAzureAdConfig() {
+    const clientId = process.env.NEXT_PUBLIC_AZURE_CLIENT_ID;
+    const tenantId = process.env.NEXT_PUBLIC_AZURE_TENANT_ID;
+
+    if (!clientId || !tenantId) {
+        throw new Error("Missing Azure AD environment variables. Please set NEXT_PUBLIC_AZURE_CLIENT_ID and NEXT_PUBLIC_AZURE_TENANT_ID.");
+    }
+    return { clientId, tenantId };
+}
+
+
 /**
  * Fetches and caches the OpenID Connect metadata from Azure AD.
  */
 async function getAzureADOidcMetadata(): Promise<OidcMetadata> {
+    const { tenantId } = getAzureAdConfig();
     const now = Date.now();
     if (cachedOidcMetadata && (now - lastMetadataFetchTime < METADATA_CACHE_DURATION)) {
         return cachedOidcMetadata;
     }
 
-    const tenantForMetadataUrl = AZURE_AD_TENANT_ID === 'common' ? 'common' : AZURE_AD_TENANT_ID;
+    const tenantForMetadataUrl = tenantId === 'common' ? 'common' : tenantId;
     const AAD_OIDC_METADATA_URL = `https://login.microsoftonline.com/${tenantForMetadataUrl}/v2.0/.well-known/openid-configuration`;
 
     try {
@@ -122,6 +128,7 @@ async function getAzureADJwkSet(jwksUri?: string): Promise<ReturnType<typeof cre
  */
 export async function validateMsalToken(idToken: string): Promise<MsalValidationResult> {
     try {
+        const { clientId } = getAzureAdConfig();
         // First, get the OIDC metadata to obtain the official issuer and JWKS URI
         const oidcMetadata = await getAzureADOidcMetadata();
         const expectedIssuer = oidcMetadata.issuer; // This is the dynamically obtained issuer
@@ -133,7 +140,7 @@ export async function validateMsalToken(idToken: string): Promise<MsalValidation
         // Verify the ID token
         const { payload } = await jwtVerify(idToken, JWKS, {
             issuer: expectedIssuer, // Use the dynamically fetched issuer here
-            audience: AZURE_AD_CLIENT_ID,
+            audience: clientId,
             algorithms: ['RS256'], // Azure AD typically uses RS256
         });
 
