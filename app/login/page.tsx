@@ -13,6 +13,8 @@ export default function LoginPage() {
 
     const [sessionChecked, setSessionChecked] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+
 
     useEffect(() => {
         async function checkAuthenticationStatus() {
@@ -31,6 +33,14 @@ export default function LoginPage() {
             }
             setIsAuthenticated(msalAuthenticated || serverSessionAuthenticated);
             setSessionChecked(true);
+            if (isLoggingIn) {
+                return (
+                    <main style={{ padding: '2rem', textAlign: 'center' }}>
+                        <div className="spinner"></div>
+                        Iniciando sesión...
+                    </main>
+                );
+            }
         }
 
         checkAuthenticationStatus();
@@ -55,6 +65,7 @@ export default function LoginPage() {
     }
 
     const handleLogin = async () => {
+        setIsLoggingIn(true);
         try {
             const loginResponse = await instance.loginPopup(loginRequest);
 
@@ -78,6 +89,7 @@ export default function LoginPage() {
 
                 if (apiResponse.ok) {
                     router.push('/auditorias');
+                    return;
                 } else {
                     // Handle API error
                     const errorData = await apiResponse.json();
@@ -91,6 +103,8 @@ export default function LoginPage() {
         } catch (error) {
             console.error("Login process failed:", error);
             alert("Login failed during MSAL process. Please check console for details.");
+        } finally {
+            setIsLoggingIn(false); // 👈 para quitar loading si no redirige
         }
     };
 

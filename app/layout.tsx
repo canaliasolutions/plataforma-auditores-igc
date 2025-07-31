@@ -4,6 +4,9 @@ import "./globals.css";
 import {MsalClientProvider} from "@/components/msal-client-provider";
 import {getSession, UserSessionData} from "@/lib/session-utils";
 import NavbarWrapper from "@/components/navbar-wrapper";
+import '@/components/loader.css';
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
