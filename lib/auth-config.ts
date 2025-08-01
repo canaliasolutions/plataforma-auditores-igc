@@ -8,7 +8,7 @@ export const msalConfig: Configuration = {
     redirectUri:
       typeof window !== "undefined"
         ? window.location.origin
-        : "http://localhost:3000", // Must match Azure App Registration redirect URI
+        : process.env.BASE_URL // Must match Azure App Registration redirect URI
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
