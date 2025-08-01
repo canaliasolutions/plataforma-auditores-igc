@@ -18,7 +18,7 @@ export const msalConfig: Configuration = {
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
 export const loginRequest: PopupRequest = {
   scopes: ["openid", "profile", "User.Read"],
-  redirectUri: "https://yourdomain.com/auth.html"// Basic profile information
+  redirectUri: process.env.BASE_URL+ "/auth.html"
 };
 
 // Graph API endpoint
