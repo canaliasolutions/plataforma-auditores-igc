@@ -8,7 +8,7 @@ export const msalConfig: Configuration = {
     redirectUri:
       typeof window !== "undefined"
         ? window.location.origin
-        : process.env.BASE_URL // Must match Azure App Registration redirect URI
+        : process.env.BASE_URL+ "/auth.html",
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -17,7 +17,8 @@ export const msalConfig: Configuration = {
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
 export const loginRequest: PopupRequest = {
-  scopes: ["openid", "profile", "User.Read"], // Basic profile information
+  scopes: ["openid", "profile", "User.Read"],
+  redirectUri: "https://yourdomain.com/auth.html"// Basic profile information
 };
 
 // Graph API endpoint

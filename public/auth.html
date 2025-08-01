@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Redirect</title>
+</head>
+<body>
+<script type="text/javascript">
+    // Delay execution until MSAL is ready
+    (async function () {
+        const msal = window.opener.msalInstance; // Get msal from parent window
+        if (msal) {
+            await msal.handleRedirectPromise();
+            window.close();
+        } else {
+            console.error("MSAL instance not found in opener window");
+        }
+    })();
+</script>
+</body>
+</html>
