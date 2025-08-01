@@ -77,7 +77,7 @@ export async function verifySignedSessionCookie(signedSession: string): Promise<
 export function setSessionCookie(response: NextResponse, signedSessionValue: string) {
     response.cookies.set(SESSION_COOKIE_NAME, signedSessionValue, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.APP_ENV === 'production',
         sameSite: 'lax', // 'strict' is more secure but can break cross-site navigation, 'lax' is generally a good balance.
         path: '/',
         maxAge: SESSION_MAX_AGE,
