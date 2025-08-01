@@ -37,4 +37,4 @@ jobs:
           NEXT_PUBLIC_AZURE_CLIENT_ID: 'azure-client-id'
           NEXT_PUBLIC_AZURE_TENANT_ID: 'azure-tenant-id'
           SESSION_SECRET: 'secret'
-          NODE_ENV: 'development'
+          APP_ENV: 'development'
