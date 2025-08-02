@@ -5,7 +5,7 @@ export const msalConfig: Configuration = {
   auth: {
     clientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || "", // This should be your Azure App Registration Client ID
     authority: "https://login.microsoftonline.com/"+process.env.NEXT_PUBLIC_AZURE_TENANT_ID, // This allows both personal and work accounts
-    redirectUri: process.env.BASE_URL+"/auth.html",
+    redirectUri: "https://portalauditores.igccert.com/auth.html",
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
