@@ -2,7 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession } from '@/lib/session-utils';
 
-const publicPaths = ['/login', '/api/login', '/api/logout', '/api/check-session'];
+const publicPaths = ['/login', '/api/login', '/api/logout', '/api/check-session', '/auth.html'];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
