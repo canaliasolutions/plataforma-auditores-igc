@@ -1,0 +1,80 @@
+/* ————————— Contenedor ————————— */
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* ————————— Botón (caja del select) ————————— */
+.button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 150px;
+  padding: 12px 16px;            /* mismo “feel” que tus inputs */
+  border: 1px solid var(--tertiary);
+  border-radius: 8px;
+
+  background: #fff;
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+/* estado disabled */
+.disabled .button {
+  background: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* SelectWrapper.module.css ─ añade / sustituye */
+
+/* ——— MENÚ (pop-up) ——————————————————— */
+.menu {
+  position: absolute;
+  z-index: 10;
+  margin-top: 4px;
+  width: 100%;
+
+  max-height: 14rem;          /* ≈ 224 px */
+  overflow-y: auto;           /* ← solo vertical */
+  overflow-x: hidden;         /* ← nunca horizontal */
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 4px 0;
+  outline: none;
+
+  /* Scrollbar “slim” — Chrome / Edge / Safari */
+  scrollbar-width: thin;                        /* Firefox */
+  scrollbar-color: var(--primary) transparent;  /* Firefox */
+
+}
+.menu::-webkit-scrollbar {
+  width: 6px;               /* grosor */
+}
+.menu::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+.menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ——— ITEM ———————————————————————— */
+.item {
+  padding: 6px 12px;        /* más compacto que 8/16 */
+  font-size: 14px;          /* antes era 16 px por defecto */
+  line-height: 1.35;
+  cursor: pointer;
+  white-space: nowrap;      /* evita que rompa línea */
+}
+.itemActive { background: rgba(0, 96, 157, 0.10); }
+.itemDisabled { opacity: .4; cursor: not-allowed; }
