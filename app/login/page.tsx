@@ -131,7 +131,7 @@ export default function LoginPage() {
 
                 <div className={styles["login-footer"]}>
                     <p className={styles["privacy-text"]}>
-                        Iniciar sesión implica la aceptación de los términos y condiciones del portal de auditorías
+                        SOLO PARA USO INTERNO DE IGC
                     </p>
                 </div>
             </div>
