@@ -56,13 +56,14 @@
 }
 
 .modal-content {
-  background: white;
-  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
   width: 90%;
   max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,.1);
 }
 
 .modal-header {
@@ -79,6 +80,27 @@
   color: var(--text-primary);
   margin: 0;
 }
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-left: 24px;
+  padding-right: 12px;
+  margin-right: 12px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+  max-height: 350px;
+}
+
+/* Scrollbar WebKit (opcional) */
+.modal-body::-webkit-scrollbar { width: 8px; }
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 6px;
+}
+.modal-body::-webkit-scrollbar-track { background: transparent; }
 
 .close-button {
   background: none;
@@ -101,9 +123,6 @@
 }
 
 /* Form Styles */
-.add-form {
-  padding: 32px;
-}
 
 .form-group {
   margin-bottom: 20px;
@@ -161,11 +180,13 @@
   cursor: pointer;
 }
 
+/* ——— acciones abajo iguales ——— */
 .form-actions {
+  padding: 16px 24px;
   display: flex;
-  gap: 12px;
   justify-content: flex-end;
-  margin-top: 32px;
+  gap: 12px;
+  border-top: 1px solid #eee;
 }
 
 .cancel-button {
@@ -451,10 +472,6 @@
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
-  }
-
-  .add-form {
-    padding: 24px 16px;
   }
 
   .form-row {

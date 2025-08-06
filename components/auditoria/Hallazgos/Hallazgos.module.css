@@ -66,6 +66,7 @@
 .modal-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-left: 24px;
   padding-right: 12px;
   margin-right: 12px;

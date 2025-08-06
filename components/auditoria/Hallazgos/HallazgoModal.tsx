@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { flushSync } from "react-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./Hallazgos.module.css";
 import { Auditoria, Hallazgo } from "@/types/tipos";
@@ -29,9 +30,6 @@ export default function HallazgoModal({
   const [warnSeveridad, setWarnSeveridad] = useState(false);
   const [warnDescripcion, setWarnDescripcion] = useState(false);
   const [warnEvidencia, setWarnEvidencia] = useState(false);
-
-
-
 
   const initialDraft: HallazgoDraft = isEdit
     ? {
@@ -90,25 +88,21 @@ export default function HallazgoModal({
     const faltaDescripcion = data.descripcion.trim() === "";
     const faltaEvidencia = data.evidencia.trim() === "";
 
+    flushSync(() => {
+      setWarnClausula(false);
+      setWarnSeveridad(false);
+      setWarnDescripcion(false);
+      setWarnEvidencia(false);
+    });
+
     if (faltaClausula || faltaSeveridad || faltaDescripcion || faltaEvidencia) {
-      if (faltaClausula) {
-        setWarnClausula(true);
-        setTimeout(() => setWarnClausula(false), 2000);   // 2 s
-      }
-      if (faltaSeveridad) {
-        setWarnSeveridad(true);
-        setTimeout(() => setWarnSeveridad(false), 2000);  // 2 s
-      }
-      if (faltaDescripcion) {
-        setWarnDescripcion(true);
-        setTimeout(() => setWarnDescripcion(false), 2000);  // 2 s
-      }
-      if (faltaEvidencia) {
-        setWarnEvidencia(true);
-        setTimeout(() => setWarnEvidencia(false), 2000);  // 2 s
-      }
-      return;
+      setWarnClausula(faltaClausula);
+      setWarnSeveridad(faltaSeveridad);
+      setWarnDescripcion(faltaDescripcion);
+      setWarnEvidencia(faltaEvidencia);
+      return;               // ⬅️ impide el envío
     }
+
 
     const method = isEdit ? "PUT" : "POST";
     const url = "/api/hallazgos";
@@ -177,6 +171,9 @@ export default function HallazgoModal({
                 variant="danger"
                 trigger="manual"
                 open={warnEvidencia}
+                autoClose={2000}
+                onHide={() => setWarnEvidencia(false)}
+                placement="bottom"
               >
                 <input
                   type="text"
@@ -195,6 +192,9 @@ export default function HallazgoModal({
                 variant="danger"
                 trigger="manual"
                 open={warnDescripcion}
+                autoClose={2000}
+                placement = "bottom"
+                onHide={() => setWarnDescripcion(false)}
               >
                 <textarea
                   value={data.descripcion}
@@ -243,6 +243,9 @@ export default function HallazgoModal({
                   variant="danger"
                   trigger="manual"
                   open={warnClausula}
+                  autoClose={2000}
+                  onHide={() => setWarnClausula(false)}
+                  placement="bottom"
                 >
                   <SelectWrapper
                     name="clausula"
@@ -280,6 +283,9 @@ export default function HallazgoModal({
                   variant="danger"
                   trigger="manual"
                   open={warnSeveridad}
+                  autoClose={2000}
+                  placement="bottom"
+                  onHide={() => setWarnSeveridad(false)}
                 >
                   <SelectWrapper
                     name="severidad"

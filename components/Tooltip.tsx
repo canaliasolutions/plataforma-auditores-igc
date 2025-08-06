@@ -1,66 +1,82 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./Tooltip.module.css";
 
-export type TooltipVariant = "info" | "success" | "warning" | "danger";
-
-interface Props {
-    content: string;
-    variant?: TooltipVariant;
-    delay?: number;
-    children: React.ReactElement;
-    open?: boolean;
-    trigger?: "auto" | "manual";
-}
-
 export default function Tooltip({
     content,
-    children,
     variant = "info",
     delay = 200,
-    open,
+    autoClose = 0,
     trigger = "auto",
-}: Props) {
+    open,
+    placement = "top",
+    children,
+    onHide
+}: {
+    content: string;
+    variant?: "info" | "success" | "warning" | "danger";
+    delay?: number;
+    autoClose?: number;
+    trigger?: "auto" | "manual";
+    open?: boolean;
+    placement?: "top" | "bottom";
+    children: React.ReactElement;
+    onHide?: () => void
+}) {
     const [visible, setVisible] = useState(false);
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const wrapperRef = useRef<HTMLSpanElement>(null);
-    const isVisible = trigger === "manual" ? open : visible;
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-    /* Limpia temporizador al desmontar */
+    /* ——— sincroniza estado controlado ——— */
     useEffect(() => {
-        return () => {
-            if (timeoutRef.current !== null) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
+        if (trigger === "manual") setVisible(Boolean(open));
+    }, [open, trigger]);
 
+    /* ——— autocierre ——— */
+    useEffect(() => {
+        if (autoClose > 0 && visible) {
+            const id = setTimeout(() => setVisible(false), autoClose);
+            return () => clearTimeout(id);
+        }
+    }, [visible, autoClose]);
 
+    useEffect(() => {
+        if (autoClose > 0 && visible) {
+            const id = setTimeout(() => {
+                setVisible(false);
+                onHide?.();
+            }, autoClose);
+            return () => clearTimeout(id);
+        }
+    }, [visible, autoClose, onHide]);
+
+    /* ——— gestiona delay ——— */
     const show = () => {
-        timeoutRef.current = setTimeout(() => setVisible(true), delay);
+        clearTimeout(timerRef.current as NodeJS.Timeout);
+        timerRef.current = setTimeout(() => setVisible(true), delay);
     };
     const hide = () => {
-        if (timeoutRef.current !== null) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
+        clearTimeout(timerRef.current as NodeJS.Timeout);
         setVisible(false);
     };
 
+    const isVisible = visible;            // ← ahora sólo miramos el estado interno
 
     return (
         <span
             className={styles.wrapper}
-            ref={wrapperRef}
-            onMouseEnter={show}
-            onMouseLeave={hide}
-            onFocus={show}
-            onBlur={hide}
+            onMouseEnter={trigger === "auto" ? show : undefined}
+            onMouseLeave={trigger === "auto" ? hide : undefined}
+            onFocus={trigger === "auto" ? show : undefined}
+            onBlur={trigger === "auto" ? hide : undefined}
         >
             {children}
+
             {isVisible && (
-                <span className={`${styles.tooltip} ${styles[variant]}`} role="tooltip">
+                <span
+                    className={`${styles.tooltip} ${styles[variant]} ${styles[placement]}`}
+                    role="tooltip"
+                >
                     {content}
-                    <span className={styles.arrow} />
+                    <span className={styles[`arrow-${placement}`]} />
                 </span>
             )}
         </span>

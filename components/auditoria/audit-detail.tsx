@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuditSubNavigation } from "./audit-sub-navigation";
 import Hallazgos from '@/components/auditoria/Hallazgos/Hallazgos';
-import { Participants } from "./participants";
+import Participants from "./Participants/participants";
 import { DataVerification } from "./data-verification";
 import { Eficacia } from "./eficacia";
 import { Conclusions } from "./conclusions";
