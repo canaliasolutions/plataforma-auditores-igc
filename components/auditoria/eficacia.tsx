@@ -253,7 +253,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
                 ¿Qué medio se utilizó en la auditoría?
               </h3>
               <div className={styles["options-grid"]}>
-                {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro medio'].map((option) => (
+                {['Google Meets', 'Zoom', 'Teams', 'Correo electrónico', 'Otro medio'].map((option) => (
                   <OptionButton
                     key={option}
                     selected={eficaciaData.medio_utilizado === option}
