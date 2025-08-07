@@ -1,5 +1,5 @@
 
-import AuditDetail from "@/components/auditoria/audit-detail";
+import DetalleAuditoria from "@/components/auditoria/DetalleAuditoria";
 import { getAuditById } from "@/lib/filemaker";
 
 interface AuditDetailPageProps {
@@ -14,7 +14,7 @@ export default async function AuditDetailPage({ params }: AuditDetailPageProps) 
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa" }}>
-        {audit ? <AuditDetail key={audit.id} auditoria={audit} /> : "No audit"}
+        {audit ? <DetalleAuditoria key={audit.id} auditoria={audit} /> : "No audit"}
     </div>
   );
 }

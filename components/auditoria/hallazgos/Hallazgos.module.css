@@ -1,5 +1,5 @@
 /* Non Conformities Styles */
-.non-conformities {
+.hallazgos {
   padding: 32px;
 }
 
@@ -413,7 +413,7 @@
 }
 
 @media (max-width: 768px) {
-  .non-conformities {
+  .hallazgos {
     padding: 24px 16px;
   }
 

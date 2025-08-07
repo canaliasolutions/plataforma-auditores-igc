@@ -207,7 +207,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
 
     if (loading) {
         return (
-            <div className={styles["non-conformities"]}>
+            <div className={styles["hallazgos"]}>
                 <div className={styles["loading-state"]}>
                     <p>Cargando hallazgos...</p>
                 </div>
@@ -216,7 +216,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     }
 
     return (
-        <div className={styles["non-conformities"]}>
+        <div className={styles["hallazgos"]}>
             <div className={styles["section-header"]}>
                 <h2 className={styles["section-title"]}>Hallazgos</h2>
                 <button

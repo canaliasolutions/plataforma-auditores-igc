@@ -3,20 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuditSubNavigation } from "./audit-sub-navigation";
-import { Hallazgos } from "./hallazgos";
+import { Hallazgos } from "./hallazgos/Hallazgos";
 import { Participants } from "./participants";
 import { DataVerification } from "./data-verification";
 import { Eficacia } from "./eficacia";
 import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
-import styles from "./AuditDetail.module.css";
+import styles from "./DetalleAuditoria.module.css";
 import {Auditoria} from "@/types/tipos";
 
 interface AuditDetailProps {
   auditoria: Auditoria;
 }
 
-export default function AuditDetail({ auditoria }: AuditDetailProps) {
+export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
@@ -58,7 +58,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
               <div className={styles["info-card"]}>
                 <h3 className={styles["info-title"]}>Información General</h3>
                 <div className={styles["info-item"]}>
-                  <span className={styles["info-label"]}>Auditor:</span>
+                  <span className={styles["info-label"]}>Auditor jefe:</span>
                   <span className={styles["info-value"]}>{auditoria.nombreAuditor}</span>
                 </div>
                 <div className={styles["info-item"]}>
@@ -84,7 +84,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
             </div>
           </div>
         );
-      case "non-conformities":
+      case "hallazgos":
         return <Hallazgos auditoria={auditoria} />;
       case "participants":
         return <Participants auditId={auditoria.id} />;
@@ -109,20 +109,20 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
           <div className={styles["header-main"]}>
             <div className={styles["client-section"]}>
               <div className={styles["client-logo"]}>
-                {auditoria.cliente.logo ? (
+                {auditoria.logo_cliente ? (
                   <img
-                    src={auditoria.cliente.logo}
-                    alt={`${auditoria.cliente.nombre} logo`}
+                    src={auditoria.logo_cliente}
+                    alt={`${auditoria.nombre_cliente} logo`}
                     className={styles["logo-image"]}
                   />
                 ) : (
                   <div className={styles["logo-placeholder"]}>
-                    {auditoria.cliente.nombre.charAt(0).toUpperCase()}
+                    {auditoria.nombre_cliente.charAt(0).toUpperCase()}
                   </div>
                 )}
               </div>
               <div className={styles["client-info"]}>
-                <h1 className={styles["client-name"]}>{auditoria.cliente.nombre}</h1>
+                <h1 className={styles["client-name"]}>{auditoria.nombre_cliente}</h1>
                 <div className={styles["audit-meta"]}>
                   <span className={styles["standard-badge"]} style={{"backgroundColor": getStandardColor(auditoria.norma)}}>
                     {auditoria.norma}
@@ -182,7 +182,7 @@ export default function AuditDetail({ auditoria }: AuditDetailProps) {
             }
             setShowReportModal(false);
           }}
-          auditName={auditoria.cliente.nombre}
+          auditName={auditoria.nombre_cliente}
         />
       )}
     </div>
