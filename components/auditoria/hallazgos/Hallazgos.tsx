@@ -5,21 +5,26 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import styles from "./Hallazgos.module.css";
-import {Auditoria, Hallazgo} from "@/types/tipos";
+import {Auditoria, Hallazgo} from "@/schemas/types";
 import {apartados} from "@/constants/apartados";
 
 interface HallazgosProps {
     auditoria: Auditoria;
 }
 
-const hallazgoVacio = {
-    evidencia: "",
-    descripcion: "",
-    clausula: {value: "", label: ""},
-    tipo: "OB",
-    severidad: "",
-    norma: "",
-}
+const hallazgoVacio: Hallazgo = {
+    id_auditoria: '',
+    proceso: null,
+    descripcion: null,
+    norma: null,
+    id_clausula: null,
+    label_clausula: null,
+    tipo: null,
+    severidad: null,
+    estado_abierto: true,
+    fecha_creacion: null,
+    fecha_actualizacion: null,
+};
 
 export function Hallazgos({auditoria}: HallazgosProps) {
     const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
@@ -40,9 +45,9 @@ export function Hallazgos({auditoria}: HallazgosProps) {
         }
     }, [auditoria.id]);
 
-    // Load hallazgos from database
+    // Carga hallazhos de la base de datos
     useEffect(() => {
-        cargarHallazgos();
+        cargarHallazgos().then();
     }, [cargarHallazgos]);
 
     const [showAddForm, setShowAddForm] = useState(false);
@@ -50,46 +55,9 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
-    const [newNonConformity, setNewNonConformity] = useState(hallazgoVacio);
+    const [newNonConformity, setnewNonConformity] = useState(hallazgoVacio);
 
-    const getSeverityColor = (severity: string) => {
-        switch (severity) {
-            case "mayor":
-                return "#f39c12";
-            case "menor":
-                return "#f1c40f";
-            default:
-                return "#95a5a6";
-        }
-    };
-
-    const getSeverityText = (severity: string) => {
-        switch (severity) {
-            case "mayor":
-                return "Mayor";
-            case "menor":
-                return "Menor";
-            default:
-                return "Desconocida";
-        }
-    };
-
-    const getTypeText = (type: string) => {
-        switch (type) {
-            case "OB":
-                return "Observación";
-            case "NC":
-                return "No conformidad";
-            case "OM":
-                return "Oportunidad de mejora";
-            case "PF":
-                return "Punto fuerte";
-            default:
-                return "Desconocido";
-        }
-    };
-
-    const handleAddNonConformity = async (e: React.FormEvent) => {
+    const crearNuevoHallazgo = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
@@ -112,7 +80,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
 
             if (response.ok) {
                 await cargarHallazgos(); // Reload the list
-                setNewNonConformity(hallazgoVacio);
+                setnewNonConformity(hallazgoVacio);
                 setShowAddForm(false);
             } else {
                 console.error('Error adding hallazgo');
@@ -125,7 +93,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     const handleEditNonConformity = (item: Hallazgo) => {
         console.log("editing hallazgo", item);
         setEditingItem(item);
-        setNewNonConformity({
+        setnewNonConformity({
             norma: "",
             evidencia: item.evidencia,
             descripcion: item.descripcion,
@@ -160,7 +128,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
 
             if (response.ok) {
                 await cargarHallazgos(); // Reload the list
-                setNewNonConformity(hallazgoVacio);
+                setnewNonConformity(hallazgoVacio);
                 setEditingItem(null);
                 setShowEditForm(false);
             } else {
@@ -242,7 +210,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                         </div>
 
                         <form
-                            onSubmit={handleAddNonConformity}
+                            onSubmit={crearNuevoHallazgo}
                             className={styles["add-form"]}
                         >
                             <div className={styles["form-group"]}>
@@ -251,7 +219,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     type="text"
                                     value={newNonConformity.evidencia}
                                     onChange={(e) =>
-                                        setNewNonConformity({
+                                        setnewNonConformity({
                                             ...newNonConformity,
                                             evidencia: e.target.value,
                                         })
@@ -265,7 +233,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <textarea
                                     value={newNonConformity.descripcion}
                                     onChange={(e) =>
-                                        setNewNonConformity({
+                                        setnewNonConformity({
                                             ...newNonConformity,
                                             descripcion: e.target.value,
                                         })
@@ -282,7 +250,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <select
                                         value={newNonConformity.tipo}
                                         onChange={(e) =>
-                                            setNewNonConformity({
+                                            setnewNonConformity({
                                                 ...newNonConformity,
                                                 tipo: e.target.value,
                                             })
@@ -302,7 +270,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <select
                                         value={newNonConformity.clausula.value}
                                         onChange={(e) =>
-                                            setNewNonConformity({
+                                            setnewNonConformity({
                                                 ...newNonConformity,
                                                 clausula: {
                                                     value: e.target.value,
@@ -324,7 +292,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <select
                                         value={newNonConformity.severidad}
                                         onChange={(e) =>
-                                            setNewNonConformity({
+                                            setnewNonConformity({
                                                 ...newNonConformity,
                                                 severidad: e.target.value,
                                             })
@@ -366,7 +334,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 onClick={() => {
                                     setShowEditForm(false);
                                     setEditingItem(null);
-                                    setNewNonConformity(hallazgoVacio);
+                                    setnewNonConformity(hallazgoVacio);
                                 }}
                                 className={styles["close-button"]}
                             >
@@ -384,7 +352,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     type="text"
                                     value={newNonConformity.evidencia}
                                     onChange={(e) =>
-                                        setNewNonConformity({
+                                        setnewNonConformity({
                                             ...newNonConformity,
                                             evidencia: e.target.value,
                                         })
@@ -399,7 +367,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <textarea
                                     value={newNonConformity.descripcion}
                                     onChange={(e) =>
-                                        setNewNonConformity({
+                                        setnewNonConformity({
                                             ...newNonConformity,
                                             descripcion: e.target.value,
                                         })
@@ -416,7 +384,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <select
                                         value={newNonConformity.tipo}
                                         onChange={(e) =>
-                                            setNewNonConformity({
+                                            setnewNonConformity({
                                                 ...newNonConformity,
                                                 tipo: e.target.value,
                                             })
@@ -436,7 +404,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <select
                                         value={newNonConformity.clausula.value}
                                         onChange={(e) =>
-                                            setNewNonConformity({
+                                            setnewNonConformity({
                                                 ...newNonConformity,
                                                 clausula: {
                                                     value: e.target.value,
@@ -458,7 +426,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     <select
                                         value={newNonConformity.severidad}
                                         onChange={(e) =>
-                                            setNewNonConformity({
+                                            setnewNonConformity({
                                                 ...newNonConformity,
                                                 severidad: e.target.value,
                                             })
@@ -480,7 +448,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     onClick={() => {
                                         setShowEditForm(false);
                                         setEditingItem(null);
-                                        setNewNonConformity(hallazgoVacio);
+                                        setnewNonConformity(hallazgoVacio);
                                     }}
                                     className={styles["cancel-button"]}
                                 >

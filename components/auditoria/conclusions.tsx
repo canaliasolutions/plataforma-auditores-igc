@@ -5,7 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import WarningIcon from "@mui/icons-material/Warning";
 import SaveIcon from "@mui/icons-material/Save";
-import { Auditoria } from "@/types/tipos";
+import { Auditoria } from "@/schemas/types";
 import { OptionButton } from "./option-button";
 import styles from "./Conclusions.module.css";
 

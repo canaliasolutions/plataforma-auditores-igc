@@ -1,5 +1,4 @@
 import {Pool, QueryResult, QueryResultRow} from 'pg';
-import {Hallazgo, Conclusion, Participante, Eficacia, VerificacionDatos} from "@/types/tipos";
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -10,7 +9,7 @@ const pool = new Pool({
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
-async function query<T extends QueryResultRow>(text: string, params?: unknown[]): Promise<QueryResult<T>> {
+async function query <T extends QueryResultRow>(text: string, params?: unknown[]): Promise<QueryResult<T>> {
   console.info('Ejecutando consulta:', text, params);
   try {
     return pool.query<T>(text, params);
@@ -20,58 +19,62 @@ async function query<T extends QueryResultRow>(text: string, params?: unknown[])
   }
 }
 
-type OmittedColumns = 'id' | 'fecha_creacion' | 'fecha_actualizacion';
-type InsertData<T> = Omit<T, OmittedColumns>;
-type UpdateData<T> = Omit<T, OmittedColumns | 'id_auditoria'>;
+function getColumns<T extends object>(obj: T, update: boolean): (keyof T)[] {
+  const filterKeys = ['id', 'fecha_creacion', 'fecha_actualizacion'] as (keyof T)[];
 
-type ColumnNames<T> = ReadonlyArray<keyof T>;
+  if (update) {
+    filterKeys.push('id_auditoria' as keyof T);
+  }
 
-const hallazgosInsertColumns: ColumnNames<InsertData<Hallazgo>> = [
-  'id_auditoria', 'evidencia', 'descripcion', 'norma', 'id_clausula',
-  'label_clausula', 'tipo', 'severidad',
-];
-const hallazgosUpdateColumns: ColumnNames<UpdateData<Hallazgo>> = [
-  'evidencia', 'descripcion', 'norma', 'id_clausula', 'label_clausula',
-  'tipo', 'severidad',
-];
+  return (Object.keys(obj) as (keyof T)[]).filter(
+      (key) => !filterKeys.includes(key)
+  );
+}
 
-const participantesInsertColumns: ColumnNames<InsertData<Participante>> = [
-  'id_auditoria', 'nombre_completo', 'cargo_rol', 'correo_electronico',
-  'asistio_reunion_inicial', 'asistio_reunion_cierre',
-];
-const participantesUpdateColumns: ColumnNames<UpdateData<Participante>> = [
-  'nombre_completo', 'cargo_rol', 'correo_electronico',
-  'asistio_reunion_inicial', 'asistio_reunion_cierre'
-];
+export async function getAll <T extends QueryResultRow>(tableName: string, filterCol: keyof T, filterValue: string): Promise<T[]> {
+  const res = await query<T>(`SELECT * FROM ${tableName} WHERE ${String(filterCol)} = $1 ORDER BY fecha_creacion DESC`, [filterValue]);
+  return res.rows;
+}
 
-const verificacionDatosInsertColumns: ColumnNames<InsertData<VerificacionDatos>> = [
-  'id_auditoria', 'datos_contacto', 'datos_alcance', 'datos_facturacion', 'comentarios_verificacion'
-];
-const verificacionDatosUpdateColumns: ColumnNames<UpdateData<VerificacionDatos>> = [
-  'datos_contacto', 'datos_alcance', 'datos_facturacion', 'comentarios_verificacion'
-];
+export async function getById <T extends QueryResultRow>(tableName: string, id: string): Promise<T | undefined> {
+  const res = await query<T>(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+  return res.rows[0];
+}
 
-const eficaciaInsertColumns: ColumnNames<InsertData<Eficacia>> = [
-  'id_auditoria', 'tipo_auditoria', 'medio_utilizado', 'otro_medio', 'medio_efectivo',
-  'inconvenientes_presentados', 'tipos_inconvenientes', 'otros_inconvenientes',
-  'tecnicas_utilizadas', 'tecnicas_insitu_utilizadas', 'otras_tecnicas', 'otras_tecnicas_insitu'
-];
-const eficaciaUpdateColumns: ColumnNames<UpdateData<Eficacia>> = [
-  'tipo_auditoria', 'medio_utilizado', 'otro_medio', 'medio_efectivo',
-  'inconvenientes_presentados', 'tipos_inconvenientes', 'otros_inconvenientes',
-  'tecnicas_utilizadas', 'tecnicas_insitu_utilizadas', 'otras_tecnicas', 'otras_tecnicas_insitu'
-];
+export async function create <T extends QueryResultRow>(tableName: string, data: object): Promise<T> {
+  const columns = getColumns(data, false);
+  const values = columns.map(col => data[col]);
+  const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
+  const columnsString = columns.join(', ');
 
-const conclusionesInsertColumns: ColumnNames<InsertData<Conclusion>> = [
-  'id_auditoria', 'objetivos_cumplidos', 'desviacion_plan', 'sistema_cumple_norma'
-];
-const conclusionesUpdateColumns: ColumnNames<UpdateData<Conclusion>> = [
-  'objetivos_cumplidos', 'desviacion_plan', 'sistema_cumple_norma'
-];
+  const res = await query<T>(
+      `INSERT INTO ${tableName} (${columnsString}) VALUES (${placeholders}) RETURNING *`,
+      values
+  );
+  return res.rows[0];
+}
+
+export async function update <T extends QueryResultRow>(tableName: string, id: number, data: object): Promise<T> {
+  const columns = getColumns(data, true);
+  const values = [...columns.map(col => data[col]), id];
+
+  const setClause = columns.map((col, i) => `${String(col)} = $${i + 1}`).join(', ');
+
+  const res = await query<T>(
+      `UPDATE ${tableName} SET ${setClause}, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = $${values.length} RETURNING *`,
+      values
+  );
+  return res.rows[0];
+}
+
+export async function remove (tableName: string, id: string): Promise<{ id: string } | undefined> {
+  const res = await query<{ id: string }>(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+  return res.rows[0];
+}
 
 async function createTables(): Promise<void> {
-  const crearTablaHallazgos = `
-  CREATE TABLE IF NOT EXISTS hallazgos (
+  const crearTablas = `
+  CREATE TABLE IF NOT EXISTS informe_hallazgos (
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL,
     proceso TEXT NOT NULL,
@@ -81,32 +84,29 @@ async function createTables(): Promise<void> {
     label_clausula TEXT,
     tipo TEXT NOT NULL,
     severidad TEXT,
+    estado_abierto BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
-  `;
 
-  const crearTablaParticipantes = `
-  CREATE TABLE IF NOT EXISTS participantes (
+  CREATE TABLE IF NOT EXISTS informe_participantes (
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL,
     nombre_completo TEXT NOT NULL,
     cargo TEXT NOT NULL,
     departamento TEXT NOT NULL,
-    asistio_reunion_inicial BOOLEAN DEFAULT FALSE,
-    asistio_reunion_cierre BOOLEAN DEFAULT FALSE,
+    asistio_reunion_inicial BOOLEAN NOT NULL,
+    asistio_reunion_cierre BOOLEAN NOT NULL,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
-  `;
 
-  const crearTablaVerificacionDatos = `
-  CREATE TABLE IF NOT EXISTS verificacion_datos (
+  CREATE TABLE IF NOT EXISTS informe_verificacion_datos (
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL UNIQUE,
-    nombre_organizacion_correcto BOOLEAN NOT NULL DEFAULT TRUE,
+    nombre_organizacion_correcto BOOLEAN NOT NULL,
     nombre_organizacion TEXT,
-    RUC_correcto BOOLEAN NOT NULL DEFAULT TRUE,
+    RUC_correcto BOOLEAN NOT NULL,
     RUC TEXT,
     persona_contacto_nombre TEXT,
     persona_contacto_cargo TEXT,
@@ -116,52 +116,59 @@ async function createTables(): Promise<void> {
     direccion_principal TEXT,
     telefono TEXT,
     centros_incluidos_alcance TEXT,
-    exclusiones_correctas BOOLEAN NOT NULL DEFAULT TRUE,
-    exclusion_7152 BOOLEAN NOT NULL DEFAULT FALSE,
-    exclusion_83 BOOLEAN NOT NULL DEFAULT FALSE,
-    exclusion_851f BOOLEAN NOT NULL DEFAULT FALSE,
-    exclusion_853 BOOLEAN NOT NULL DEFAULT FALSE,
-    exclusion_855 BOOLEAN NOT NULL DEFAULT FALSE,
+    exclusiones_correctas BOOLEAN NOT NULL,
+    exclusion_7152 BOOLEAN NOT NULL,
+    exclusion_83 BOOLEAN NOT NULL,
+    exclusion_851f BOOLEAN NOT NULL,
+    exclusion_853 BOOLEAN NOT NULL,
+    exclusion_855 BOOLEAN NOT NULL,
     numero_empleados_emplazamiento_json JSONB DEFAULT '{}'::jsonb,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
-  `;
-
-  const crearTablaEficacia = `
-  CREATE TABLE IF NOT EXISTS eficacia (
+  
+  CREATE TABLE IF NOT EXISTS informe_conclusiones (
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL UNIQUE,
-    tipo_auditoria TEXT NOT NULL,
-    medio_utilizado TEXT,
-    otro_medio TEXT,
-    medio_efectivo TEXT,
-    inconvenientes_presentados TEXT,
-    tipos_inconvenientes TEXT,
-    otros_inconvenientes TEXT,
-    tecnicas_utilizadas TEXT,
-    tecnicas_insitu_utilizadas TEXT,
-    otras_tecnicas TEXT,
-    otras_tecnicas_insitu TEXT,
+    objetivos_auditoria_no_cumplidos TEXT,
+    sistema_no_cumple_norma TEXT,
+    auditor_jefe_recomienda_certificacion_inicial BOOLEAN NOT NULL,
+    auditor_jefe_recomienda_mantenimiento BOOLEAN NOT NULL,
+    auditor_jefe_recomienda_levantar_suspension BOOLEAN NOT NULL,
+    auditor_jefe_recomienda_renovacion BOOLEAN NOT NULL,
+    auditor_jefe_recomienda_ampliar_alcance BOOLEAN NOT NULL,
+    auditor_jefe_recomienda_reduccion_alcance BOOLEAN NOT NULL,
+    auditor_jefe_recomienda_restaurar_certificacion BOOLEAN NOT NULL,
+    distancia_medio_fue_efectivo BOOLEAN NOT NULL,
+    distancia_medio_utilizado_google_meets BOOLEAN NOT NULL,
+    distancia_medio_utilizado_zoom BOOLEAN NOT NULL,
+    distancia_medio_utilizado_teams BOOLEAN NOT NULL,
+    distancia_medio_utilizado_otro TEXT,
+    distancia_inconveniente_interlocutor_no_disponible BOOLEAN,
+    distancia_inconveniente_informacion_documentada_no_disponible BOOLEAN,
+    distancia_inconveniente_confidencialidad_informacion BOOLEAN,
+    distancia_inconveniente_observacion_actividades_tecnicas BOOLEAN,
+    distancia_inconveniente_otro TEXT,
+    distancia_tecnica_video_conferencia BOOLEAN,
+    distancia_tecnica_revision_asincrona BOOLEAN,
+    distancia_tecnica_revision_sincrona BOOLEAN,
+    distancia_tecnica_video_recorrido BOOLEAN,
+    distancia_tecnica_video_procesos BOOLEAN,
+    distancia_tecnica_plataformas_archivos BOOLEAN,
+    distancia_tecnica_grabaciones BOOLEAN,
+    distancia_tecnica_fotografias BOOLEAN,
+    distancia_tecnica_otro TEXT
+    presencial_tecnica_entrevistas BOOLEAN,
+    presencial_tecnica_revision_registros BOOLEAN,
+    presencial_tecnica_recorrido BOOLEAN,
+    presencial_tecnica_observacion_procesos BOOLEAN,
+    presencial_tecnica_observacion_actividades BOOLEAN,
+    presencial_tecnica_otro TEXT,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
-  `;
-
-  const crearTablaConclusiones = `
-  CREATE TABLE IF NOT EXISTS conclusiones (
-    id SERIAL PRIMARY KEY,
-    id_auditoria TEXT NOT NULL UNIQUE,
-    objetivos_cumplidos TEXT NOT NULL DEFAULT 'si',
-    desviacion_plan TEXT,
-    sistema_cumple_norma TEXT NOT NULL DEFAULT 'si',
-    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-  );
-  `;
-
-  const crearTablaValoracionSG = `
-  CREATE TABLE IF NOT EXISTS valoracion_sg (
+  
+  CREATE TABLE IF NOT EXISTS informe_valoracion_sg (
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL UNIQUE,
     proyectos_construccion_ubicacion TEXT,
@@ -169,14 +176,36 @@ async function createTables(): Promise<void> {
     sitios_instalaciones_clientes TEXT,
     sedes_auditdas TEXT,
     productos_servicios_auditdos TEXT,
-    turnos_auditados_7_16 BOOLEAN NOT NULL DEFAULT FALSE,
-    turnos_auditados_8_17 BOOLEAN NOT NULL DEFAULT FALSE,
-    turnos_auditados_9_18 BOOLEAN NOT NULL DEFAULT FALSE,
+    aspecto_ambiental_producido_emisiones BOOLEAN,
+    aspecto_ambiental_producido_energia BOOLEAN,
+    aspecto_ambiental_producido_vertidos BOOLEAN,
+    aspecto_ambiental_producido_recursos_naturales BOOLEAN,
+    aspecto_ambiental_producido_descargas_suelo BOOLEAN,
+    aspecto_ambiental_producido_residuos BOOLEAN,
+    aspecto_ambiental_producido_espacio_alteracion BOOLEAN,
+    aspecto_ambiental_emergencia_incendio BOOLEAN,
+    aspecto_ambiental_emergencia_inundacion BOOLEAN,
+    aspecto_ambiental_emergencia_explosion BOOLEAN,
+    aspecto_ambiental_emergencia_derrames BOOLEAN,
+    aspecto_ambiental_emergencia_fugas BOOLEAN,
+    aspecto_ambiental_emergencia_vertidos_incontrolados BOOLEAN,
+    aspecto_ambiental_emergencia_otro TEXT,
+    turnos_auditados_7_16 BOOLEAN NOT NULL,
+    turnos_auditados_8_17 BOOLEAN NOT NULL,
+    turnos_auditados_9_18 BOOLEAN NOT NULL,
     turnos_auditados_otro TEXT,
     modalidad_auditoria TEXT,
-    periodicidad_auditoria_interna_anual BOOLEAN NOT NULL DEFAULT FALSE,
-    periodicidad_auditoria_interna_semestral BOOLEAN NOT NULL DEFAULT FALSE,
-    periodicidad_auditoria_interna_trimestral BOOLEAN NOT NULL DEFAULT FALSE,
+    declaracion_conformidad_sistema_gestion TEXT,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE IF NOT EXISTS informe_auditorias_internas (
+    id SERIAL PRIMARY KEY,
+    id_auditoria TEXT NOT NULL UNIQUE,
+    periodicidad_auditoria_interna_anual BOOLEAN NOT NULL,
+    periodicidad_auditoria_interna_semestral BOOLEAN NOT NULL,
+    periodicidad_auditoria_interna_trimestral BOOLEAN NOT NULL,
     periodicidad_auditoria_interna_otra TEXT,
     periodicidad_segun_procesos TEXT,
     fecha_ultima_auditoria_interna DATE,
@@ -185,20 +214,134 @@ async function createTables(): Promise<void> {
     evidencias_incluyen_informe_auditoria TEXT,
     evidencias_incluyen_listado_verificacion TEXT,
     evidencias_incluyen_evaluacion_auditores TEXT,
-    //Aqui quede
-    sistema_cumple_norma TEXT NOT NULL DEFAULT 'si',
+    auditoria_interna_no_conformidades INTEGER,
+    auditoria_interna_observaciones INTEGER,
+    auditoria_interna_oportunidades_mejora INTEGER,
+    auditoria_interna_fortalezas INTEGER,
+    planificaicon_oportuna_con_antelacion_explicacion TEXT,
+    independencia_objetividad_competencia_explicacion TEXT,
+    todos_requisitos_norma_alcance_auditados_explicacion TEXT,
+    consistencia_entre_interna_externa TEXT,
+    proceso_auditoria_interna_conforme BOOLEAN NOT NULL,
+    nombre_consultor_empresa_implanto_sg TEXT,
+    auditoria_interna_por_personal_interno BOOLEAN NOT NULL,
+    nombre_auditor_interno TEXT,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE IF NOT EXISTS informe_revision_sistema (
+    id SERIAL PRIMARY KEY,
+    id_auditoria TEXT NOT NULL UNIQUE,
+    periodicidad_revision_anual BOOLEAN NOT NULL,
+    periodicidad_revision_semestral BOOLEAN NOT NULL,
+    periodicidad_revision_trimestral BOOLEAN NOT NULL,
+    periodicidad_revision_otra TEXT,
+    fecha_ultima_revision DATE,
+    evidencias_incluyen_informe_revision TEXT,
+    evidencias_incluyen_acta_reunion TEXT,
+    evidencias_incluyen_resumen_ejecutivo TEXT,
+    evidencias_incluyen_presentacion TEXT,
+    evidencias_incluyen_otro TEXT,
+    proceso_revision_conforme BOOLEAN NOT NULL,
+    periodicidad_requisitos_legales_anual BOOLEAN,
+    periodicidad_requisitos_legales_semestral BOOLEAN,
+    periodicidad_requisitos_legales_trimestral BOOLEAN,
+    mecanismo_requisitos_legales_procedimiento_interno BOOLEAN,
+    mecanismo_requisitos_legales_contrato BOOLEAN,
+    mecanismo_requisitos_legales_sistema BOOLEAN,
+    mecanismo_requisitos_legales_otro BOOLEAN,
+    emprende_acciones_necesarias BOOLEAN,
+    metodologia_requisitos_legales_conforme TEXT,
+    licencias_permisos_registros TEXT,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE IF NOT EXISTS informe_desviaciones (
+    id SERIAL PRIMARY KEY,
+    id_auditoria TEXT NOT NULL UNIQUE,
+    cambio_responsable_sistema TEXT,
+    cambio_estructura_organizacion TEXT,
+    cambio_procesos TEXT,
+    cambio_turnos_o_modalidad TEXT,
+    otros_cambios TEXT,
+    cuestiones_afectan_programa_trienal TEXT,
+    asignar_mayor_tiempo_auditar_operaciones TEXT,
+    asignar_mayor_tiempo_auditar_recursos_apoyo TEXT,
+    asignar_mayor_tiempo_auditar_estrategicos TEXT,
+    asignar_mayor_tiempo_auditar_seguimiento_medicion TEXT,
+    asignar_mayor_tiempo_otros TEXT,
+    desviaciones_auditando_proceso TEXT,
+    desviaciones_auditando_proyecto TEXT,
+    desviaciones_auditando_instalacion TEXT,
+    desviaciones_auditando_sitio TEXT,
+    desviaciones_auditando_otro TEXT,
+    motivo_desviacion_interlocutor_no_disponible BOOLEAN,
+    motivo_desviacion_documentacion_no_disponible BOOLEAN,
+    motivo_desviacion_problemas_conexion BOOLEAN,
+    motivo_desviacion_problemas_logisticos BOOLEAN,
+    motivo_desviacion_incidentes_trabajo BOOLEAN,
+    motivo_desviacion_cambio_agenda BOOLEAN,
+    motivo_desviacion_otro TEXT,
+    tiempo_faltante TEXT,
+    proxima_auditoria_evidenciar_insitu BOOLEAN NOT NULL,
+    proxima_auditoria_9001_produccion_prestacion_servicio BOOLEAN,
+    proxima_auditoria_9001_programar_visita_sitio BOOLEAN,
+    proxima_auditoria_9001_preservacion BOOLEAN,
+    proxima_auditoria_9001_trazabilidad BOOLEAN,
+    proxima_auditoria_9001_ambiente_procesos BOOLEAN,
+    proxima_auditoria_9001_infraestructura BOOLEAN,
+    proxima_auditoria_9001_otro BOOLEAN,
+    proxima_auditoria_14001_control_operacional BOOLEAN,
+    proxima_auditoria_14001_programar_visita_sitio BOOLEAN,
+    proxima_auditoria_14001_aspectos_ambientales BOOLEAN,
+    proxima_auditoria_14001_recursos BOOLEAN,
+    proxima_auditoria_14001_otro BOOLEAN,
+    diferencias_opinion TEXT,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE IF NOT EXISTS informe_actividades_integadas (
+    id SERIAL PRIMARY KEY,
+    id_auditoria TEXT NOT NULL UNIQUE,
+    unica_revision_todos_requerimientos BOOLEAN NOT NULL,
+    auditorias_internas_integradas BOOLEAN NOT NULL,
+    politica_unica_sistema_integrado BOOLEAN NOT NULL,
+    gestion_ambiental_integrada BOOLEAN NOT NULL,
+    mapa_procesos_integrados BOOLEAN NOT NULL,
+    identificacion_contexto_considera_ambiente_calidad BOOLEAN NOT NULL,
+    unica_sistematica_riesgos_oportunidades BOOLEAN NOT NULL,
+    informacion_documentada_unica_requisitos_comunes BOOLEAN NOT NULL,
+    acciones_de_mejora_integradas BOOLEAN NOT NULL,
+    planificacion_objetivos_indicadores_integrados BOOLEAN NOT NULL,
+    planificacion_objetivos_indicadores_integrados BOOLEAN NOT NULL,
+    actividades_responsabilidades_integradas BOOLEAN NOT NULL,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE IF NOT EXISTS informe_uso_de_marca (
+    id SERIAL PRIMARY KEY,
+    id_auditoria TEXT NOT NULL UNIQUE,
+    uso_marca BOOLEAN NOT NULL,
+    uso_marca_adecuado BOOLEAN,
+    sitio_uso_marca_pagina_web BOOLEAN,
+    sitio_uso_marca_hojas BOOLEAN,
+    sitio_uso_marca_vehiculos BOOLEAN,
+    sitio_uso_marca_tarjetas BOOLEAN,
+    sitio_uso_marca_documento BOOLEAN,
+    sitio_uso_marca_redes_sociales BOOLEAN,
+    sitio_uso_marca_correo_electronico BOOLEAN,
+    sitio_uso_marca_otro TEXT,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
   `;
 
   try {
-    await query(crearTablaHallazgos);
-    await query(crearTablaParticipantes);
-    await query(crearTablaVerificacionDatos);
-    await query(crearTablaEficacia);
-    await query(crearTablaConclusiones);
-    await query(crearTablaValoracionSG);
+    await query(crearTablas);
     console.log('Tablas creadas o verificadas con éxito.');
   } catch (err) {
     console.error('Error al crear las tablas:', err);
@@ -206,102 +349,5 @@ async function createTables(): Promise<void> {
 }
 
 createTables();
-
-
-function createGenericQueries<T extends { id: number | string }>(
-    tableName: string,
-    insertColumns: ColumnNames<InsertData<T>>,
-    updateColumns: ColumnNames<UpdateData<T>>,
-    uniqueKeyColumn?: keyof T
-) {
-  return {
-    getAll: async (filterCol: keyof T, filterValue: string): Promise<T[]> => {
-      const res = await query<T>(`SELECT * FROM ${tableName} WHERE ${String(filterCol)} = $1 ORDER BY fecha_creacion DESC`, [filterValue]);
-      return res.rows;
-    },
-    getById: async (id: string): Promise<T | undefined> => {
-      const res = await query<T>(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
-      return res.rows[0];
-    },
-    create: async (data: Omit<T, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>): Promise<T> => {
-      const values = insertColumns.map(col => data[col]);
-      const placeholders = insertColumns.map((_, i) => `$${i + 1}`).join(', ');
-      const columns = insertColumns.join(', ');
-
-      const res = await query<T>(
-          `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders}) RETURNING *`,
-          values
-      );
-      return res.rows[0];
-    },
-    update: async (id: string, data: Partial<Omit<T, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>>, idColumn: keyof T = 'id' as keyof T): Promise<T> => {
-      const values = [...updateColumns.map(col => (data as UpdateData<T>)[col]), id];
-
-      const setClause = updateColumns.map((col, i) => `${String(col)} = $${i + 1}`).join(', ');
-
-      const res = await query<T>(
-          `UPDATE ${tableName} SET ${setClause}, fecha_actualizacion = CURRENT_TIMESTAMP WHERE ${String(idColumn)} = $${values.length} RETURNING *`,
-          values
-      );
-      return res.rows[0];
-    },
-    upsert: async (data: Omit<T, 'id' | 'fecha_creacion' | 'fecha_actualizacion'>): Promise<T> => {
-      if (!uniqueKeyColumn) {
-        throw new Error(`Unique key column is required for upsert on table ${tableName}`);
-      }
-      const values = insertColumns.map(col => data[col]);
-      const placeholders = insertColumns.map((_, i) => `$${i + 1}`).join(', ');
-      const columns = insertColumns.join(', ');
-      const updateSetClause = updateColumns.map((col) => `${String(col)} = EXCLUDED.${String(col)}`).join(', ');
-
-      const res = await query<T>(
-          `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})
-         ON CONFLICT(${String(uniqueKeyColumn)}) DO UPDATE SET
-           ${updateSetClause},
-           fecha_actualizacion = CURRENT_TIMESTAMP
-         RETURNING *`,
-          values
-      );
-      return res.rows[0];
-    },
-    delete: async (id: string): Promise<{ id: string } | undefined> => {
-      const res = await query<{ id: string }>(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-      return res.rows[0];
-    }
-  };
-}
-
-export const hallazgosQueries = createGenericQueries<Hallazgo>(
-    'hallazgos',
-    hallazgosInsertColumns,
-    hallazgosUpdateColumns
-);
-
-export const participantesQueries = createGenericQueries<Participante>(
-    'participantes',
-    participantesInsertColumns,
-    participantesUpdateColumns
-);
-
-export const verificacionDatosQueries = createGenericQueries<VerificacionDatos>(
-    'verificacion_datos',
-    verificacionDatosInsertColumns,
-    verificacionDatosUpdateColumns,
-    'id_auditoria'
-);
-
-export const eficaciaQueries = createGenericQueries<Eficacia>(
-    'eficacia',
-    eficaciaInsertColumns,
-    eficaciaUpdateColumns,
-    'id_auditoria'
-);
-
-export const conclusionesQueries = createGenericQueries<Conclusion>(
-    'conclusiones',
-    conclusionesInsertColumns,
-    conclusionesUpdateColumns,
-    'id_auditoria'
-);
 
 export default pool;

@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./AuditCard.module.css";
-import {ResumenAuditoria} from "@/types/tipos";
+import {ResumenAuditoria} from "@/schemas/types";
 
 interface AuditCardProps {
     audit: ResumenAuditoria,

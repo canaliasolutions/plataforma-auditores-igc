@@ -1,5 +1,5 @@
 import {Client} from 'fm-data-api-client';
-import {Auditoria, Hallazgo, Objeto, ResumenAuditoria} from "@/types/tipos";
+import {Auditoria, Hallazgo, Objeto, ResumenAuditoria} from "@/schemas/types";
 import {fakeAudits} from "@/lib/fake-data";
 import {
     conclusionesQueries,

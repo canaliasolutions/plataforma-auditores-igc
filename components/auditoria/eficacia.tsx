@@ -6,7 +6,7 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import SaveIcon from "@mui/icons-material/Save";
-import { Auditoria } from "@/types/tipos";
+import { Auditoria } from "@/schemas/types";
 import { OptionButton } from "./option-button";
 import styles from "./Eficacia.module.css";
 

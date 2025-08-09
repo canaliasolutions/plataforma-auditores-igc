@@ -10,7 +10,7 @@ import { Eficacia } from "./eficacia";
 import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./DetalleAuditoria.module.css";
-import {Auditoria} from "@/types/tipos";
+import {Auditoria} from "@/schemas/types";
 
 interface AuditDetailProps {
   auditoria: Auditoria;
