@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {getAll, update} from '@/lib/database';
+import {getAll, remove, update} from '@/lib/database';
 import {Hallazgo, HallazgoSchema} from "@/schemas/types";
 import {create} from '@/lib/database';
-import {z, ZodError} from 'zod';
+import {ZodError} from 'zod';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -54,12 +54,7 @@ export async function PUT(req: NextRequest) {
 
     const info = update('informe_hallazgos', hallazgo.id, hallazgo as Hallazgo);
 
-    if (info.changes === 0) {
-      return NextResponse.json({ error: 'Hallazgo not found' }, { status: 404 });
-    }
-
-    const updatedHallazgo = hallazgosQueries.getById.get(id);
-    return NextResponse.json(updatedHallazgo);
+    return NextResponse.json(info);
   } catch (error) {
     console.error('Error updating hallazgo:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -75,15 +70,13 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const info = hallazgosQueries.delete.run(id);
-
-    if (info.changes === 0) {
+    const info = remove('informe_hallazgos',id);
+    if (!info) {
       return NextResponse.json({ error: 'Hallazgo not found' }, { status: 404 });
     }
-
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting hallazgo:', error);
+    console.error('Error borrando hallazgo:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

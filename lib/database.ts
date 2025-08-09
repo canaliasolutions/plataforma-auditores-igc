@@ -61,7 +61,7 @@ export async function update <T extends QueryResultRow>(tableName: string, id: n
   const setClause = columns.map((col, i) => `${String(col)} = $${i + 1}`).join(', ');
 
   const res = await query<T>(
-      `UPDATE ${tableName} SET ${setClause}, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = $${values.length} RETURNING *`,
+      `UPDATE ${tableName} SET ${setClause}, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = ${id} RETURNING *`,
       values
   );
   return res.rows[0];

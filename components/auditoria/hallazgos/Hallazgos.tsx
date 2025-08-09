@@ -7,6 +7,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import styles from "./Hallazgos.module.css";
 import {Auditoria, Hallazgo} from "@/schemas/types";
 import {apartados} from "@/constants/apartados";
+import {DeleteDialog} from "@/components/common/DeleteDialog";
 
 interface HallazgosProps {
     auditoria: Auditoria;
@@ -29,6 +30,12 @@ const hallazgoVacio: Hallazgo = {
 export function Hallazgos({auditoria}: HallazgosProps) {
     const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [showEditForm, setShowEditForm] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
+    const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+    const [nuevoHallazgo, setNuevoHallazgo] = useState(hallazgoVacio);
 
     const cargarHallazgos = useCallback(async () => {
         try {
@@ -45,57 +52,41 @@ export function Hallazgos({auditoria}: HallazgosProps) {
         }
     }, [auditoria.id]);
 
-    // Carga hallazhos de la base de datos
     useEffect(() => {
         cargarHallazgos().then();
     }, [cargarHallazgos]);
 
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [showEditForm, setShowEditForm] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
-    const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
-    const [newNonConformity, setnewNonConformity] = useState(hallazgoVacio);
-
-    const crearNuevoHallazgo = async (e: React.FormEvent) => {
+    const crearHallazgo = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
+            nuevoHallazgo.id_auditoria = auditoria.id;
+            nuevoHallazgo.norma = auditoria.norma;
             const response = await fetch('/api/hallazgos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    auditoriaId: auditoria.id,
-                    evidencia: newNonConformity.evidencia,
-                    descripcion: newNonConformity.descripcion,
-                    clausula: newNonConformity.clausula,
-                    tipo: newNonConformity.tipo,
-                    norma: auditoria.norma,
-                    severidad: newNonConformity.tipo === "NC" ? newNonConformity.severidad : null,
-                    fechaEncontrado: new Date().toISOString().split("T")[0],
-                }),
+                body: JSON.stringify(nuevoHallazgo),
             });
 
             if (response.ok) {
-                await cargarHallazgos(); // Reload the list
-                setnewNonConformity(hallazgoVacio);
+                await cargarHallazgos();
+                setNuevoHallazgo(hallazgoVacio);
                 setShowAddForm(false);
             } else {
-                console.error('Error adding hallazgo');
+                console.error('Error añadiendo hallazgo');
             }
         } catch (error) {
-            console.error('Error adding hallazgo:', error);
+            console.error('Error añadiendo hallazgo:', error);
         }
     };
 
-    const handleEditNonConformity = (item: Hallazgo) => {
-        console.log("editing hallazgo", item);
+    const onEditClick = (item: Hallazgo) => {
         setEditingItem(item);
-        setnewNonConformity({
+        setNuevoHallazgo({
             norma: "",
-            evidencia: item.evidencia,
+            proceso: item.proceso,
             descripcion: item.descripcion,
             clausula: item.clausula,
             tipo: item.tipo,
@@ -104,7 +95,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
         setShowEditForm(true);
     };
 
-    const handleUpdateNonConformity = async (e: React.FormEvent) => {
+    const editarHallazgo = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingItem) return;
 
@@ -116,19 +107,19 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                 },
                 body: JSON.stringify({
                     id: editingItem.id,
-                    evidencia: newNonConformity.evidencia,
-                    descripcion: newNonConformity.descripcion,
-                    clausula: newNonConformity.clausula,
-                    tipo: newNonConformity.tipo,
+                    proceso: nuevoHallazgo.proceso,
+                    descripcion: nuevoHallazgo.descripcion,
+                    clausula: nuevoHallazgo.clausula,
+                    tipo: nuevoHallazgo.tipo,
                     norma: auditoria.norma,
-                    severidad: newNonConformity.tipo === "NC" ? newNonConformity.severidad : null,
+                    severidad: nuevoHallazgo.tipo === "NC" ? nuevoHallazgo.severidad : null,
                     fechaResuelto: editingItem.fecha_resuelto,
                 }),
             });
 
             if (response.ok) {
                 await cargarHallazgos(); // Reload the list
-                setnewNonConformity(hallazgoVacio);
+                setNuevoHallazgo(hallazgoVacio);
                 setEditingItem(null);
                 setShowEditForm(false);
             } else {
@@ -210,18 +201,18 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                         </div>
 
                         <form
-                            onSubmit={crearNuevoHallazgo}
+                            onSubmit={crearHallazgo}
                             className={styles["add-form"]}
                         >
                             <div className={styles["form-group"]}>
                                 <label className={styles["form-label"]}>Evidencia:</label>
                                 <input
                                     type="text"
-                                    value={newNonConformity.evidencia}
+                                    value={nuevoHallazgo.proceso}
                                     onChange={(e) =>
-                                        setnewNonConformity({
-                                            ...newNonConformity,
-                                            evidencia: e.target.value,
+                                        setNuevoHallazgo({
+                                            ...nuevoHallazgo,
+                                            proceso: e.target.value,
                                         })
                                     }
                                     className={styles["form-input"]}
@@ -231,10 +222,10 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                             <div className={styles["form-group"]}>
                                 <label className={styles["form-label"]}>Descripción:</label>
                                 <textarea
-                                    value={newNonConformity.descripcion}
+                                    value={nuevoHallazgo.descripcion}
                                     onChange={(e) =>
-                                        setnewNonConformity({
-                                            ...newNonConformity,
+                                        setNuevoHallazgo({
+                                            ...nuevoHallazgo,
                                             descripcion: e.target.value,
                                         })
                                     }
@@ -248,10 +239,10 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Tipo:</label>
                                     <select
-                                        value={newNonConformity.tipo}
+                                        value={nuevoHallazgo.tipo}
                                         onChange={(e) =>
-                                            setnewNonConformity({
-                                                ...newNonConformity,
+                                            setNuevoHallazgo({
+                                                ...nuevoHallazgo,
                                                 tipo: e.target.value,
                                             })
                                         }
@@ -268,10 +259,10 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Cláusula:</label>
                                     <select
-                                        value={newNonConformity.clausula.value}
+                                        value={nuevoHallazgo.clausula.value}
                                         onChange={(e) =>
-                                            setnewNonConformity({
-                                                ...newNonConformity,
+                                            setNuevoHallazgo({
+                                                ...nuevoHallazgo,
                                                 clausula: {
                                                     value: e.target.value,
                                                     label: e.target.options[e.target.selectedIndex].text
@@ -279,8 +270,8 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                             })
                                         }
                                         className={styles["form-select"]}
-                                        disabled={newNonConformity.tipo !== "NC"}
-                                        required={newNonConformity.tipo === "NC"}
+                                        disabled={nuevoHallazgo.tipo !== "NC"}
+                                        required={nuevoHallazgo.tipo === "NC"}
                                     >
                                         {apartados.map((apartado) => <option key={apartado.id}
                                                                              value={String(apartado.id)}>{apartado.clausula}</option>)}
@@ -290,16 +281,16 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Severidad:</label>
                                     <select
-                                        value={newNonConformity.severidad}
+                                        value={nuevoHallazgo.severidad}
                                         onChange={(e) =>
-                                            setnewNonConformity({
-                                                ...newNonConformity,
+                                            setNuevoHallazgo({
+                                                ...nuevoHallazgo,
                                                 severidad: e.target.value,
                                             })
                                         }
                                         className={styles["form-select"]}
-                                        disabled={newNonConformity.tipo !== "NC"}
-                                        required={newNonConformity.tipo === "NC"}
+                                        disabled={nuevoHallazgo.tipo !== "NC"}
+                                        required={nuevoHallazgo.tipo === "NC"}
                                     >
                                         <option value=""></option>
                                         <option value="menor">Menor</option>
@@ -334,7 +325,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 onClick={() => {
                                     setShowEditForm(false);
                                     setEditingItem(null);
-                                    setnewNonConformity(hallazgoVacio);
+                                    setNuevoHallazgo(hallazgoVacio);
                                 }}
                                 className={styles["close-button"]}
                             >
@@ -343,18 +334,18 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                         </div>
 
                         <form
-                            onSubmit={handleUpdateNonConformity}
+                            onSubmit={editarHallazgo}
                             className={styles["add-form"]}
                         >
                             <div className={styles["form-group"]}>
                                 <label className={styles["form-label"]}>Evidencia:</label>
                                 <input
                                     type="text"
-                                    value={newNonConformity.evidencia}
+                                    value={nuevoHallazgo.proceso}
                                     onChange={(e) =>
-                                        setnewNonConformity({
-                                            ...newNonConformity,
-                                            evidencia: e.target.value,
+                                        setNuevoHallazgo({
+                                            ...nuevoHallazgo,
+                                            proceso: e.target.value,
                                         })
                                     }
                                     className={styles["form-input"]}
@@ -365,10 +356,10 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                             <div className={styles["form-group"]}>
                                 <label className={styles["form-label"]}>Descripción:</label>
                                 <textarea
-                                    value={newNonConformity.descripcion}
+                                    value={nuevoHallazgo.descripcion}
                                     onChange={(e) =>
-                                        setnewNonConformity({
-                                            ...newNonConformity,
+                                        setNuevoHallazgo({
+                                            ...nuevoHallazgo,
                                             descripcion: e.target.value,
                                         })
                                     }
@@ -382,10 +373,10 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Tipo:</label>
                                     <select
-                                        value={newNonConformity.tipo}
+                                        value={nuevoHallazgo.tipo}
                                         onChange={(e) =>
-                                            setnewNonConformity({
-                                                ...newNonConformity,
+                                            setNuevoHallazgo({
+                                                ...nuevoHallazgo,
                                                 tipo: e.target.value,
                                             })
                                         }
@@ -402,10 +393,10 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Cláusula:</label>
                                     <select
-                                        value={newNonConformity.clausula.value}
+                                        value={nuevoHallazgo.clausula.value}
                                         onChange={(e) =>
-                                            setnewNonConformity({
-                                                ...newNonConformity,
+                                            setNuevoHallazgo({
+                                                ...nuevoHallazgo,
                                                 clausula: {
                                                     value: e.target.value,
                                                     label: e.target.options[e.target.selectedIndex].text
@@ -413,8 +404,8 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                             })
                                         }
                                         className={styles["form-select"]}
-                                        disabled={newNonConformity.tipo !== "NC"}
-                                        required={newNonConformity.tipo === "NC"}
+                                        disabled={nuevoHallazgo.tipo !== "NC"}
+                                        required={nuevoHallazgo.tipo === "NC"}
                                     >
                                         {apartados.map((apartado) => <option
                                             key={apartado.id} value={String(apartado.id)}>{apartado.clausula}</option>)}
@@ -424,16 +415,16 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 <div className={styles["form-group"]}>
                                     <label className={styles["form-label"]}>Severidad:</label>
                                     <select
-                                        value={newNonConformity.severidad}
+                                        value={nuevoHallazgo.severidad}
                                         onChange={(e) =>
-                                            setnewNonConformity({
-                                                ...newNonConformity,
+                                            setNuevoHallazgo({
+                                                ...nuevoHallazgo,
                                                 severidad: e.target.value,
                                             })
                                         }
                                         className={styles["form-select"]}
-                                        disabled={newNonConformity.tipo !== "NC"}
-                                        required={newNonConformity.tipo === "NC"}
+                                        disabled={nuevoHallazgo.tipo !== "NC"}
+                                        required={nuevoHallazgo.tipo === "NC"}
                                     >
                                         <option value=""></option>
                                         <option value="menor">Menor</option>
@@ -448,7 +439,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                     onClick={() => {
                                         setShowEditForm(false);
                                         setEditingItem(null);
-                                        setnewNonConformity(hallazgoVacio);
+                                        setNuevoHallazgo(hallazgoVacio);
                                     }}
                                     className={styles["cancel-button"]}
                                 >
@@ -463,37 +454,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                 </div>
             )}
 
-            {showDeleteDialog && (
-                <div className={styles["modal-overlay"]}>
-                    <div className={styles["delete-dialog"]}>
-                        <div className={styles["delete-header"]}>
-                            <h3 className={styles["delete-title"]}>Confirmar Eliminación</h3>
-                        </div>
-
-                        <div className={styles["delete-content"]}>
-                            <p className={styles["delete-message"]}>
-                                ¿Estás seguro de que deseas eliminar este hallazgo? Esta
-                                acción no se puede deshacer.
-                            </p>
-                        </div>
-
-                        <div className={styles["delete-actions"]}>
-                            <button
-                                onClick={cancelDelete}
-                                className={styles["cancel-button"]}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={confirmDelete}
-                                className={styles["confirm-delete-button"]}
-                            >
-                                Eliminar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {showDeleteDialog && (<DeleteDialog></DeleteDialog>)}
 
             <div className={styles["conformities-list"]}>
                 {hallazgos.length === 0 ? (
@@ -512,7 +473,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                         <div key={item.id} className={styles["conformity-card"]}>
                             <div className={styles["card-header"]}>
                                 <div className={styles["title-section"]}>
-                                    <h3 className={styles["conformity-title"]}>{item.evidencia}</h3>
+                                    <h3 className={styles["conformity-title"]}>{item.proceso}</h3>
                                     {(item.clausula.label !== "") ?
                                         (<span className={styles["clause-badge"]}>
                                         Cláusula {item.clausula.label}
@@ -552,7 +513,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                 </div>
                                 <div className={styles["action-buttons"]}>
                                     <button
-                                        onClick={() => handleEditNonConformity(item)}
+                                        onClick={() => onEditClick(item)}
                                         className={styles["edit-button"]}
                                         title="Editar hallazgo"
                                     >
