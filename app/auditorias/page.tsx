@@ -8,7 +8,14 @@ import {getAudits} from "@/lib/filemaker";
 
 export default async function AuditoriasPage() {
     const audits = await getAudits("jorge.achurra@certificacionglobal.com");
-
+    if (!audits) {
+        return (
+            <div className={styles["error-state"]}>
+                <h2>Error al cargar las auditorías</h2>
+                <p>Por favor, recarga la página.</p>
+            </div>
+        );
+    }
   return (
       <div>
         <main>

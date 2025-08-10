@@ -4,6 +4,7 @@ import styles from "./Navbar.module.css";
 import {useRouter} from "next/navigation";
 import { useMsal } from "@azure/msal-react";
 import {UserSessionData} from "@/lib/session-utils";
+import NavbarUser from "@/components/NavbarUserModal";
 
 interface NavbarProps {
   activeTab?: string;
@@ -16,23 +17,19 @@ export function Navbar({
 }: NavbarProps) {
   const { instance } = useMsal();
   const router = useRouter();
+
   const handleLogout = async () => {
     try {
-
       await instance.logoutPopup();
-
       const response = await fetch('/api/logout', {
         method: 'POST', // Use POST as defined in your API route
       });
-
       if (!response.ok) {
         throw new Error(`Server logout failed: ${response.statusText}`);
+      } else {
+        router.push('/login');
+        console.log("User successfully logged out (client-side MSAL and server-side session invalidated).");
       }
-
-      router.push('/login');
-
-      console.log("User successfully logged out (client-side MSAL and server-side session invalidated).");
-
     } catch (error) {
       console.error("Error during logout process:", error);
     }
@@ -69,23 +66,9 @@ export function Navbar({
             </button>
           ))}
         </div>
-
-        <div className={styles["navbar-user"]}>
-          <div className={styles["user-info"]}>
-            <div className={styles["user-avatar"]}>
-              {userSession?.name ? userSession.name.charAt(0).toUpperCase() : "U"}
-            </div>
-            <div className={styles["user-details"]}>
-              <span className={styles["user-name"]}>
-                {userSession?.name || "Usuario"}
-              </span>
-              <span className={styles["user-email"]}>{userSession?.email}</span>
-            </div>
-          </div>
-          <button onClick={handleLogout} className={styles["logout-btn"]}>
-            Cerrar Sesión
-          </button>
-        </div>
+      <NavbarUser name={userSession?.name || "Usuario"}
+                  email={userSession?.email || "email.com"}
+                    handleLogout={handleLogout} />
       </div>
     </nav>
   );

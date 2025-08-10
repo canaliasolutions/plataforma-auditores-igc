@@ -19,8 +19,8 @@ export async function getAudits(auditorEmail: string): Promise<ResumenAuditoria[
             }
         );
     } catch (e) {
-        console.warn("Using fake records, failed fetch from filemaker: ",e);
-        records = {data: fakeAudits};
+        console.error("Error obteniendo auditorias de filemaker: ",e);
+        throw new Error(`Error obteniendo auditorias de filemaker: ${e}`);
     }
     const auditsRawData = records.data.map((item: {[key: string]: string}) => item.fieldData);
     auditsRawData.forEach((auditRawItem: {[key: string]: string}) => {

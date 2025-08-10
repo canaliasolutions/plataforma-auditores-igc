@@ -13,29 +13,29 @@
 
 .delete-dialog {
     background: white;
-    border-radius: 12px;
+    border-radius: 0.75rem;  /* 12px */
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    max-width: 25rem;  /* 400px */
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.1);  /* 20px 40px */
 }
 
 .delete-header {
-    padding: 24px 24px 0 24px;
+    padding: 1.5rem 1.5rem 0 1.5rem;  /* 24px */
 }
 
 .delete-title {
-    font-size: 18px;
+    font-size: 1.125rem;  /* 18px */
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
 }
 
 .delete-content {
-    padding: 16px 24px;
+    padding: 1rem 1.5rem;  /* 16px 24px */
 }
 
 .delete-message {
-    font-size: 14px;
+    font-size: 0.875rem;  /* 14px */
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
@@ -43,18 +43,18 @@
 
 .delete-actions {
     display: flex;
-    gap: 12px;
+    gap: 0.75rem;  /* 12px */
     justify-content: flex-end;
-    padding: 0 24px 24px 24px;
+    padding: 0 1.5rem 1.5rem 1.5rem;  /* 24px */
 }
 
 .confirm-delete-button {
-    padding: 12px 20px;
+    padding: 0.75rem 1.25rem;  /* 12px 20px */
     background: #d32f2f;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 0.5rem;  /* 8px */
+    font-size: 0.875rem;  /* 14px */
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -65,12 +65,12 @@
 }
 
 .cancel-button {
-    padding: 12px 20px;
+    padding: 0.75rem 1.25rem;  /* 12px 20px */
     background: transparent;
     color: var(--text-secondary);
     border: 1px solid var(--tertiary);
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 0.5rem;  /* 8px */
+    font-size: 0.875rem;  /* 14px */
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
