@@ -3,24 +3,25 @@
 import {useState, useEffect, useCallback} from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import styles from "./Hallazgos.module.css";
 import {Auditoria, Hallazgo} from "@/schemas/types";
-import {apartados} from "@/constants/apartados";
 import {DeleteDialog} from "@/components/common/DeleteDialog";
+import {getSeverityColor, getTypeText} from "@/components/auditoria/hallazgos/HallazgosHelper";
+import { HallazgoModal } from "./HallazgoModal";
 
 interface HallazgosProps {
     auditoria: Auditoria;
 }
 
 const hallazgoVacio: Hallazgo = {
+    id: undefined,
     id_auditoria: '',
-    proceso: null,
+    proceso: '',
     descripcion: null,
-    norma: null,
+    norma: '',
     id_clausula: null,
     label_clausula: null,
-    tipo: null,
+    tipo: '',
     severidad: null,
     estado_abierto: true,
     fecha_creacion: null,
@@ -28,52 +29,69 @@ const hallazgoVacio: Hallazgo = {
 };
 
 export function Hallazgos({auditoria}: HallazgosProps) {
-    const [hallazgos, setHallazgos] = useState<Hallazgo[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [showEditForm, setShowEditForm] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [editingItem, setEditingItem] = useState<Hallazgo | null>(null);
-    const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
-    const [nuevoHallazgo, setNuevoHallazgo] = useState(hallazgoVacio);
+    const [uiState, setUiState] = useState({
+        hallazgos: [] as Hallazgo[],
+        loading: true,
+        showAddForm: false,
+        showEditForm: false,
+        showDeleteDialog: false,
+        editingItem: null as Hallazgo | null,
+        deletingItemId: null as number | null,
+        nuevoHallazgo: hallazgoVacio,
+    });
+
+    const handleHallazgoChange = (changes: Partial<Hallazgo>) => {
+        setUiState(prev => ({
+            ...prev,
+            nuevoHallazgo: {
+                ...prev.nuevoHallazgo,
+                ...changes
+            }
+        }));
+    };
 
     const cargarHallazgos = useCallback(async () => {
         try {
-            setLoading(true);
+            setUiState(prev => ({ ...prev, loading: true }));
             const response = await fetch(`/api/hallazgos?auditoriaId=${auditoria.id}`);
             if (response.ok) {
                 const data = await response.json();
-                setHallazgos(data);
+                setUiState(prev => ({ ...prev, hallazgos: data, loading: false }));
             }
         } catch (error) {
             console.error('Error loading hallazgos:', error);
-        } finally {
-            setLoading(false);
+            setUiState(prev => ({ ...prev, loading: false }));
         }
     }, [auditoria.id]);
 
     useEffect(() => {
-        cargarHallazgos().then();
+        cargarHallazgos().then(() => console.log('Hallazgos cargados', uiState));
+
     }, [cargarHallazgos]);
 
     const crearHallazgo = async (e: React.FormEvent) => {
         e.preventDefault();
-
         try {
-            nuevoHallazgo.id_auditoria = auditoria.id;
-            nuevoHallazgo.norma = auditoria.norma;
+            const hallazgoData = {
+                ...uiState.nuevoHallazgo,
+                id_auditoria: auditoria.id,
+                norma: auditoria.norma,
+            };
             const response = await fetch('/api/hallazgos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(nuevoHallazgo),
+                body: JSON.stringify(hallazgoData),
             });
 
             if (response.ok) {
                 await cargarHallazgos();
-                setNuevoHallazgo(hallazgoVacio);
-                setShowAddForm(false);
+                setUiState(prev => ({
+                    ...prev,
+                    nuevoHallazgo: hallazgoVacio,
+                    showAddForm: false
+                }));
             } else {
                 console.error('Error añadiendo hallazgo');
             }
@@ -83,45 +101,39 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     };
 
     const onEditClick = (item: Hallazgo) => {
-        setEditingItem(item);
-        setNuevoHallazgo({
-            norma: "",
-            proceso: item.proceso,
-            descripcion: item.descripcion,
-            clausula: item.clausula,
-            tipo: item.tipo,
-            severidad: item.severidad || ""
-        });
-        setShowEditForm(true);
+        setUiState(prev => ({
+            ...prev,
+            editingItem: item,
+            nuevoHallazgo: {
+                ...hallazgoVacio,
+                ...item
+            },
+            showEditForm: true
+        }));
     };
 
     const editarHallazgo = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editingItem) return;
+        if (!uiState.editingItem) return;
 
         try {
+            uiState.nuevoHallazgo.id = uiState.editingItem.id;
             const response = await fetch('/api/hallazgos', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    id: editingItem.id,
-                    proceso: nuevoHallazgo.proceso,
-                    descripcion: nuevoHallazgo.descripcion,
-                    clausula: nuevoHallazgo.clausula,
-                    tipo: nuevoHallazgo.tipo,
-                    norma: auditoria.norma,
-                    severidad: nuevoHallazgo.tipo === "NC" ? nuevoHallazgo.severidad : null,
-                    fechaResuelto: editingItem.fecha_resuelto,
-                }),
+                body: JSON.stringify(uiState.nuevoHallazgo),
             });
 
             if (response.ok) {
-                await cargarHallazgos(); // Reload the list
-                setNuevoHallazgo(hallazgoVacio);
-                setEditingItem(null);
-                setShowEditForm(false);
+                await cargarHallazgos();
+                setUiState(prev => ({
+                    ...prev,
+                    nuevoHallazgo: hallazgoVacio,
+                    editingItem: null,
+                    showEditForm: false
+                }));
             } else {
                 console.error('Error updating hallazgo');
             }
@@ -131,23 +143,26 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     };
 
     const handleDeleteNonConformity = (id: number) => {
-        setDeletingItemId(id);
-        setShowDeleteDialog(true);
+        setUiState(prev => ({
+            ...prev,
+            deletingItemId: id,
+            showDeleteDialog: true
+        }));
     };
 
     const confirmDelete = async () => {
-        if (deletingItemId) {
+        if (uiState.deletingItemId) {
             try {
                 const response = await fetch('/api/hallazgos', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({id: deletingItemId}),
+                    body: JSON.stringify({id: uiState.deletingItemId}),
                 });
 
                 if (response.ok) {
-                    await cargarHallazgos(); // Reload the list
+                    await cargarHallazgos();
                 } else {
                     console.error('Error deleting hallazgo');
                 }
@@ -155,16 +170,22 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                 console.error('Error deleting hallazgo:', error);
             }
         }
-        setDeletingItemId(null);
-        setShowDeleteDialog(false);
+        setUiState(prev => ({
+            ...prev,
+            deletingItemId: null,
+            showDeleteDialog: false
+        }));
     };
 
     const cancelDelete = () => {
-        setDeletingItemId(null);
-        setShowDeleteDialog(false);
+        setUiState(prev => ({
+            ...prev,
+            deletingItemId: null,
+            showDeleteDialog: false
+        }));
     };
 
-    if (loading) {
+    if (uiState.loading) {
         return (
             <div className={styles["hallazgos"]}>
                 <div className={styles["loading-state"]}>
@@ -179,7 +200,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
             <div className={styles["section-header"]}>
                 <h2 className={styles["section-title"]}>Hallazgos</h2>
                 <button
-                    onClick={() => setShowAddForm(true)}
+                    onClick={() => setUiState(prev => ({ ...prev, showAddForm: true }))}
                     className={styles["add-button"]}
                 >
                     <AddIcon sx={{fontSize: 16, marginRight: 1}}/>
@@ -187,277 +208,40 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                 </button>
             </div>
 
-            {showAddForm && (
-                <div className={styles["modal-overlay"]}>
-                    <div className={styles["modal-content"]}>
-                        <div className={styles["modal-header"]}>
-                            <h3 className={styles["modal-title"]}>Nuevo hallazgo</h3>
-                            <button
-                                onClick={() => setShowAddForm(false)}
-                                className={styles["close-button"]}
-                            >
-                                <CloseIcon sx={{fontSize: 20}}/>
-                            </button>
-                        </div>
+            <HallazgoModal
+                isOpen={uiState.showAddForm}
+                title="Nuevo hallazgo"
+                hallazgo={uiState.nuevoHallazgo}
+                submitButtonText="Agregar hallazgo"
+                onClose={() => setUiState(prev => ({ ...prev, showAddForm: false }))}
+                onSubmit={crearHallazgo}
+                onHallazgoChange={handleHallazgoChange}
+            />
 
-                        <form
-                            onSubmit={crearHallazgo}
-                            className={styles["add-form"]}
-                        >
-                            <div className={styles["form-group"]}>
-                                <label className={styles["form-label"]}>Evidencia:</label>
-                                <input
-                                    type="text"
-                                    value={nuevoHallazgo.proceso}
-                                    onChange={(e) =>
-                                        setNuevoHallazgo({
-                                            ...nuevoHallazgo,
-                                            proceso: e.target.value,
-                                        })
-                                    }
-                                    className={styles["form-input"]}
-                                />
-                            </div>
+            <HallazgoModal
+                isOpen={uiState.showEditForm}
+                title="Editar hallazgo"
+                hallazgo={uiState.nuevoHallazgo}
+                submitButtonText="Actualizar hallazgo"
+                onClose={() => setUiState(prev => ({
+                    ...prev,
+                    showEditForm: false,
+                    editingItem: null,
+                    nuevoHallazgo: hallazgoVacio
+                }))}
+                onSubmit={editarHallazgo}
+                onHallazgoChange={handleHallazgoChange}
+            />
 
-                            <div className={styles["form-group"]}>
-                                <label className={styles["form-label"]}>Descripción:</label>
-                                <textarea
-                                    value={nuevoHallazgo.descripcion}
-                                    onChange={(e) =>
-                                        setNuevoHallazgo({
-                                            ...nuevoHallazgo,
-                                            descripcion: e.target.value,
-                                        })
-                                    }
-                                    className={styles["form-textarea"]}
-                                    rows={4}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles["form-row"]}>
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Tipo:</label>
-                                    <select
-                                        value={nuevoHallazgo.tipo}
-                                        onChange={(e) =>
-                                            setNuevoHallazgo({
-                                                ...nuevoHallazgo,
-                                                tipo: e.target.value,
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        required
-                                    >
-                                        <option value="OB">Observación</option>
-                                        <option value="NC">No conformidad</option>
-                                        <option value="OM">Oportunidad de mejora</option>
-                                        <option value="PF">Punto fuerte</option>
-                                    </select>
-                                </div>
-
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Cláusula:</label>
-                                    <select
-                                        value={nuevoHallazgo.clausula.value}
-                                        onChange={(e) =>
-                                            setNuevoHallazgo({
-                                                ...nuevoHallazgo,
-                                                clausula: {
-                                                    value: e.target.value,
-                                                    label: e.target.options[e.target.selectedIndex].text
-                                                },
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        disabled={nuevoHallazgo.tipo !== "NC"}
-                                        required={nuevoHallazgo.tipo === "NC"}
-                                    >
-                                        {apartados.map((apartado) => <option key={apartado.id}
-                                                                             value={String(apartado.id)}>{apartado.clausula}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Severidad:</label>
-                                    <select
-                                        value={nuevoHallazgo.severidad}
-                                        onChange={(e) =>
-                                            setNuevoHallazgo({
-                                                ...nuevoHallazgo,
-                                                severidad: e.target.value,
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        disabled={nuevoHallazgo.tipo !== "NC"}
-                                        required={nuevoHallazgo.tipo === "NC"}
-                                    >
-                                        <option value=""></option>
-                                        <option value="menor">Menor</option>
-                                        <option value="mayor">Mayor</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className={styles["form-actions"]}>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddForm(false)}
-                                    className={styles["cancel-button"]}
-                                >
-                                    Cancelar
-                                </button>
-                                <button type="submit" className={styles["submit-button"]}>
-                                    Agregar hallazgo
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+            {uiState.showDeleteDialog && (
+                <DeleteDialog
+                    onDelete={confirmDelete}
+                    onCancel={cancelDelete}
+                />
             )}
-
-            {showEditForm && editingItem && (
-                <div className={styles["modal-overlay"]}>
-                    <div className={styles["modal-content"]}>
-                        <div className={styles["modal-header"]}>
-                            <h3 className={styles["modal-title"]}>Editar hallazgo</h3>
-                            <button
-                                onClick={() => {
-                                    setShowEditForm(false);
-                                    setEditingItem(null);
-                                    setNuevoHallazgo(hallazgoVacio);
-                                }}
-                                className={styles["close-button"]}
-                            >
-                                <CloseIcon sx={{fontSize: 20}}/>
-                            </button>
-                        </div>
-
-                        <form
-                            onSubmit={editarHallazgo}
-                            className={styles["add-form"]}
-                        >
-                            <div className={styles["form-group"]}>
-                                <label className={styles["form-label"]}>Evidencia:</label>
-                                <input
-                                    type="text"
-                                    value={nuevoHallazgo.proceso}
-                                    onChange={(e) =>
-                                        setNuevoHallazgo({
-                                            ...nuevoHallazgo,
-                                            proceso: e.target.value,
-                                        })
-                                    }
-                                    className={styles["form-input"]}
-
-                                />
-                            </div>
-
-                            <div className={styles["form-group"]}>
-                                <label className={styles["form-label"]}>Descripción:</label>
-                                <textarea
-                                    value={nuevoHallazgo.descripcion}
-                                    onChange={(e) =>
-                                        setNuevoHallazgo({
-                                            ...nuevoHallazgo,
-                                            descripcion: e.target.value,
-                                        })
-                                    }
-                                    className={styles["form-textarea"]}
-                                    rows={4}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles["form-row"]}>
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Tipo:</label>
-                                    <select
-                                        value={nuevoHallazgo.tipo}
-                                        onChange={(e) =>
-                                            setNuevoHallazgo({
-                                                ...nuevoHallazgo,
-                                                tipo: e.target.value,
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        required
-                                    >
-                                        <option value="OB">Observación</option>
-                                        <option value="NC">No conformidad</option>
-                                        <option value="OM">Oportunidad de mejora</option>
-                                        <option value="PF">Punto fuerte</option>
-                                    </select>
-                                </div>
-
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Cláusula:</label>
-                                    <select
-                                        value={nuevoHallazgo.clausula.value}
-                                        onChange={(e) =>
-                                            setNuevoHallazgo({
-                                                ...nuevoHallazgo,
-                                                clausula: {
-                                                    value: e.target.value,
-                                                    label: e.target.options[e.target.selectedIndex].text
-                                                },
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        disabled={nuevoHallazgo.tipo !== "NC"}
-                                        required={nuevoHallazgo.tipo === "NC"}
-                                    >
-                                        {apartados.map((apartado) => <option
-                                            key={apartado.id} value={String(apartado.id)}>{apartado.clausula}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className={styles["form-group"]}>
-                                    <label className={styles["form-label"]}>Severidad:</label>
-                                    <select
-                                        value={nuevoHallazgo.severidad}
-                                        onChange={(e) =>
-                                            setNuevoHallazgo({
-                                                ...nuevoHallazgo,
-                                                severidad: e.target.value,
-                                            })
-                                        }
-                                        className={styles["form-select"]}
-                                        disabled={nuevoHallazgo.tipo !== "NC"}
-                                        required={nuevoHallazgo.tipo === "NC"}
-                                    >
-                                        <option value=""></option>
-                                        <option value="menor">Menor</option>
-                                        <option value="mayor">Mayor</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className={styles["form-actions"]}>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowEditForm(false);
-                                        setEditingItem(null);
-                                        setNuevoHallazgo(hallazgoVacio);
-                                    }}
-                                    className={styles["cancel-button"]}
-                                >
-                                    Cancelar
-                                </button>
-                                <button type="submit" className={styles["submit-button"]}>
-                                    Actualizar hallazgo
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {showDeleteDialog && (<DeleteDialog></DeleteDialog>)}
 
             <div className={styles["conformities-list"]}>
-                {hallazgos.length === 0 ? (
+                {(uiState.hallazgos.length === 0) || (!Array.isArray(uiState.hallazgos)) ? (
                     <div className={styles["empty-state"]}>
                         <CheckCircleIcon
                             className={styles["empty-icon"]}
@@ -469,27 +253,27 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                         </p>
                     </div>
                 ) : (
-                    hallazgos.map((item) => (
+                    uiState.hallazgos.map((item) => (
                         <div key={item.id} className={styles["conformity-card"]}>
                             <div className={styles["card-header"]}>
                                 <div className={styles["title-section"]}>
                                     <h3 className={styles["conformity-title"]}>{item.proceso}</h3>
-                                    {(item.clausula.label !== "") ?
+                                    {(item.label_clausula !== "") ?
                                         (<span className={styles["clause-badge"]}>
-                                        Cláusula {item.clausula.label}
-                                    </span>) : null}
+                                            Cláusula {item.label_clausula}
+                                        </span>) : null}
                                 </div>
                                 <div className={styles["badges"]}>
-                  <span className={styles["status-badge"]}>
-                    {getTypeText(item.tipo)}
-                  </span>
+                                    <span className={styles["status-badge"]}>
+                                        {getTypeText(item.tipo)}
+                                    </span>
                                     {item.tipo === "NC" && item.severidad && (
                                         <span
                                             className={styles["severity-badge"]}
                                             style={{backgroundColor: getSeverityColor(item.severidad)}}
                                         >
-                      {getSeverityText(item.severidad)}
-                    </span>
+                                            {item.severidad}
+                                        </span>
                                     )}
                                 </div>
                             </div>
@@ -500,16 +284,6 @@ export function Hallazgos({auditoria}: HallazgosProps) {
 
                             <div className={styles["card-footer"]}>
                                 <div className={styles["date-section"]}>
-                  <span className={styles["date-info"]}>
-                    Encontrada el:{" "}
-                      {new Date(item.fecha_encontrado).toLocaleDateString("es-ES")}
-                  </span>
-                                    {item.fecha_resuelto && (
-                                        <span className={styles["date-info"]}>
-                      Resuelta el:{" "}
-                                            {new Date(item.fecha_resuelto).toLocaleDateString("es-ES")}
-                    </span>
-                                    )}
                                 </div>
                                 <div className={styles["action-buttons"]}>
                                     <button
@@ -520,7 +294,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                                         Editar
                                     </button>
                                     <button
-                                        onClick={() => handleDeleteNonConformity(item.id)}
+                                        onClick={() => handleDeleteNonConformity(item.id || 0)}
                                         className={styles["delete-button"]}
                                         title="Eliminar hallazgo"
                                     >

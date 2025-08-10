@@ -7,7 +7,6 @@ import {ZodError} from 'zod';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const auditoriaId = searchParams.get('auditoriaId');
-  console.info('Atendiendo peticion: ', req);
 
   if (!auditoriaId) {
     return NextResponse.json({ error: 'auditoriaId is required' }, { status: 400 });
@@ -25,7 +24,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    console.info('Atendiendo peticion: ', req);
     const hallazgo = HallazgoSchema.parse(data);
     const info = create('informe_hallazgos', hallazgo as Hallazgo);
 
@@ -45,7 +43,6 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const data = await req.json();
-    console.info('Atendiendo peticion: ', req);
     const hallazgo = HallazgoSchema.parse(data);
 
     if (!hallazgo.id) {

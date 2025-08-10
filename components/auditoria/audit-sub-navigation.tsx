@@ -19,11 +19,11 @@ export function AuditSubNavigation({
 }: AuditSubNavigationProps) {
           const tabs = [
     { id: "overview", label: "Resumen", icon: AssignmentIcon },
-    { id: "participants", label: "Participantes", icon: PeopleIcon },
+    // { id: "participants", label: "Participantes", icon: PeopleIcon },
     { id: "hallazgos", label: "Hallazgos", icon: WarningIcon },
-    { id: "data-verification", label: "Verificación de datos", icon: VerifiedUserIcon },
-    { id: "eficacia", label: "Eficacia del método de auditoría", icon: TrendingUpIcon },
-    { id: "conclusions", label: "Conclusiones", icon: AssignmentTurnedInIcon },
+    // { id: "data-verification", label: "Verificación de datos", icon: VerifiedUserIcon },
+    // { id: "eficacia", label: "Eficacia del método de auditoría", icon: TrendingUpIcon },
+    // { id: "conclusions", label: "Conclusiones", icon: AssignmentTurnedInIcon },
   ];
 
   return (

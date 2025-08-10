@@ -9,7 +9,7 @@ export const getSeverityColor = (severity: string) => {
     }
 };
 
-export const getTypeText = (type: string) => {
+export const getTypeText = (type: string | null) => {
     switch (type) {
         case "OB":
             return "Observación";

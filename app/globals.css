@@ -8,6 +8,12 @@
   --tertiary: #dfdfe1;
   --text-primary: #2c3e50;
   --text-secondary: #7f8c8d;
+
+  --z-index-base: 1;
+  --z-index-dropdown: 10;
+  --z-index-sticky: 100;
+  --z-index-modal: 1000;
+  --z-index-toast: 1100;
 }
 
 @theme inline {

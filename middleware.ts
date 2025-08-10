@@ -19,7 +19,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    console.log(`Authenticated access to ${pathname} for user ${session.email}`);
+    console.info(`Authenticated access to ${pathname} for user ${session.email}`);
+    console.info('Atendiendo peticion: ', request.url, request.body);
     return NextResponse.next();
 }
 

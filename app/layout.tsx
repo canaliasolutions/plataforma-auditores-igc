@@ -28,12 +28,13 @@ export default async function RootLayout({children}: Readonly<{
 
     return (
         <html lang="es">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <MsalClientProvider>
-                    <NavbarWrapper userSession={session}></NavbarWrapper>
-                    {children}
-                </MsalClientProvider>
-            </body>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <MsalClientProvider>
+                <NavbarWrapper userSession={session}></NavbarWrapper>
+                {children}
+            </MsalClientProvider>
+            <div id="modal-root"/>
+        </body>
         </html>
     );
 }
