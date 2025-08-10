@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {MsalClientProvider} from "@/components/MsalClientProvider";
-import {getSession, UserSessionData} from "@/lib/session-utils";
-import NavbarWrapper from "@/components/NavbarWrapper";
+import { Navbar } from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,14 +22,11 @@ export const metadata: Metadata = {
 export default async function RootLayout({children}: Readonly<{
     children: React.ReactNode;
 }>) {
-    const session: UserSessionData | null = await getSession();
-    console.log("Session data in RootLayout:", session);
-
     return (
         <html lang="es">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
             <MsalClientProvider>
-                <NavbarWrapper userSession={session}></NavbarWrapper>
+                <Navbar></Navbar>
                 {children}
             </MsalClientProvider>
             <div id="modal-root"/>

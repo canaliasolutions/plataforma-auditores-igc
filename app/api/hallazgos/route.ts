@@ -11,9 +11,8 @@ export async function GET(req: NextRequest) {
   if (!auditoriaId) {
     return NextResponse.json({ error: 'auditoriaId is required' }, { status: 400 });
   }
-
   try {
-    const hallazgos = getAll<Hallazgo>('informe_hallazgos', 'id', auditoriaId)
+    const hallazgos: Hallazgo[] = await getAll<Hallazgo>('informe_hallazgos', 'id_auditoria', auditoriaId)
     return NextResponse.json(hallazgos);
   } catch (error) {
     console.error('Error fetching hallazgos:', error);

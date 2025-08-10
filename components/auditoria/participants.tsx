@@ -469,7 +469,7 @@ export function Participants({ auditId }: ParticipantsProps) {
         <div className={styles["modal-overlay"]}>
           <div className={styles["delete-dialog"]}>
             <div className={styles["delete-header"]}>
-              <h3 className={styles["delete-title"]}>Confirmar Eliminación</h3>
+              <h3 className={styles["delete-title"]}>Confirmar eliminación</h3>
             </div>
 
             <div className={styles["delete-content"]}>
