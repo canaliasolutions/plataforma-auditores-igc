@@ -22,7 +22,7 @@ export default function NavbarUser({name, email, handleLogout}: NavbarUserProps)
     }, []);
 
     return (
-        <div className={styles["navbar-user"]}>
+        <div ref={ref} className={styles["navbar-user"]}>
             <button className={styles["user-info"]} onClick={e => {
                 e.stopPropagation();
                 setOpen(prev => !prev);
@@ -37,7 +37,7 @@ export default function NavbarUser({name, email, handleLogout}: NavbarUserProps)
                 </div>
             </button>
             {open && (
-                <div ref={ref} className={styles["avatar-dropdown-container"]}>
+                <div className={styles["avatar-dropdown-container"]}>
                     <div className={styles["avatar-dropdown-card"]}>
                         <div className={styles["avatar-dropdown-email"]}>{email}</div>
                         <button className={styles["avatar-dropdown-logout"]} onClick={handleLogout}>
