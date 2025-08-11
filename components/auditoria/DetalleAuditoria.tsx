@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuditSubNavigation } from "./audit-sub-navigation";
+import { AuditoriasNavbar } from "./AuditoriasNavbar";
 import { Hallazgos } from "./hallazgos/Hallazgos";
-import { Participants } from "./participants";
-import { DataVerification } from "./data-verification";
+import { Participantes } from "./participantes/Participantes";
+import { DataVerification } from "./verificacion-datos/VerificacionDatos";
 import { Eficacia } from "./eficacia";
 import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
@@ -19,7 +19,7 @@ interface AuditDetailProps {
 export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
 
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("resumen");
   const [showReportModal, setShowReportModal] = useState(false);
 
   const formatDate = (dateStr: string) => {
@@ -51,7 +51,7 @@ export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "overview":
+      case "resumen":
         return (
           <div className={styles["overview-content"]}>
             <div className={styles["info-grid"]}>
@@ -86,9 +86,9 @@ export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
         );
       case "hallazgos":
         return <Hallazgos auditoria={auditoria} />;
-      case "participants":
-        return <Participants auditId={auditoria.id} />;
-      case "data-verification":
+      case "participantes":
+        return <Participantes auditoria={auditoria} />;
+      case "verificacion-datos":
         return <DataVerification auditId={auditoria.id} />;
       case "eficacia":
         return <Eficacia auditId={auditoria.id} auditoria={auditoria} />;
@@ -159,7 +159,7 @@ export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
         </div>
       </div>
 
-      <AuditSubNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <AuditoriasNavbar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className={styles["detail-content"]}>{renderContent()}</div>
 

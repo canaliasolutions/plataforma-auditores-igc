@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import styles from "./Hallazgos.module.css";
 import {Auditoria, Hallazgo} from "@/schemas/types";
 import {DeleteDialog} from "@/components/common/DeleteDialog";
-import {getSeverityColor, getTypeText} from "@/components/auditoria/hallazgos/HallazgosHelper";
+import {getSeverityColor} from "@/components/auditoria/hallazgos/HallazgosHelper";
 import { HallazgoModal } from "./HallazgoModal";
 
 interface HallazgosProps {
@@ -65,7 +65,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     }, [auditoria.id]);
 
     useEffect(() => {
-        cargarHallazgos().then(() => console.log('Hallazgos cargados', uiState));
+        cargarHallazgos().then();
 
     }, [cargarHallazgos]);
 
@@ -258,16 +258,16 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                             <div className={styles["card-header"]}>
                                 <div className={styles["title-section"]}>
                                     <h3 className={styles["conformity-title"]}>{item.proceso}</h3>
-                                    {(item.label_clausula !== "") ?
-                                        (<span className={styles["clause-badge"]}>
-                                            Cláusula {item.label_clausula}
-                                        </span>) : null}
                                 </div>
                                 <div className={styles["badges"]}>
                                     <span className={styles["status-badge"]}>
-                                        {getTypeText(item.tipo)}
+                                        {item.tipo}
                                     </span>
-                                    {item.tipo === "NC" && item.severidad && (
+                                    {(item.label_clausula!) ?
+                                        (<span className={styles["status-badge"]}>
+                                            Requisito {item.label_clausula}
+                                        </span>) : null}
+                                    {item.tipo === "No conformidad" && item.severidad && (
                                         <span
                                             className={styles["severity-badge"]}
                                             style={{backgroundColor: getSeverityColor(item.severidad)}}

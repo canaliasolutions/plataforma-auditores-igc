@@ -11,6 +11,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    const hasBody = request.headers.get('content-type')?.includes('application/json');
+    let body;
+    if (hasBody) {
+        const clonedRequest = request.clone();
+        body = await clonedRequest.json();
+    }
     const session = await getSession();
 
     if (!session) {
@@ -20,7 +26,7 @@ export async function middleware(request: NextRequest) {
     }
 
     console.info(`Authenticated access to ${pathname} for user ${session.email}`);
-    console.info('Atendiendo peticion: ', request.url, request.body);
+    console.info('Atendiendo peticion: ', request.url, body);
     return NextResponse.next();
 }
 

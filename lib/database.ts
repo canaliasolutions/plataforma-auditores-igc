@@ -7,6 +7,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: parseInt(process.env.DB_PORT || '5432', 10),
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  client_encoding: 'UTF8',
 });
 
 async function query <T extends QueryResultRow>(text: string, params?: unknown[]): Promise<QueryResult<T>> {
@@ -56,7 +57,7 @@ export async function create <T extends QueryResultRow>(tableName: string, data:
 
 export async function update <T extends QueryResultRow>(tableName: string, id: number, data: object): Promise<T> {
   const columns = getColumns(data, true);
-  const values = [...columns.map(col => data[col]), id];
+  const values = [...columns.map(col => data[col])];
 
   const setClause = columns.map((col, i) => `${String(col)} = $${i + 1}`).join(', ');
 

@@ -15,8 +15,8 @@ export default async function AuditDetailPage({ params }: AuditDetailPageProps) 
     audit = await getAuditById((await params).auditId, user.email);
   } catch {
     return (
-      <div style={{ minHeight: "100vh", background: "#f8f9fa", padding: "20px" }}>
-        <h1>Error al cargar la auditoría. Por favor, recarga la pagina</h1>
+      <div style={{ padding: "20px", textAlign: "center", justifyContent: "center" }}>
+        <h1>Error al cargar la auditoría. Por favor, recarga la página</h1>
       </div>
     );
   }

@@ -50,9 +50,7 @@ export const ParticipanteSchema = z.object({
 export const VerificacionDatosSchema = z.object({
     id: z.number().optional(),
     id_auditoria: z.string(),
-    nombre_organizacion_correcto: z.boolean(),
     nombre_organizacion: z.string().nullable(),
-    RUC_correcto: z.boolean(),
     RUC: z.string().nullable(),
     persona_contacto_nombre: z.string().nullable(),
     persona_contacto_cargo: z.string().nullable(),
@@ -62,7 +60,6 @@ export const VerificacionDatosSchema = z.object({
     direccion_principal: z.string().nullable(),
     telefono: z.string().nullable(),
     centros_incluidos_alcance: z.string().nullable(),
-    exclusiones_correctas: z.boolean(),
     exclusion_7152: z.boolean(),
     exclusion_83: z.boolean(),
     exclusion_851f: z.boolean(),

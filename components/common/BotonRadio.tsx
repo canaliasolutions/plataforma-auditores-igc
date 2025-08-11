@@ -1,24 +1,24 @@
 "use client";
 
 import { ReactNode } from "react";
-import styles from "./OptionButton.module.css";
+import styles from "./BotonRadio.module.css";
 
 interface OptionButtonProps {
   selected: boolean;
   onClick: () => void;
   icon?: ReactNode;
   children: ReactNode;
-  variant?: "default" | "correct" | "error" | "warning" | "info";
-  className?: string;
+  variant?: "default" | "correcto" | "error" | "warning";
+  classNm?: string;
 }
 
-export function OptionButton({ 
+export function BotonRadio({
   selected, 
   onClick, 
   icon, 
   children, 
   variant = "default",
-  className = ""
+  classNm = ""
 }: OptionButtonProps) {
   const variantClass = variant !== "default" ? styles[`option-${variant}`] : "";
   
@@ -27,7 +27,7 @@ export function OptionButton({
       type="button"
       className={`${styles["option-button"]} ${variantClass} ${
         selected ? styles["option-selected"] : ""
-      } ${className}`}
+      } ${classNm}`}
       onClick={onClick}
     >
       {icon && <span className={styles["option-icon"]}>{icon}</span>}

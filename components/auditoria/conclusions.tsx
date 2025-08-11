@@ -6,7 +6,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import WarningIcon from "@mui/icons-material/Warning";
 import SaveIcon from "@mui/icons-material/Save";
 import { Auditoria } from "@/schemas/types";
-import { OptionButton } from "./option-button";
+import { BotonRadio } from "@/components/common/BotonRadio";
 import styles from "./Conclusions.module.css";
 
 interface Conclusions {
@@ -149,23 +149,23 @@ export function Conclusions({ auditId, auditoria }: ConclusionsProps) {
           </h3>
           
           <div className={styles["options-grid"]}>
-            <OptionButton
+            <BotonRadio
               selected={conclusions.objetivos_cumplidos === "si"}
               onClick={() => handleConclusionChange("objetivos_cumplidos", "si")}
               icon={getOptionIcon("si")}
               variant="correct"
             >
               Sí
-            </OptionButton>
+            </BotonRadio>
 
-            <OptionButton
+            <BotonRadio
               selected={conclusions.objetivos_cumplidos === "no"}
               onClick={() => handleConclusionChange("objetivos_cumplidos", "no")}
               icon={getOptionIcon("no")}
               variant="error"
             >
               No
-            </OptionButton>
+            </BotonRadio>
           </div>
 
           {conclusions.objetivos_cumplidos === "no" && (
@@ -197,32 +197,32 @@ export function Conclusions({ auditId, auditoria }: ConclusionsProps) {
           </h3>
           
           <div className={styles["options-grid"]}>
-            <OptionButton
+            <BotonRadio
               selected={conclusions.sistema_cumple_norma === "si"}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "si")}
               icon={getOptionIcon("si")}
               variant="correct"
             >
               Sí
-            </OptionButton>
+            </BotonRadio>
 
-            <OptionButton
+            <BotonRadio
               selected={conclusions.sistema_cumple_norma === "si_excepto_hallazgos"}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "si_excepto_hallazgos")}
               icon={getOptionIcon("si_excepto_hallazgos")}
               variant="warning"
             >
               Sí, salvo por los hallazgos
-            </OptionButton>
+            </BotonRadio>
 
-            <OptionButton
+            <BotonRadio
               selected={conclusions.sistema_cumple_norma === "no"}
               onClick={() => handleConclusionChange("sistema_cumple_norma", "no")}
               icon={getOptionIcon("no")}
               variant="error"
             >
               No
-            </OptionButton>
+            </BotonRadio>
           </div>
         </div>
       </div>
