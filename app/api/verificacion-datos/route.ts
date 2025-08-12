@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const verificacionDatos: VerificacionDatos[] = await getAll<VerificacionDatos>('informe_verificacion_datos', 'id_auditoria', auditoriaId);
-    return NextResponse.json(verificacionDatos[0]);
+    console.log('Verificacion Datos:', verificacionDatos);
+    return NextResponse.json(verificacionDatos);
   } catch (error) {
     console.error('Error fetching data verification:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

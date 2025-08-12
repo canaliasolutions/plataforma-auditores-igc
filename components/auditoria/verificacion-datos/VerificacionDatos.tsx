@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import styles from "./VerificacionDatos.module.css";
 import {BotonRadio} from "@/components/common/BotonRadio";
 import { VerificacionDatos } from "@/schemas/types";
@@ -13,7 +14,7 @@ interface DataVerificationProps {
   auditoria_id: string;
 }
 
-type camposCorregibles =
+type CamposTexto =
     "ruc"
     | "centros_incluidos_alcance"
     | "direccion_principal"
@@ -25,7 +26,15 @@ type camposCorregibles =
     | "persona_firma_marca_nombre"
     | "telefono";
 
-const datosAVerificar: {texto: string, campo: camposCorregibles}[] = [
+type CamposExclusiones =
+      "exclusion_7152"
+    | "exclusion_83"
+    | "exclusion_851f"
+    | "exclusion_853"
+    | "exclusion_855";
+
+type Campos = CamposTexto | CamposExclusiones;
+const datosAVerificar: {texto: string, campo: CamposTexto}[] = [
   {
     texto: "Nombre de la organización:",
     campo: "nombre_organizacion",
@@ -68,6 +77,29 @@ const datosAVerificar: {texto: string, campo: camposCorregibles}[] = [
   },
 ];
 
+const exclusiones9001: {texto: string, campo: CamposExclusiones}[] = [
+  {
+    texto: "7.1.5.2 Trazabilidad de las mediciones",
+    campo: "exclusion_7152"
+  },
+  {
+    texto: "8.3 Diseño y Desarrollo",
+    campo: "exclusion_83"
+  },
+  {
+    texto: "8.5.1 f) Validación y revalidación de los procesos",
+    campo: "exclusion_851f"
+  },
+  {
+    texto: "8.5.3 Propiedad perteneciente al cliente",
+    campo: "exclusion_853"
+  },
+  {
+    texto: "8.5.5 Actividades posteriores a la entrega",
+    campo: "exclusion_855"
+  },
+]
+
   const vetificacionDatosVacio: VerificacionDatos = {
   id: 0,
   id_auditoria: "",
@@ -92,14 +124,19 @@ const datosAVerificar: {texto: string, campo: camposCorregibles}[] = [
 }
 
 const inicializarBooleanosVerificacion = (data: VerificacionDatos) => {
-  const initialState = {} as Record<keyof camposCorregibles, boolean>;
-  for (const key in data) {
-    if (Object.prototype.hasOwnProperty.call(data, key)) {
-      initialState[key as keyof camposCorregibles] =
-          data[key as keyof VerificacionDatos] === null ||
-          data[key as keyof VerificacionDatos] === "";
-    }
-  }
+  const initialState = {} as Record<Campos, boolean>;
+  console.log("Inicializando estado de verificación de datos:", data);
+  datosAVerificar.forEach((item) => {
+    const campo = item.campo;
+    initialState[campo] = data[campo] === null || data[campo] === "";
+    console.log(`Campo: ${campo}, Valor: ${data[campo]}, Estado: ${initialState[campo]}`);
+  });
+
+  exclusiones9001.forEach((item) => {
+    const campo = item.campo;
+    initialState[campo] = !data[campo];
+    console.log(`Campo: ${campo}, Valor: ${data[campo]}, Estado: ${initialState[campo]}`);
+  });
   return initialState;
 };
 
@@ -117,7 +154,12 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
         setLoading(true);
         const response = await fetch(`/api/verificacion-datos?auditoriaId=${auditoria_id}`);
         if (response.ok) {
-          datos = await response.json();
+          const body = await response.json();
+          if (body.length == 0) {
+            setHayCambios(true);
+          } else {
+            datos = body[0] as VerificacionDatos;
+          }
         }
       } catch (error) {
         console.error('Error cargando datos de verificacion:', error);
@@ -131,7 +173,7 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
 
   }, [auditoria_id]);
 
-  const handleButtonClick = (campo: keyof VerificacionDatos, esCorrecto: boolean) => {
+  const onCampoTextoButtonClick = (campo: Campos, esCorrecto: boolean) => {
     setVerificacionBooleanos((prevState) => {
         if( prevState[campo] === esCorrecto) {
           return prevState;
@@ -143,7 +185,20 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
     }});
   };
 
-  const handleTextChange = (campo: keyof VerificacionDatos, value: string) => {
+  const onExclusionButtonClick = (campo: CamposExclusiones, seExcluye: boolean) => {
+    setVerificacion((prevState) => {
+      if( prevState[campo] === seExcluye) {
+        return prevState;
+      }
+      setHayCambios(true);
+      return {
+        ...prevState,
+        [campo]: seExcluye,
+      };
+    });
+  }
+
+  const handleTextChange = (campo: CamposTexto, value: string) => {
     setHayCambios(true);
     setVerificacion({
       ...verificacion,
@@ -159,7 +214,7 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
             id_auditoria: auditoria_id,
         };
       datosAVerificar.forEach(item => {
-        const campo = item.campo;
+        const campo: CamposTexto = item.campo;
         if (verificacionBooleanos[campo]) {
           verificacionDatos[campo] = null;
         }
@@ -223,7 +278,7 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
               <div className={styles["options-grid"]}>
                 <BotonRadio
                     selected={verificacionBooleanos[item.campo]}
-                    onClick={() => handleButtonClick(item.campo, true)}
+                    onClick={() => onCampoTextoButtonClick(item.campo, true)}
                     icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
                     classNm="option-correct"
                     variant="correcto"
@@ -232,7 +287,7 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
                 </BotonRadio>
                 <BotonRadio
                     selected={!verificacionBooleanos[item.campo]}
-                    onClick={() => handleButtonClick(item.campo, false)}
+                    onClick={() => onCampoTextoButtonClick(item.campo, false)}
                     icon={<EditIcon className={styles["option-icon-change"]} />}
                     classNm="option-change"
                     variant="warning"
@@ -250,67 +305,33 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
             </div>
         ))}
         <div className={styles["verification-field"]}>
-          <h3 className={styles["field-label"]}>Exclusiones</h3>
-          <div className={styles["options-grid"]}>
-            <BotonRadio
-              selected={verificacion.exclusion_7152}
-              onClick={() => handleButtonClick("exclusion_7152", true)}
-              icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
-              classNm="option-correct"
-              variant="correcto"
-            >
-              Excluido 7152
-            </BotonRadio>
-            <BotonRadio
-              selected={!verificacion.exclusion_7152}
-              onClick={() => handleButtonClick("exclusion_7152", false)}
-              icon={<EditIcon className={styles["option-icon-change"]} />}
-              classNm="option-change"
-              variant="warning"
-            >
-              No excluido 7152
-            </BotonRadio>
-          </div>
-          <div className={styles["options-grid"]}>
-            <BotonRadio
-              selected={verificacion.exclusion_83}
-              onClick={() => handleButtonClick("exclusion_83", true)}
-              icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
-              classNm="option-correct"
-              variant="correcto"
-            >
-              Excluido 83
-            </BotonRadio>
-            <BotonRadio
-              selected={!verificacion.exclusion_83}
-              onClick={() => handleButtonClick("exclusion_83", false)}
-              icon={<EditIcon className={styles["option-icon-change"]} />}
-              classNm="option-change"
-              variant="warning"
-            >
-              No excluido 83
-            </BotonRadio>
-          </div>
-          <div className={styles["options-grid"]}>
-            <BotonRadio
-              selected={verificacion.exclusion_851f}
-              onClick={() => handleButtonClick("exclusion_851f", true)}
-              icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
-              classNm="option-correct"
-              variant="correcto"
-            >
-              Excluido 851f
-            </BotonRadio>
-            <BotonRadio
-              selected={!verificacion.exclusion_851f}
-              onClick={() => handleButtonClick("exclusion", false)}
-              icon={<EditIcon className={styles["option-icon-change"]} />}
-              classNm="option-change"
-              variant="warning"
-            >
-              No excluido 851f
-            </BotonRadio>
-          </div>
+          <h3 className={styles["field-label"]}>Exclusiones (ISO 9001)</h3>
+          {exclusiones9001.map((item, key) => (
+              <div key={key} className={styles["verification-field"]}>
+                <h5 className={styles["subfield-label"]}>{item.texto}
+                </h5>
+                <div className={styles["options-grid"]}>
+                  <BotonRadio
+                      selected={!verificacion[item.campo]}
+                      onClick={() => onExclusionButtonClick(item.campo, false)}
+                      icon={<CheckCircleIcon className={styles["option-icon-correct"]}/>}
+                      classNm="option-correct"
+                      variant="correcto"
+                  >
+                    Se incluye en la auditoría
+                  </BotonRadio>
+                  <BotonRadio
+                      selected={verificacion[item.campo]}
+                      onClick={() => onExclusionButtonClick(item.campo, true)}
+                      icon={<CancelIcon className={styles["option-icon-error"]}/>}
+                      classNm="option-change"
+                      variant="warning"
+                  >
+                    Se excluye de la auditoría
+                  </BotonRadio>
+                </div>
+              </div>
+          ))}
         </div>
       </div>
     </div>

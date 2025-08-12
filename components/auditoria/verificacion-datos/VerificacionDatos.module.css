@@ -67,6 +67,13 @@
   margin: 0 0 20px 0;
 }
 
+.subfield-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+}
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -193,6 +200,17 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+.badge {
+   background-color: #007bff; /* Blue color */
+   color: white;
+   padding: 0.25em 0.5em;
+   font-size: 0.75em;
+   font-weight: bold;
+   border-radius: 0.25rem;
+   vertical-align: middle;
+   margin-left: 0.5em;
+ }
 
 /* Responsive Design */
 @media (max-width: 768px) {
