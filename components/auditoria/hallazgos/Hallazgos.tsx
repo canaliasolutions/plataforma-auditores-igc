@@ -6,8 +6,8 @@ import AddIcon from "@mui/icons-material/Add";
 import styles from "./Hallazgos.module.css";
 import {Auditoria, Hallazgo} from "@/schemas/types";
 import {DeleteDialog} from "@/components/common/DeleteDialog";
-import {getSeverityColor} from "@/components/auditoria/hallazgos/HallazgosHelper";
 import { HallazgoModal } from "./HallazgoModal";
+import {HallazgoCard} from "@/components/auditoria/hallazgos/HallazgoCard";
 
 interface HallazgosProps {
     auditoria: Auditoria;
@@ -142,7 +142,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
         }
     };
 
-    const handleDeleteNonConformity = (id: number) => {
+    const onDeleteClick = (id: number) => {
         setUiState(prev => ({
             ...prev,
             deletingItemId: id,
@@ -254,55 +254,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
                     </div>
                 ) : (
                     uiState.hallazgos.map((item) => (
-                        <div key={item.id} className={styles["conformity-card"]}>
-                            <div className={styles["card-header"]}>
-                                <div className={styles["title-section"]}>
-                                    <h3 className={styles["conformity-title"]}>{item.proceso}</h3>
-                                </div>
-                                <div className={styles["badges"]}>
-                                    <span className={styles["status-badge"]}>
-                                        {item.tipo}
-                                    </span>
-                                    {(item.label_clausula!) ?
-                                        (<span className={styles["status-badge"]}>
-                                            Requisito {item.label_clausula}
-                                        </span>) : null}
-                                    {item.tipo === "No conformidad" && item.severidad && (
-                                        <span
-                                            className={styles["severity-badge"]}
-                                            style={{backgroundColor: getSeverityColor(item.severidad)}}
-                                        >
-                                            {item.severidad}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            <p className={styles["conformity-description"]}>
-                                {item.descripcion}
-                            </p>
-
-                            <div className={styles["card-footer"]}>
-                                <div className={styles["date-section"]}>
-                                </div>
-                                <div className={styles["action-buttons"]}>
-                                    <button
-                                        onClick={() => onEditClick(item)}
-                                        className={styles["edit-button"]}
-                                        title="Editar hallazgo"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteNonConformity(item.id || 0)}
-                                        className={styles["delete-button"]}
-                                        title="Eliminar hallazgo"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <HallazgoCard key={item.id} hallazgo={item} onEditClick={onEditClick} onDeleteClick={onDeleteClick}></HallazgoCard>
                     ))
                 )}
             </div>
