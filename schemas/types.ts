@@ -51,7 +51,7 @@ export const VerificacionDatosSchema = z.object({
     id: z.number().optional(),
     id_auditoria: z.string(),
     nombre_organizacion: z.string().nullable(),
-    RUC: z.string().nullable(),
+    ruc: z.string().nullable(),
     persona_contacto_nombre: z.string().nullable(),
     persona_contacto_cargo: z.string().nullable(),
     persona_contacto_correo: z.string().nullable(),

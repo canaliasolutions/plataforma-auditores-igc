@@ -110,14 +110,7 @@ export function Participantes({ auditoria }: ParticipantsProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          id: editingItem.id,
-          nombreCompleto: newParticipant.nombre_completo,
-          cargoRol: newParticipant.cargo,
-          correoElectronico: newParticipant.departamento,
-          asistioReunionInicial: newParticipant.asistio_reunion_inicial,
-          asistioReunionCierre: newParticipant.asistio_reunion_cierre,
-        }),
+        body: JSON.stringify(newParticipant),
       });
 
       if (response.ok) {

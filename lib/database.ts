@@ -13,7 +13,9 @@ const pool = new Pool({
 async function query <T extends QueryResultRow>(text: string, params?: unknown[]): Promise<QueryResult<T>> {
   console.info('Ejecutando consulta:', text, params);
   try {
-    return pool.query<T>(text, params);
+    const result = await pool.query<T>(text, params);
+    console.info('Consulta retorna:', result.rows);
+    return result;
   } catch (error) {
     console.error('Error ejecutando la consulta:', error);
     throw error;
@@ -65,6 +67,36 @@ export async function update <T extends QueryResultRow>(tableName: string, id: n
       `UPDATE ${tableName} SET ${setClause}, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = ${id} RETURNING *`,
       values
   );
+  return res.rows[0];
+}
+
+export async function upsert<T extends QueryResultRow>(
+    tableName: string,
+    data: object,
+    conflictColumn: keyof T
+): Promise<T> {
+  const insertColumns = getColumns(data, false);
+  const insertValues = insertColumns.map(col => data[col as keyof typeof data]);
+  const insertPlaceholders = insertColumns.map((_, i) => `$${i + 1}`).join(', ');
+  const insertColumnsString = insertColumns.join(', ');
+
+  const updateColumns = getColumns(data, true);
+  const setClauseParts = updateColumns
+      .map((col) => `${String(col)} = EXCLUDED.${String(col)}`);
+
+  setClauseParts.push('fecha_actualizacion = CURRENT_TIMESTAMP');
+
+  const fullSetClause = setClauseParts.join(', ');
+
+  const queryString = `
+    INSERT INTO ${tableName} (${insertColumnsString})
+    VALUES (${insertPlaceholders})
+    ON CONFLICT (${String(conflictColumn)}) DO UPDATE SET
+      ${fullSetClause}
+    RETURNING *;
+  `;
+
+  const res = await query<T>(queryString, insertValues);
   return res.rows[0];
 }
 

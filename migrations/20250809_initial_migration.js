@@ -32,7 +32,7 @@ export async function up(pool) {
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL UNIQUE,
     nombre_organizacion TEXT,
-    RUC TEXT,
+    ruc TEXT,
     persona_contacto_nombre TEXT,
     persona_contacto_cargo TEXT,
     persona_contacto_correo TEXT,

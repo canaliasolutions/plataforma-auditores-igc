@@ -10,17 +10,29 @@ import { VerificacionDatos } from "@/schemas/types";
 import {TextInput} from "@/components/common/TextInput";
 
 interface DataVerificationProps {
-  auditId: string;
+  auditoria_id: string;
 }
 
-const datosAVerificar: {texto: string, campo: keyof VerificacionDatos}[] = [
+type camposCorregibles =
+    "ruc"
+    | "centros_incluidos_alcance"
+    | "direccion_principal"
+    | "nombre_organizacion"
+    | "persona_contacto_cargo"
+    | "persona_contacto_correo"
+    | "persona_contacto_nombre"
+    | "persona_firma_marca_cargo"
+    | "persona_firma_marca_nombre"
+    | "telefono";
+
+const datosAVerificar: {texto: string, campo: camposCorregibles}[] = [
   {
     texto: "Nombre de la organización:",
     campo: "nombre_organizacion",
   },
   {
     texto: "CIF/RUC:",
-    campo: "RUC",
+    campo: "ruc",
   },
   {
     texto: "Teléfono:",
@@ -59,7 +71,7 @@ const datosAVerificar: {texto: string, campo: keyof VerificacionDatos}[] = [
   const vetificacionDatosVacio: VerificacionDatos = {
   id: 0,
   id_auditoria: "",
-  RUC: null,
+  ruc: null,
   centros_incluidos_alcance: null,
   direccion_principal: null,
   exclusion_7152: false,
@@ -80,10 +92,10 @@ const datosAVerificar: {texto: string, campo: keyof VerificacionDatos}[] = [
 }
 
 const inicializarBooleanosVerificacion = (data: VerificacionDatos) => {
-  const initialState = {} as Record<keyof VerificacionDatos, boolean>;
+  const initialState = {} as Record<keyof camposCorregibles, boolean>;
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
-      initialState[key as keyof VerificacionDatos] =
+      initialState[key as keyof camposCorregibles] =
           data[key as keyof VerificacionDatos] === null ||
           data[key as keyof VerificacionDatos] === "";
     }
@@ -91,10 +103,10 @@ const inicializarBooleanosVerificacion = (data: VerificacionDatos) => {
   return initialState;
 };
 
-export function DataVerification({ auditId }: DataVerificationProps) {
+export function DataVerification({ auditoria_id }: DataVerificationProps) {
   const [verificacion, setVerificacion] = useState<VerificacionDatos>(vetificacionDatosVacio);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [guardando, setGuardando] = useState(false);
   const [hayCambios, setHayCambios] = useState(false);
   const [verificacionBooleanos, setVerificacionBooleanos] = useState(inicializarBooleanosVerificacion(vetificacionDatosVacio));
 
@@ -103,10 +115,9 @@ export function DataVerification({ auditId }: DataVerificationProps) {
       let datos = vetificacionDatosVacio;
       try {
         setLoading(true);
-        const response = await fetch(`/api/verificacion-datos?auditoriaId=${auditId}`);
+        const response = await fetch(`/api/verificacion-datos?auditoriaId=${auditoria_id}`);
         if (response.ok) {
           datos = await response.json();
-          console.log('Verification data:', datos);
         }
       } catch (error) {
         console.error('Error cargando datos de verificacion:', error);
@@ -118,7 +129,7 @@ export function DataVerification({ auditId }: DataVerificationProps) {
     };
     loadVerification();
 
-  }, [auditId]);
+  }, [auditoria_id]);
 
   const handleButtonClick = (campo: keyof VerificacionDatos, esCorrecto: boolean) => {
     setVerificacionBooleanos((prevState) => {
@@ -130,30 +141,29 @@ export function DataVerification({ auditId }: DataVerificationProps) {
       ...prevState,
       [campo]: esCorrecto,
     }});
-
-    if (esCorrecto && (verificacion[campo] === null || verificacion[campo] === '')) {
-      setVerificacion((prevState) => ({
-        ...prevState,
-        [campo]: '',
-      }));
-    }
   };
 
   const handleTextChange = (campo: keyof VerificacionDatos, value: string) => {
     setHayCambios(true);
-    setVerificacion((prevState) => ({
-      ...prevState,
+    setVerificacion({
+      ...verificacion,
       [campo]: value,
-    }));
+    });
   };
 
   const handleSave = async () => {
+    setGuardando(true);
     try {
-      setSaving(true);
         const verificacionDatos: VerificacionDatos = {
             ...verificacion,
-            id_auditoria: auditId,
+            id_auditoria: auditoria_id,
         };
+      datosAVerificar.forEach(item => {
+        const campo = item.campo;
+        if (verificacionBooleanos[campo]) {
+          verificacionDatos[campo] = null;
+        }
+      });
       const response = await fetch('/api/verificacion-datos', {
         method: 'POST',
         headers: {
@@ -161,18 +171,14 @@ export function DataVerification({ auditId }: DataVerificationProps) {
         },
         body: JSON.stringify(verificacionDatos),
       });
-
-      if (response.ok) {
-        const savedData = await response.json();
-        setVerificacion(savedData);
-        setHayCambios(false);
-      } else {
-        console.error('Error saving verification data');
+      if (!response.ok) {
+        throw new Error(response.statusText);
       }
     } catch (error) {
       console.error('Error saving verification data:', error);
     } finally {
-      setSaving(false);
+      setGuardando(false);
+      setHayCambios(false);
     }
   };
 
@@ -192,13 +198,13 @@ export function DataVerification({ auditId }: DataVerificationProps) {
         <h2 className={styles["section-title"]}>Verificación de datos</h2>
         <button
           onClick={handleSave}
-          disabled={!hayCambios || saving}
+          disabled={!hayCambios || guardando}
           className={`${styles["save-button"]} ${
             !hayCambios ? styles["save-button-disabled"] : ""
           }`}
         >
           <SaveIcon sx={{ fontSize: 16, marginRight: 1 }} />
-          {saving ? "Guardando..." : "Guardar cambios"}
+          {guardando ? "Guardando..." : "Guardar cambios"}
         </button>
       </div>
 
@@ -236,13 +242,76 @@ export function DataVerification({ auditId }: DataVerificationProps) {
                 <TextInput
                     value={verificacion[item.campo] as string || ""}
                     onChange={(e) => handleTextChange(item.campo, e.target.value)}
-                    label={"Escribe aquí el campo corregido"}
-                    disabled={verificacionBooleanos[item.campo] === true}
-                    placeholder={"Campo corregido"}
+                    label={"Escribe aquí el dato corregido"}
+                    disabled={verificacionBooleanos[item.campo]}
+                    placeholder={"Dato corregido"}
                 />
               </div>
             </div>
         ))}
+        <div className={styles["verification-field"]}>
+          <h3 className={styles["field-label"]}>Exclusiones</h3>
+          <div className={styles["options-grid"]}>
+            <BotonRadio
+              selected={verificacion.exclusion_7152}
+              onClick={() => handleButtonClick("exclusion_7152", true)}
+              icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
+              classNm="option-correct"
+              variant="correcto"
+            >
+              Excluido 7152
+            </BotonRadio>
+            <BotonRadio
+              selected={!verificacion.exclusion_7152}
+              onClick={() => handleButtonClick("exclusion_7152", false)}
+              icon={<EditIcon className={styles["option-icon-change"]} />}
+              classNm="option-change"
+              variant="warning"
+            >
+              No excluido 7152
+            </BotonRadio>
+          </div>
+          <div className={styles["options-grid"]}>
+            <BotonRadio
+              selected={verificacion.exclusion_83}
+              onClick={() => handleButtonClick("exclusion_83", true)}
+              icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
+              classNm="option-correct"
+              variant="correcto"
+            >
+              Excluido 83
+            </BotonRadio>
+            <BotonRadio
+              selected={!verificacion.exclusion_83}
+              onClick={() => handleButtonClick("exclusion_83", false)}
+              icon={<EditIcon className={styles["option-icon-change"]} />}
+              classNm="option-change"
+              variant="warning"
+            >
+              No excluido 83
+            </BotonRadio>
+          </div>
+          <div className={styles["options-grid"]}>
+            <BotonRadio
+              selected={verificacion.exclusion_851f}
+              onClick={() => handleButtonClick("exclusion_851f", true)}
+              icon={<CheckCircleIcon className={styles["option-icon-correct"]} />}
+              classNm="option-correct"
+              variant="correcto"
+            >
+              Excluido 851f
+            </BotonRadio>
+            <BotonRadio
+              selected={!verificacion.exclusion_851f}
+              onClick={() => handleButtonClick("exclusion", false)}
+              icon={<EditIcon className={styles["option-icon-change"]} />}
+              classNm="option-change"
+              variant="warning"
+            >
+              No excluido 851f
+            </BotonRadio>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAll, create, update } from '@/lib/database';
+import { getAll, upsert, update } from '@/lib/database';
 import { VerificacionDatosSchema, VerificacionDatos } from "@/schemas/types";
 import { ZodError } from 'zod';
 
@@ -13,19 +13,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const verificacion: VerificacionDatos[] = await getAll<VerificacionDatos>('informe_verificacion_datos', 'id_auditoria', auditoriaId);
-
-    if (!verificacion || verificacion.length === 0) {
-      return NextResponse.json({
-        auditoria_id: auditoriaId,
-        datos_contacto: 'correcto',
-        datos_alcance: 'correcto',
-        datos_facturacion: 'correcto',
-        comentarios_verificacion: ''
-      });
-    }
-
-    return NextResponse.json(verificacion[0]);
+    const verificacionDatos: VerificacionDatos[] = await getAll<VerificacionDatos>('informe_verificacion_datos', 'id_auditoria', auditoriaId);
+    return NextResponse.json(verificacionDatos[0]);
   } catch (error) {
     console.error('Error fetching data verification:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -38,7 +27,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const verificacion = VerificacionDatosSchema.parse(data);
 
-    const info = create('verificacion_datos', verificacion as VerificacionDatos);
+    const info = upsert('informe_verificacion_datos', verificacion as VerificacionDatos, 'id_auditoria');
 
     return NextResponse.json(info, { status: 201 });
   } catch (error) {
@@ -63,7 +52,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'ID es requerido' }, { status: 400 });
     }
 
-    const info = update('verificacion_datos', verificacion.id, verificacion as VerificacionDatos);
+    const info = update('informe_verificacion_datos', verificacion.id, verificacion as VerificacionDatos);
 
     return NextResponse.json(info);
   } catch (error) {

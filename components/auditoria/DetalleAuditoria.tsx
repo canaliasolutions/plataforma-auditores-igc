@@ -89,7 +89,7 @@ export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
       case "participantes":
         return <Participantes auditoria={auditoria} />;
       case "verificacion-datos":
-        return <DataVerification auditId={auditoria.id} />;
+        return <DataVerification auditoria_id={auditoria.id} />;
       case "eficacia":
         return <Eficacia auditId={auditoria.id} auditoria={auditoria} />;
       case "conclusions":
