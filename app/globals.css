@@ -38,3 +38,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.loader-wrapper{width:96px;height:96px;display:grid;place-items:center}
+@keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+.line{animation:blink 1.2s infinite ease-in-out;opacity:0}
+.l1{animation-delay:0s}.l2{animation-delay:.12s}.l3{animation-delay:.24s}
+.l4{animation-delay:.36s}.l5{animation-delay:.48s}.l6{animation-delay:.60s}
+.l7{animation-delay:.72s}.l8{animation-delay:.84s}.l9{animation-delay:.96s}
+.l10{animation-delay:1.08s}

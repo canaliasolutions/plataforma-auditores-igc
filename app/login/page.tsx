@@ -4,7 +4,8 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "@/lib/auth-config";
 import { useRouter } from "next/navigation";
 import styles from "@/components/Login.module.css";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import Image from 'next/image'
 
 export default function LoginPage() {
     const { instance } = useMsal();
@@ -12,6 +13,8 @@ export default function LoginPage() {
 
     const [sessionChecked, setSessionChecked] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+
 
     useEffect(() => {
         async function checkAuthenticationStatus() {
@@ -30,6 +33,14 @@ export default function LoginPage() {
             }
             setIsAuthenticated(msalAuthenticated || serverSessionAuthenticated);
             setSessionChecked(true);
+            if (isLoggingIn) {
+                return (
+                    <main style={{ padding: '2rem', textAlign: 'center' }}>
+                        <div className="spinner"></div>
+                        Iniciando sesión...
+                    </main>
+                );
+            }
         }
 
         checkAuthenticationStatus();
@@ -46,14 +57,15 @@ export default function LoginPage() {
     // If we're still checking the session or are about to redirect, show a loading state
     if (!sessionChecked) {
         return (
-            <main style={{padding: '2rem', textAlign: 'center'}}>
-                    <div className="spinner"></div>
-                    Cargando ...
+            <main style={{ padding: '2rem', textAlign: 'center' }}>
+                <div className="spinner"></div>
+                Cargando ...
             </main>
         );
     }
 
     const handleLogin = async () => {
+        setIsLoggingIn(true);
         try {
             const loginResponse = await instance.loginPopup(loginRequest);
 
@@ -77,6 +89,7 @@ export default function LoginPage() {
 
                 if (apiResponse.ok) {
                     router.push('/auditorias');
+                    return;
                 } else {
                     // Handle API error
                     const errorData = await apiResponse.json();
@@ -90,6 +103,8 @@ export default function LoginPage() {
         } catch (error) {
             console.error("Login process failed:", error);
             alert("Login failed during MSAL process. Please check console for details.");
+        } finally {
+            setIsLoggingIn(false); // 👈 para quitar loading si no redirige
         }
     };
 
@@ -99,7 +114,12 @@ export default function LoginPage() {
             <div className={styles["login-card"]}>
                 <div className={styles["login-header"]}>
                     <div className={styles["logo-container"]}>
-                        <img alt={"IGC Logo"} src={"/sello_redondo_IGC.png"}/>
+                        <Image
+                            alt="IGC Logo"
+                            src="/sello_redondo_IGC.png"
+                            width={200}
+                            height={200}
+                        />
                     </div>
                     <h1 className={styles["login-title"]}>Portal de auditores</h1>
                     <p className={styles["login-subtitle"]}>
