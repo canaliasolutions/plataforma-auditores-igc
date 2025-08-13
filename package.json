@@ -2,7 +2,9 @@
   "name": "authentication-test",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
+    "predev": "node lib/migrations-runner.js",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -16,17 +18,21 @@
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
     "better-sqlite3": "^12.2.0",
+    "dotenv": "^17.2.1",
     "fm-data-api-client": "^2.0.3",
     "jose": "^6.0.12",
     "nanoid": "^5.1.5",
     "next": "15.3.5",
+    "pg": "^8.16.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^4.0.16"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.15.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

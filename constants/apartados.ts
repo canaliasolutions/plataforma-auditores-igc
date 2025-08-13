@@ -1,10 +1,4 @@
  export const apartados = [
-     {
-         "clausula": "",
-         "titulo": "",
-         "id": "",
-         "descripcion": ""
-     },
     {
         "clausula": "4.1",
         "titulo": "Comprensión de la organización y de su contexto",

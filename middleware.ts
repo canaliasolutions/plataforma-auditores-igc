@@ -2,7 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession } from '@/lib/session-utils';
 
-const publicPaths = ['/login', '/api/login', '/api/logout', '/api/check-session'];
+const publicPaths = ['/login', '/api/login', '/api/logout', '/api/check-session', '/auth.html'];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -11,6 +11,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    const hasBody = request.headers.get('content-type')?.includes('application/json');
+    let body;
+    if (hasBody) {
+        const clonedRequest = request.clone();
+        body = await clonedRequest.json();
+    }
     const session = await getSession();
 
     if (!session) {
@@ -19,7 +25,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    console.log(`Authenticated access to ${pathname} for user ${session.email}`);
+    console.info(`Authenticated access to ${pathname} for user ${session.email}`);
+    console.info('Atendiendo peticion: ', request.url, body);
     return NextResponse.next();
 }
 

@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { participantesQueries } from '@/lib/database';
+import { getAll, create, update, remove } from '@/lib/database';
+import { Participante, ParticipanteSchema } from "@/schemas/types";
+import { ZodError } from 'zod';
 
-// GET: Fetch all participants for a specific audit
+// GET: Obtener todos los participantes de una auditoría
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const auditoriaId = searchParams.get('auditoriaId');
-  
+
   if (!auditoriaId) {
     return NextResponse.json({ error: 'auditoriaId is required' }, { status: 400 });
   }
-
   try {
-    const participantes = participantesQueries.getAll.all(auditoriaId);
+    const participantes: Participante[] = await getAll<Participante>('informe_participantes', 'id_auditoria', auditoriaId);
     return NextResponse.json(participantes);
   } catch (error) {
     console.error('Error fetching participantes:', error);
@@ -19,98 +20,61 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST: Add a new participant
+// POST: Agregar un nuevo participante
 export async function POST(req: NextRequest) {
   try {
-    const { 
-      auditoriaId, 
-      nombreCompleto, 
-      cargoRol, 
-      correoElectronico, 
-      asistioReunionInicial, 
-      asistioReunionCierre,
-      fechaAgregado 
-    } = await req.json();
-    
-    if (!auditoriaId || !nombreCompleto || !cargoRol || !correoElectronico) {
-      return NextResponse.json({ 
-        error: 'auditoriaId, nombreCompleto, cargoRol and correoElectronico are required' 
+    const data = await req.json();
+    const participante = ParticipanteSchema.parse(data);
+    const info = create('informe_participantes', participante as Participante);
+
+    return NextResponse.json(info, { status: 201 });
+  } catch (error) {
+    console.error('Error creando participante:', error);
+    if (error instanceof ZodError) {
+      return NextResponse.json({
+        message: 'Cuerpo de la solicitud inválido',
+        errors: error.issues,
       }, { status: 400 });
     }
-
-    const info = participantesQueries.create.run(
-      auditoriaId, 
-      nombreCompleto, 
-      cargoRol, 
-      correoElectronico, 
-      asistioReunionInicial ? 1 : 0, 
-      asistioReunionCierre ? 1 : 0,
-      fechaAgregado || new Date().toISOString().split('T')[0]
-    );
-
-    const newParticipant = participantesQueries.getById.get(info.lastInsertRowid);
-    return NextResponse.json(newParticipant, { status: 201 });
-  } catch (error) {
-    console.error('Error creating participant:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// PUT: Update a participant by id
+// PUT: Actualizar un participante existente
 export async function PUT(req: NextRequest) {
   try {
-    const { 
-      id, 
-      nombreCompleto, 
-      cargoRol, 
-      correoElectronico, 
-      asistioReunionInicial, 
-      asistioReunionCierre 
-    } = await req.json();
-    
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    const data = await req.json();
+    const participante = ParticipanteSchema.parse(data);
+
+    if (!participante.id) {
+      return NextResponse.json({ error: 'ID es requerido' }, { status: 400 });
     }
 
-    const info = participantesQueries.update.run(
-      nombreCompleto, 
-      cargoRol, 
-      correoElectronico, 
-      asistioReunionInicial ? 1 : 0, 
-      asistioReunionCierre ? 1 : 0, 
-      id
-    );
+    const info = update('informe_participantes', participante.id, participante as Participante);
 
-    if (info.changes === 0) {
-      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
-    }
-
-    const updatedParticipant = participantesQueries.getById.get(id);
-    return NextResponse.json(updatedParticipant);
+    return NextResponse.json(info);
   } catch (error) {
-    console.error('Error updating participant:', error);
+    console.error('Error updating participante:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// DELETE: Delete a participant by id
+// DELETE: Borrar un participante
 export async function DELETE(req: NextRequest) {
   try {
     const { id } = await req.json();
-    
+
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const info = participantesQueries.delete.run(id);
-    
-    if (info.changes === 0) {
-      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
+    const info = remove('informe_participantes', id);
+    if (!info) {
+      return NextResponse.json({ error: 'Participante not found' }, { status: 404 });
     }
-
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting participant:', error);
+    console.error('Error borrando participante:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

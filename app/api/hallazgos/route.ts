@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hallazgosQueries } from '@/lib/database';
-import {Hallazgo} from "@/types/tipos";
+import {getAll, remove, update} from '@/lib/database';
+import {Hallazgo, HallazgoSchema} from "@/schemas/types";
+import {create} from '@/lib/database';
+import {ZodError} from 'zod';
 
-// GET: Fetch all hallazgos for a specific audit
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const auditoriaId = searchParams.get('auditoriaId');
@@ -10,21 +11,8 @@ export async function GET(req: NextRequest) {
   if (!auditoriaId) {
     return NextResponse.json({ error: 'auditoriaId is required' }, { status: 400 });
   }
-
   try {
-    const hallazgosRaw = hallazgosQueries.getAll.all(auditoriaId);
-    const hallazgos: Hallazgo[] = hallazgosRaw.map(
-        (row: { clausula_id: string; clausula_label: string; [key: string]: unknown }) => {
-          const { clausula_id, clausula_label, ...hallazgo } = row;
-          return {
-            ...hallazgo,
-            clausula: {
-              value: clausula_id || '',
-              label: clausula_label || ''
-            }
-          };
-        }
-    );
+    const hallazgos: Hallazgo[] = await getAll<Hallazgo>('informe_hallazgos', 'id_auditoria', auditoriaId)
     return NextResponse.json(hallazgos);
   } catch (error) {
     console.error('Error fetching hallazgos:', error);
@@ -32,64 +20,37 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST: Add a new hallazgo
 export async function POST(req: NextRequest) {
   try {
-    const { auditoriaId, evidencia, descripcion, norma, clausula, tipo, severidad, fechaEncontrado } = await req.json();
+    const data = await req.json();
+    const hallazgo = HallazgoSchema.parse(data);
+    const info = create('informe_hallazgos', hallazgo as Hallazgo);
 
-    if (!auditoriaId || !evidencia || !clausula || !tipo || !norma) {
+    return NextResponse.json(info, { status: 201 });
+  } catch (error) {
+    console.error('Error creando hallazgo:', error);
+    if (error instanceof ZodError) {
       return NextResponse.json({
-        error: 'auditoriaId, evidencia, clausula and tipo are required'
+        message: 'Cuerpo de la solicitud inválido',
+        errors: error.issues,
       }, { status: 400 });
     }
-
-    const info = hallazgosQueries.create.run(
-      auditoriaId,
-      evidencia,
-      descripcion || '',
-      norma,
-      clausula.value,
-      clausula.label,
-      tipo,
-      severidad,
-      fechaEncontrado || new Date().toISOString().split('T')[0]
-    );
-
-    const newHallazgo = hallazgosQueries.getById.get(info.lastInsertRowid);
-    return NextResponse.json(newHallazgo, { status: 201 });
-  } catch (error) {
-    console.error('Error creating hallazgo:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// PUT: Update a hallazgo by id
 export async function PUT(req: NextRequest) {
   try {
-    const { id, evidencia, descripcion, norma, clausula, tipo, severidad, fechaResuelto } = await req.json();
+    const data = await req.json();
+    const hallazgo = HallazgoSchema.parse(data);
 
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    if (!hallazgo.id) {
+      return NextResponse.json({ error: 'ID es requerido' }, { status: 400 });
     }
 
-    const info = hallazgosQueries.update.run(
-      evidencia,
-      descripcion,
-      norma,
-      clausula.value,
-      clausula.label,
-      tipo,
-      severidad,
-      fechaResuelto,
-      id
-    );
+    const info = update('informe_hallazgos', hallazgo.id, hallazgo as Hallazgo);
 
-    if (info.changes === 0) {
-      return NextResponse.json({ error: 'Hallazgo not found' }, { status: 404 });
-    }
-
-    const updatedHallazgo = hallazgosQueries.getById.get(id);
-    return NextResponse.json(updatedHallazgo);
+    return NextResponse.json(info);
   } catch (error) {
     console.error('Error updating hallazgo:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -105,15 +66,13 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const info = hallazgosQueries.delete.run(id);
-
-    if (info.changes === 0) {
+    const info = remove('informe_hallazgos',id);
+    if (!info) {
       return NextResponse.json({ error: 'Hallazgo not found' }, { status: 404 });
     }
-
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting hallazgo:', error);
+    console.error('Error borrando hallazgo:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

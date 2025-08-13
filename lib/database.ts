@@ -1,208 +1,108 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import {Pool, QueryResult, QueryResultRow} from 'pg';
 
-// Set up the database file path
-const dbPath = path.resolve(process.cwd(), 'portalAuditores.db');
-const db = new Database(dbPath);
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  client_encoding: 'UTF8',
+});
 
-// Create the hallazgos (findings/non-conformities) table
-const createHallazgosTable = `
-CREATE TABLE IF NOT EXISTS hallazgos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  auditoria_id TEXT NOT NULL,
-  evidencia TEXT NOT NULL,
-  descripcion TEXT,
-  norma TEXT NOT NULL,
-  clausula_id TEXT,
-  clausula_label TEXT,
-  tipo TEXT NOT NULL DEFAULT 'OB',
-  severidad TEXT,
-  fecha_encontrado TEXT NOT NULL,
-  fecha_resuelto TEXT,
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-`;
+async function query <T extends QueryResultRow>(text: string, params?: unknown[]): Promise<QueryResult<T>> {
+  console.info('Ejecutando consulta:', text, params);
+  try {
+    const result = await pool.query<T>(text, params);
+    console.info('Consulta retorna:', result.rows);
+    return result;
+  } catch (error) {
+    console.error('Error ejecutando la consulta:', error);
+    throw error;
+  }
+}
 
-// Create the participantes (participants) table
-const createParticipantesTable = `
-CREATE TABLE IF NOT EXISTS participantes (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  auditoria_id TEXT NOT NULL,
-  nombre_completo TEXT NOT NULL,
-  cargo_rol TEXT NOT NULL,
-  correo_electronico TEXT NOT NULL,
-  asistio_reunion_inicial INTEGER DEFAULT 0,
-  asistio_reunion_cierre INTEGER DEFAULT 0,
-  fecha_agregado TEXT NOT NULL,
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-`;
+function getColumns<T extends object>(obj: T, update: boolean): (keyof T)[] {
+  const filterKeys = ['id', 'fecha_creacion', 'fecha_actualizacion'] as (keyof T)[];
 
-// Create the verificacion_datos (data verification) table
-const createVerificacionDatosTable = `
-CREATE TABLE IF NOT EXISTS verificacion_datos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  auditoria_id TEXT NOT NULL UNIQUE,
-  datos_contacto TEXT NOT NULL DEFAULT 'correcto',
-  datos_alcance TEXT NOT NULL DEFAULT 'correcto',
-  datos_facturacion TEXT NOT NULL DEFAULT 'correcto',
-  comentarios_verificacion TEXT,
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-`;
+  if (update) {
+    filterKeys.push('id_auditoria' as keyof T);
+  }
 
-// Create the eficacia (effectiveness) table
-const createEficaciaTable = `
-CREATE TABLE IF NOT EXISTS eficacia (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  auditoria_id TEXT NOT NULL UNIQUE,
-  tipo_auditoria TEXT NOT NULL DEFAULT 'in_situ',
-  medio_utilizado TEXT,
-  otro_medio TEXT,
-  medio_efectivo TEXT,
-  inconvenientes_presentados TEXT,
-  tipos_inconvenientes TEXT,
-  otros_inconvenientes TEXT,
-  tecnicas_utilizadas TEXT,
-  tecnicas_insitu_utilizadas TEXT,
-  otras_tecnicas TEXT,
-  otras_tecnicas_insitu TEXT,
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-`;
+  return (Object.keys(obj) as (keyof T)[]).filter(
+      (key) => !filterKeys.includes(key)
+  );
+}
 
-// Create the conclusiones (conclusions) table
-const createConclusionesTable = `
-CREATE TABLE IF NOT EXISTS conclusiones (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  auditoria_id TEXT NOT NULL UNIQUE,
-  objetivos_cumplidos TEXT NOT NULL DEFAULT 'si',
-  desviacion_plan TEXT,
-  sistema_cumple_norma TEXT NOT NULL DEFAULT 'si',
-  fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-`;
+export async function getAll <T extends QueryResultRow>(tableName: string, filterCol: keyof T, filterValue: string): Promise<T[]> {
+  const res = await query<T>(`SELECT * FROM ${tableName} WHERE ${String(filterCol)} = $1 ORDER BY fecha_creacion DESC`, [filterValue]);
+  return res.rows;
+}
 
-// Execute table creation
-db.exec(createHallazgosTable);
-db.exec(createParticipantesTable);
-db.exec(createVerificacionDatosTable);
-db.exec(createEficaciaTable);
-db.exec(createConclusionesTable);
+export async function getById <T extends QueryResultRow>(tableName: string, id: string): Promise<T | undefined> {
+  const res = await query<T>(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+  return res.rows[0];
+}
 
-// Prepare common queries for hallazgos
-export const hallazgosQueries = {
-  getAll: db.prepare('SELECT * FROM hallazgos WHERE auditoria_id = ? ORDER BY fecha_creacion DESC'),
-  getById: db.prepare('SELECT * FROM hallazgos WHERE id = ?'),
-  create: db.prepare(`
-    INSERT INTO hallazgos (auditoria_id, evidencia, descripcion, norma, clausula_id, clausula_label, tipo, severidad, fecha_encontrado)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `),
-  update: db.prepare(`
-    UPDATE hallazgos
-    SET evidencia = ?, descripcion = ?, norma = ?, clausula_id = ?, clausula_label = ?, tipo = ?, severidad = ?, fecha_resuelto = ?, fecha_actualizacion = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `),
-  delete: db.prepare('DELETE FROM hallazgos WHERE id = ?')
-};
+export async function create <T extends QueryResultRow>(tableName: string, data: object): Promise<T> {
+  const columns = getColumns(data, false);
+  const values = columns.map(col => data[col]);
+  const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
+  const columnsString = columns.join(', ');
 
-// Prepare common queries for participantes
-export const participantesQueries = {
-  getAll: db.prepare('SELECT * FROM participantes WHERE auditoria_id = ? ORDER BY fecha_creacion DESC'),
-  getById: db.prepare('SELECT * FROM participantes WHERE id = ?'),
-  create: db.prepare(`
-    INSERT INTO participantes (auditoria_id, nombre_completo, cargo_rol, correo_electronico, asistio_reunion_inicial, asistio_reunion_cierre, fecha_agregado)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `),
-  update: db.prepare(`
-    UPDATE participantes
-    SET nombre_completo = ?, cargo_rol = ?, correo_electronico = ?, asistio_reunion_inicial = ?, asistio_reunion_cierre = ?, fecha_actualizacion = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `),
-  delete: db.prepare('DELETE FROM participantes WHERE id = ?')
-};
+  const res = await query<T>(
+      `INSERT INTO ${tableName} (${columnsString}) VALUES (${placeholders}) RETURNING *`,
+      values
+  );
+  return res.rows[0];
+}
 
-// Prepare common queries for verificacion_datos
-export const verificacionDatosQueries = {
-  getByAuditId: db.prepare('SELECT * FROM verificacion_datos WHERE auditoria_id = ?'),
-  create: db.prepare(`
-    INSERT INTO verificacion_datos (auditoria_id, datos_contacto, datos_alcance, datos_facturacion, comentarios_verificacion)
-    VALUES (?, ?, ?, ?, ?)
-  `),
-  update: db.prepare(`
-    UPDATE verificacion_datos
-    SET datos_contacto = ?, datos_alcance = ?, datos_facturacion = ?, comentarios_verificacion = ?, fecha_actualizacion = CURRENT_TIMESTAMP
-    WHERE auditoria_id = ?
-  `),
-  upsert: db.prepare(`
-    INSERT INTO verificacion_datos (auditoria_id, datos_contacto, datos_alcance, datos_facturacion, comentarios_verificacion)
-    VALUES (?, ?, ?, ?, ?)
-    ON CONFLICT(auditoria_id) DO UPDATE SET
-      datos_contacto = excluded.datos_contacto,
-      datos_alcance = excluded.datos_alcance,
-      datos_facturacion = excluded.datos_facturacion,
-      comentarios_verificacion = excluded.comentarios_verificacion,
-      fecha_actualizacion = CURRENT_TIMESTAMP
-  `)
-};
+export async function update <T extends QueryResultRow>(tableName: string, id: number, data: object): Promise<T> {
+  const columns = getColumns(data, true);
+  const values = [...columns.map(col => data[col])];
 
-// Prepare common queries for eficacia
-export const eficaciaQueries = {
-  getByAuditId: db.prepare('SELECT * FROM eficacia WHERE auditoria_id = ?'),
-  create: db.prepare(`
-    INSERT INTO eficacia (auditoria_id, tipo_auditoria, medio_utilizado, otro_medio, medio_efectivo, inconvenientes_presentados, tipos_inconvenientes, otros_inconvenientes, tecnicas_utilizadas, otras_tecnicas)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `),
-  update: db.prepare(`
-    UPDATE eficacia
-    SET tipo_auditoria = ?, medio_utilizado = ?, otro_medio = ?, medio_efectivo = ?, inconvenientes_presentados = ?, tipos_inconvenientes = ?, otros_inconvenientes = ?, tecnicas_utilizadas = ?, otras_tecnicas = ?, fecha_actualizacion = CURRENT_TIMESTAMP
-    WHERE auditoria_id = ?
-  `),
-  upsert: db.prepare(`
-    INSERT INTO eficacia (auditoria_id, tipo_auditoria, medio_utilizado, otro_medio, medio_efectivo, inconvenientes_presentados, tipos_inconvenientes, otros_inconvenientes, tecnicas_utilizadas, tecnicas_insitu_utilizadas, otras_tecnicas, otras_tecnicas_insitu)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(auditoria_id) DO UPDATE SET
-      tipo_auditoria = excluded.tipo_auditoria,
-      medio_utilizado = excluded.medio_utilizado,
-      otro_medio = excluded.otro_medio,
-      medio_efectivo = excluded.medio_efectivo,
-      inconvenientes_presentados = excluded.inconvenientes_presentados,
-      tipos_inconvenientes = excluded.tipos_inconvenientes,
-      otros_inconvenientes = excluded.otros_inconvenientes,
-      tecnicas_utilizadas = excluded.tecnicas_utilizadas,
-      tecnicas_insitu_utilizadas = excluded.tecnicas_insitu_utilizadas,
-      otras_tecnicas = excluded.otras_tecnicas,
-      otras_tecnicas_insitu = excluded.otras_tecnicas_insitu,
-      fecha_actualizacion = CURRENT_TIMESTAMP
-  `)
-};
+  const setClause = columns.map((col, i) => `${String(col)} = $${i + 1}`).join(', ');
 
-// Prepare common queries for conclusiones
-export const conclusionesQueries = {
-  getByAuditId: db.prepare('SELECT * FROM conclusiones WHERE auditoria_id = ?'),
-  create: db.prepare(`
-    INSERT INTO conclusiones (auditoria_id, objetivos_cumplidos, desviacion_plan, sistema_cumple_norma)
-    VALUES (?, ?, ?, ?)
-  `),
-  update: db.prepare(`
-    UPDATE conclusiones
-    SET objetivos_cumplidos = ?, desviacion_plan = ?, sistema_cumple_norma = ?, fecha_actualizacion = CURRENT_TIMESTAMP
-    WHERE auditoria_id = ?
-  `),
-  upsert: db.prepare(`
-    INSERT INTO conclusiones (auditoria_id, objetivos_cumplidos, desviacion_plan, sistema_cumple_norma)
-    VALUES (?, ?, ?, ?)
-    ON CONFLICT(auditoria_id) DO UPDATE SET
-      objetivos_cumplidos = excluded.objetivos_cumplidos,
-      desviacion_plan = excluded.desviacion_plan,
-      sistema_cumple_norma = excluded.sistema_cumple_norma,
-      fecha_actualizacion = CURRENT_TIMESTAMP
-  `)
-};
+  const res = await query<T>(
+      `UPDATE ${tableName} SET ${setClause}, fecha_actualizacion = CURRENT_TIMESTAMP WHERE id = ${id} RETURNING *`,
+      values
+  );
+  return res.rows[0];
+}
 
-export default db;
+export async function upsert<T extends QueryResultRow>(
+    tableName: string,
+    data: object,
+    conflictColumn: keyof T
+): Promise<T> {
+  const insertColumns = getColumns(data, false);
+  const insertValues = insertColumns.map(col => data[col as keyof typeof data]);
+  const insertPlaceholders = insertColumns.map((_, i) => `$${i + 1}`).join(', ');
+  const insertColumnsString = insertColumns.join(', ');
+
+  const updateColumns = getColumns(data, true);
+  const setClauseParts = updateColumns
+      .map((col) => `${String(col)} = EXCLUDED.${String(col)}`);
+
+  setClauseParts.push('fecha_actualizacion = CURRENT_TIMESTAMP');
+
+  const fullSetClause = setClauseParts.join(', ');
+
+  const queryString = `
+    INSERT INTO ${tableName} (${insertColumnsString})
+    VALUES (${insertPlaceholders})
+    ON CONFLICT (${String(conflictColumn)}) DO UPDATE SET
+      ${fullSetClause}
+    RETURNING *;
+  `;
+
+  const res = await query<T>(queryString, insertValues);
+  return res.rows[0];
+}
+
+export async function remove (tableName: string, id: string): Promise<{ id: string } | undefined> {
+  const res = await query<{ id: string }>(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+  return res.rows[0];
+}
+
+export default pool;

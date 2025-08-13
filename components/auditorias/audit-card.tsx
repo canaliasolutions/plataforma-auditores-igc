@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./AuditCard.module.css";
-import {ResumenAuditoria} from "@/types/tipos";
+import {ResumenAuditoria} from "@/schemas/types";
 
 interface AuditCardProps {
     audit: ResumenAuditoria,
@@ -30,19 +30,19 @@ export function AuditCard({
             <div className={styles["audit-card-header"]}>
                 <div className={styles["client-info"]}>
                     <div className={styles["client-logo"]}>
-                        {audit.cliente.logo ? (
+                        {audit.logo_cliente ? (
                             <img
-                                src={audit.cliente.logo}
-                                alt={`${audit.cliente.nombre} logo`}
+                                src={audit.logo_cliente}
+                                alt={`${audit.nombre_cliente} logo`}
                                 className={styles["logo-image"]}
                             />
                         ) : (
                             <div className={styles["logo-placeholder"]}>
-                                {audit.cliente.nombre?.charAt(0).toUpperCase()}
+                                {audit.nombre_cliente?.charAt(0).toUpperCase()}
                             </div>
                         )}
                     </div>
-                    <h3 className={styles["client-name"]}>{audit.cliente.nombre}</h3>
+                    <h3 className={styles["client-name"]}>{audit.nombre_cliente}</h3>
                 </div>
             </div>
 

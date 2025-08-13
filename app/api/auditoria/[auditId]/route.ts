@@ -18,6 +18,6 @@ export async function GET(req: NextRequest) {
         audit = await getAuditById(user, auditoriaId);
         return new Response(JSON.stringify(audit), {status: 200});
     } catch (error) {
-        return new Response(`Error fetching audits: ${error}`, {status: 500});
+        return new Response(`Error obteniendo auditorias: ${error}`, {status: 500});
     }
 }

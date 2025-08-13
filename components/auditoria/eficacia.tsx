@@ -6,8 +6,8 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import SaveIcon from "@mui/icons-material/Save";
-import { Auditoria } from "@/types/tipos";
-import { OptionButton } from "./option-button";
+import { Auditoria } from "@/schemas/types";
+import { BotonRadio } from "@/components/common/BotonRadio";
 import styles from "./Eficacia.module.css";
 
 interface EficaciaData {
@@ -175,7 +175,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
             Tipo de auditoría
           </h3>
           <div className={styles["options-grid"]}>
-            <OptionButton
+            <BotonRadio
               selected={eficaciaData.tipo_auditoria === 'in_situ'}
               onClick={() => handleDataChange("tipo_auditoria", "in_situ")}
               icon={eficaciaData.tipo_auditoria === 'in_situ' ?
@@ -184,8 +184,8 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
               }
             >
               In situ
-            </OptionButton>
-            <OptionButton
+            </BotonRadio>
+            <BotonRadio
               selected={eficaciaData.tipo_auditoria === 'a distancia'}
               onClick={() => handleDataChange("tipo_auditoria", "a distancia")}
               icon={eficaciaData.tipo_auditoria === 'a distancia' ?
@@ -194,7 +194,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
               }
             >
               A distancia
-            </OptionButton>
+            </BotonRadio>
           </div>
         </div>
 
@@ -253,8 +253,8 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
                 ¿Qué medio se utilizó en la auditoría?
               </h3>
               <div className={styles["options-grid"]}>
-                {['Google Meets', 'Zoom', 'Teams', 'Skype', 'Otro medio'].map((option) => (
-                  <OptionButton
+                {['Google Meets', 'Zoom', 'Teams', 'Correo electrónico', 'Otro medio'].map((option) => (
+                  <BotonRadio
                     key={option}
                     selected={eficaciaData.medio_utilizado === option}
                     onClick={() => handleDataChange("medio_utilizado", option)}
@@ -264,7 +264,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
                     }
                   >
                     {option}
-                  </OptionButton>
+                  </BotonRadio>
                 ))}
               </div>
               {eficaciaData.medio_utilizado === 'Otro medio' && (
@@ -287,7 +287,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
               </h3>
               <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
-                  <OptionButton
+                  <BotonRadio
                     key={option}
                     selected={eficaciaData.medio_efectivo === option}
                     onClick={() => handleDataChange("medio_efectivo", option)}
@@ -298,7 +298,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
                     variant={option === 'si' ? 'correct' : 'error'}
                   >
                     {option === 'si' ? 'Sí' : 'No'}
-                  </OptionButton>
+                  </BotonRadio>
                 ))}
               </div>
             </div>
@@ -309,7 +309,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
               </h3>
               <div className={styles["options-grid"]}>
                 {['si', 'no'].map((option) => (
-                  <OptionButton
+                  <BotonRadio
                     key={option}
                     selected={eficaciaData.inconvenientes_presentados === option}
                     onClick={() => handleDataChange("inconvenientes_presentados", option)}
@@ -320,7 +320,7 @@ export function Eficacia({ auditId, auditoria }: EficaciaProps) {
                     variant={option === 'si' ? 'warning' : 'correct'}
                   >
                     {option === 'si' ? 'Sí' : 'No'}
-                  </OptionButton>
+                  </BotonRadio>
                 ))}
               </div>
             </div>

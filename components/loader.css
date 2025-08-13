@@ -1,0 +1,56 @@
+.page-loader{
+  position:fixed;
+  inset:0;
+  display:grid;
+  place-items:center;
+  background:#fff;        /* color del fondo de tu marca */
+  z-index:9999;
+}
+
+
+/* -------------- variables “mágicas” ----------------------- */
+:root{
+  --delay-show: 500ms;   /* tiempo hasta que se ve el logo completo   */
+  --blink-dur : 1.2s;    /* duración de cada ciclo de parpadeo        */
+  --step      : 120ms;   /* desfase entre líneas l1, l2, l3…          */
+}
+
+/* -------------- contenedor (invisible al principio) -------- */
+.loader-wrapper{
+  width:96px;
+  height:96px;
+  display:grid;
+  place-items:center;
+
+  /* fase 1: oculto → fase 2: visible a los --delay-show */
+  opacity:0;
+  animation: fadeIn var(--delay-show) linear forwards;
+}
+
+@keyframes fadeIn{
+  to{opacity:1;}         /* del 0 % (0) al 100 % (var(--delay-show)) */
+}
+
+/* -------------- líneas azules ------------------------------ */
+@keyframes blink{
+  0%,40%  {opacity:1;}
+  50%,100%{opacity:0;}
+}
+
+/* visibles una vez aparece el wrapper; empiezan a parpadear después */
+.line{
+  opacity:1;  /* encendidas en la fase 2 */
+  animation: blink var(--blink-dur) infinite ease-in-out both;
+}
+
+/* escalonado: cada línea comienza AFTER la fase 2 */
+.l1 { animation-delay: calc(var(--delay-show) +    0ms); }
+.l2 { animation-delay: calc(var(--delay-show) +  1*var(--step)); }
+.l3 { animation-delay: calc(var(--delay-show) +  2*var(--step)); }
+.l4 { animation-delay: calc(var(--delay-show) +  3*var(--step)); }
+.l5 { animation-delay: calc(var(--delay-show) +  4*var(--step)); }
+.l6 { animation-delay: calc(var(--delay-show) +  5*var(--step)); }
+.l7 { animation-delay: calc(var(--delay-show) +  6*var(--step)); }
+.l8 { animation-delay: calc(var(--delay-show) +  7*var(--step)); }
+.l9 { animation-delay: calc(var(--delay-show) +  8*var(--step)); }
+.l10{ animation-delay: calc(var(--delay-show) +  9*var(--step)); }
