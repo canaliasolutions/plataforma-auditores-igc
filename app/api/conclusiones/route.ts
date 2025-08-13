@@ -1,69 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { conclusionesQueries } from '@/lib/database';
+import { getAll, upsert, update } from '@/lib/database';
+import { ConclusionSchema, Conclusion } from "@/schemas/types";
+import { ZodError } from 'zod';
 
-// GET: Fetch conclusions for a specific audit
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const auditoriaId = searchParams.get('auditoriaId');
-  
+
   if (!auditoriaId) {
     return NextResponse.json({ error: 'auditoriaId is required' }, { status: 400 });
   }
 
   try {
-    const conclusions = conclusionesQueries.getByAuditId.get(auditoriaId);
-    
-    // If no conclusions exist, return default values
-    if (!conclusions) {
-      return NextResponse.json({
-        auditoria_id: auditoriaId,
-        objetivos_cumplidos: 'si',
-        desviacion_plan: '',
-        sistema_cumple_norma: 'si'
-      });
-    }
-    
-    return NextResponse.json(conclusions);
+    const conclusiones: Conclusion[] = await getAll<Conclusion>('informe_conclusiones', 'id_auditoria', auditoriaId);
+    return NextResponse.json(conclusiones);
   } catch (error) {
-    console.error('Error fetching conclusions:', error);
+    console.error('Error obteniendo conclusiones:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// POST/PUT: Save or update conclusions
 export async function POST(req: NextRequest) {
   try {
-    const { 
-      auditoriaId, 
-      objetivosCumplidos, 
-      desviacionPlan, 
-      sistemaCumpleNorma 
-    } = await req.json();
-    
-    if (!auditoriaId) {
-      return NextResponse.json({ 
-        error: 'auditoriaId is required' 
+    const data = await req.json();
+    const conclusiones = ConclusionSchema.parse(data);
+
+    const info = upsert('informe_conclusiones', conclusiones as Conclusion, 'id_auditoria');
+
+    return NextResponse.json(info, { status: 201 });
+  } catch (error) {
+    console.error('Error guardando conclusiones:', error);
+    if (error instanceof ZodError) {
+      return NextResponse.json({
+        message: 'Cuerpo de la solicitud inválido',
+        errors: error.issues,
       }, { status: 400 });
     }
-
-    // Use upsert to either insert or update
-    conclusionesQueries.upsert.run(
-      auditoriaId,
-      objetivosCumplidos || 'si',
-      desviacionPlan || '', 
-      sistemaCumpleNorma || 'si'
-    );
-
-    // Fetch the updated record
-    const conclusions = conclusionesQueries.getByAuditId.get(auditoriaId);
-    return NextResponse.json(conclusions, { status: 200 });
-  } catch (error) {
-    console.error('Error saving conclusions:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// PUT: Update conclusions (alias for POST since we use upsert)
 export async function PUT(req: NextRequest) {
-  return POST(req);
+  try {
+    const data = await req.json();
+    const conclusiones = ConclusionSchema.parse(data);
+
+    if (!conclusiones.id) {
+      return NextResponse.json({ error: 'ID es requerido' }, { status: 400 });
+    }
+
+    const info = update('informe_conclusiones', conclusiones.id, conclusiones as Conclusion);
+
+    return NextResponse.json(info);
+  } catch (error) {
+    console.error('Error actualizando conclusiones:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

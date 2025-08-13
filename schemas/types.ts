@@ -290,11 +290,11 @@ export const UsoDeMarcaSchema = z.object({
 
 export type Hallazgo = z.infer<typeof HallazgoSchema>;
 export type Participante = z.infer<typeof ParticipanteSchema>;
-export type VerificacionDatos = z.infer<typeof VerificacionDatosSchema>;
+export type VerificacionDatosType = z.infer<typeof VerificacionDatosSchema>;
 export type Conclusion = z.infer<typeof ConclusionSchema>;
 export type ValoracionSg = z.infer<typeof ValoracionSgSchema>;
 export type AuditoriaInterna = z.infer<typeof AuditoriaInternaSchema>;
 export type RevisionSistema = z.infer<typeof RevisionSistemaSchema>;
 export type Desviaciones = z.infer<typeof DesviacionesSchema>;
-export type ActividadesIntegradas = z.infer<typeof ActividadesIntegradasSchema>;
+export type ActividadesIntegradasType = z.infer<typeof ActividadesIntegradasSchema>;
 export type UsoDeMarca = z.infer<typeof UsoDeMarcaSchema>;

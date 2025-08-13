@@ -198,7 +198,7 @@ export function Hallazgos({auditoria}: HallazgosProps) {
     return (
         <div className={styles["hallazgos"]}>
             <div className={styles["section-header"]}>
-                <h2 className={styles["section-title"]}>Hallazgos</h2>
+                <h2 className={styles["section-title"]}>Hallazgos de auditoría</h2>
                 <button
                     onClick={() => setUiState(prev => ({ ...prev, showAddForm: true }))}
                     className={styles["add-button"]}

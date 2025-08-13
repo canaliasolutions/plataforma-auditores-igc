@@ -227,7 +227,7 @@ export async function up(pool) {
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
   
-  CREATE TABLE IF NOT EXISTS informe_actividades_integadas (
+  CREATE TABLE IF NOT EXISTS informe_actividades_integradas (
     id SERIAL PRIMARY KEY,
     id_auditoria TEXT NOT NULL UNIQUE,
     unica_revision_todos_requerimientos BOOLEAN NOT NULL,

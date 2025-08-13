@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { AuditoriasNavbar } from "./AuditoriasNavbar";
 import { Hallazgos } from "./hallazgos/Hallazgos";
 import { Participantes } from "./participantes/Participantes";
-import { DataVerification } from "./verificacion-datos/VerificacionDatos";
+import { VerificacionDatos } from "./verificacion-datos/VerificacionDatos";
+import { ActividadesIntegradas } from "./actividades-integradas/ActividadesIntegradas";
 import { Eficacia } from "./eficacia";
-import { Conclusions } from "./conclusions";
 import { ReportGenerationModal } from "./report-generation-modal";
 import styles from "./DetalleAuditoria.module.css";
 import {Auditoria} from "@/schemas/types";
+import {ConclusionesAuditoria} from "@/components/ConclusionesAuditoria";
 
 interface AuditDetailProps {
   auditoria: Auditoria;
@@ -89,11 +90,13 @@ export default function DetalleAuditoria({ auditoria }: AuditDetailProps) {
       case "participantes":
         return <Participantes auditoria={auditoria} />;
       case "verificacion-datos":
-        return <DataVerification auditoria_id={auditoria.id} />;
+        return <VerificacionDatos auditoria_id={auditoria.id} />;
+      case "actividades-integradas":
+        return <ActividadesIntegradas auditoria_id={auditoria.id} />;
       case "eficacia":
         return <Eficacia auditId={auditoria.id} auditoria={auditoria} />;
-      case "conclusions":
-        return <Conclusions auditId={auditoria.id} auditoria={auditoria} />;
+      case "conclusiones":
+        return <ConclusionesAuditoria auditoria_id={auditoria.id} />;
       default:
         return null;
     }

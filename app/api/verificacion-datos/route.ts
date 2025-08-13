@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAll, upsert, update } from '@/lib/database';
-import { VerificacionDatosSchema, VerificacionDatos } from "@/schemas/types";
+import { VerificacionDatosSchema, VerificacionDatosType } from "@/schemas/types";
 import { ZodError } from 'zod';
 
 // GET: Fetch data verification for a specific audit
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const verificacionDatos: VerificacionDatos[] = await getAll<VerificacionDatos>('informe_verificacion_datos', 'id_auditoria', auditoriaId);
+    const verificacionDatos: VerificacionDatosType[] = await getAll<VerificacionDatosType>('informe_verificacion_datos', 'id_auditoria', auditoriaId);
     console.log('Verificacion Datos:', verificacionDatos);
     return NextResponse.json(verificacionDatos);
   } catch (error) {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const verificacion = VerificacionDatosSchema.parse(data);
 
-    const info = upsert('informe_verificacion_datos', verificacion as VerificacionDatos, 'id_auditoria');
+    const info = upsert('informe_verificacion_datos', verificacion as VerificacionDatosType, 'id_auditoria');
 
     return NextResponse.json(info, { status: 201 });
   } catch (error) {
@@ -53,7 +53,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'ID es requerido' }, { status: 400 });
     }
 
-    const info = update('informe_verificacion_datos', verificacion.id, verificacion as VerificacionDatos);
+    const info = update('informe_verificacion_datos', verificacion.id, verificacion as VerificacionDatosType);
 
     return NextResponse.json(info);
   } catch (error) {

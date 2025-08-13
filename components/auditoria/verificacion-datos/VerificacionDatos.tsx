@@ -7,7 +7,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import styles from "./VerificacionDatos.module.css";
 import {BotonRadio} from "@/components/common/BotonRadio";
-import { VerificacionDatos } from "@/schemas/types";
+import { VerificacionDatosType } from "@/schemas/types";
 import {TextInput} from "@/components/common/TextInput";
 
 interface DataVerificationProps {
@@ -100,7 +100,7 @@ const exclusiones9001: {texto: string, campo: CamposExclusiones}[] = [
   },
 ]
 
-  const vetificacionDatosVacio: VerificacionDatos = {
+  const vetificacionDatosVacio: VerificacionDatosType = {
   id: 0,
   id_auditoria: "",
   ruc: null,
@@ -123,25 +123,22 @@ const exclusiones9001: {texto: string, campo: CamposExclusiones}[] = [
   telefono: null,
 }
 
-const inicializarBooleanosVerificacion = (data: VerificacionDatos) => {
+const inicializarBooleanosVerificacion = (data: VerificacionDatosType) => {
   const initialState = {} as Record<Campos, boolean>;
-  console.log("Inicializando estado de verificación de datos:", data);
   datosAVerificar.forEach((item) => {
     const campo = item.campo;
     initialState[campo] = data[campo] === null || data[campo] === "";
-    console.log(`Campo: ${campo}, Valor: ${data[campo]}, Estado: ${initialState[campo]}`);
   });
 
   exclusiones9001.forEach((item) => {
     const campo = item.campo;
     initialState[campo] = !data[campo];
-    console.log(`Campo: ${campo}, Valor: ${data[campo]}, Estado: ${initialState[campo]}`);
   });
   return initialState;
 };
 
-export function DataVerification({ auditoria_id }: DataVerificationProps) {
-  const [verificacion, setVerificacion] = useState<VerificacionDatos>(vetificacionDatosVacio);
+export function VerificacionDatos({ auditoria_id }: DataVerificationProps) {
+  const [verificacion, setVerificacion] = useState<VerificacionDatosType>(vetificacionDatosVacio);
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [hayCambios, setHayCambios] = useState(false);
@@ -158,7 +155,7 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
           if (body.length == 0) {
             setHayCambios(true);
           } else {
-            datos = body[0] as VerificacionDatos;
+            datos = body[0] as VerificacionDatosType;
           }
         }
       } catch (error) {
@@ -209,7 +206,7 @@ export function DataVerification({ auditoria_id }: DataVerificationProps) {
   const handleSave = async () => {
     setGuardando(true);
     try {
-        const verificacionDatos: VerificacionDatos = {
+        const verificacionDatos: VerificacionDatosType = {
             ...verificacion,
             id_auditoria: auditoria_id,
         };
